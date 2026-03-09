@@ -7,7 +7,8 @@
 > cd c:/xampp/htdocs
 
 Fork репозитория Coopteh/pizza231
-- Войдите в свой аккаунт на github.com и сделайте fork на репу https://github.com/Coopteh/pizza231
+- Войдите в свой аккаунт на github.com и сделайте fork
+на репу https://github.com/Coopteh/pizza231
 - Снимите галочку с "Copy the main branch only"
 Настройте обновление веток в терминале
 > git remote add pizza231 https://github.com/Coopteh/pizza231.git
