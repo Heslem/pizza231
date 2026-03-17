@@ -9,7 +9,7 @@
   {
     "id": 2,
     "name": "Пицца Пипперони",
-    "image": "/../../asserts/img/pizza01.jpg",
+    "image": "/../../asserts/img/pizza02.jpg",
     "description": "Это знаменитая пицца с колбасой и сыром",
     "price": 550
   },
