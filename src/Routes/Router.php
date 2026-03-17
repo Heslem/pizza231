@@ -14,9 +14,9 @@ class Router {
             case "about":
                 $about = new AboutController();
                 return $about->get();
-            case "product":
+            case "products":
                 $product = new ProductController();
-                $id = ($pieces[2]) ? intval($pieces[2]) : 0;
+                $id = (isset($pieces[2])) ? intval($pieces[2]) : 0;
                 return $product->get($id);
             default:
                 $home = new HomeController();

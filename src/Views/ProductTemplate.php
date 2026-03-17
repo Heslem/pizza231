@@ -2,46 +2,33 @@
 namespace App\Views;
 
 class ProductTemplate extends BaseTemplate {
-    public static function getTemplate(): string {
+    public static function getAllTemplate(array $arr): string {
         $template = parent::getTemplate();
-        $title= 'Главная страница';
-        $content = <<<LINE
-        <section>        
-        <div class="h-50 w-50 mx-auto">          
-            <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner" style="height:80vh;">
-                    <div class="carousel-item active">
-                    <img src="/../../asserts/img/pizza01.jpg" class="d-block w-100 h-100" alt="...">
-                    </div>
-                    <div class="carousel-item">
-                    <img src="/../../asserts/img/pizza02.jpg" class="d-block w-100 h-100" alt="...">
-                    </div>
-                    <div class="carousel-item">
-                    <img src="/../../asserts/img/pizza03.jpg" class="d-block w-100 h-100" alt="...">
+        $str= '<div class="container">';
+
+        // для каждого товара
+        foreach( $arr as $key => $item ) {
+
+            $element_template= <<<END
+            <div class="row mb-5">
+                <div class="col-6">
+                    <img src="{$item['image']}" class="w-100">
+                </div>
+                <div class="col-6">
+                    <div class="block mt-3">
+                        <a href="/products/{$item['id']}"><h2>{$item['name']}</h2></a>
+                        <p>{$item['description']}</p>
+                        <h3>{$item['price']} ₽</h3>
                     </div>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>        
-        </div>
-        </section>
-        <main class="row">
-            <div class="p-5">
-                <p>Здесь можно заказать пиццу с доставкой по городу Кемерово.</p>
-                <p>Широкий ассортимент, низкие цены, быстрая доставка!</p>
-                <p class="mt-5">Первая пицца бесплатно, при заказе 3000 руб!</p>
-                <p> (*) Сайт разработан в рамках обучения в "Кузбасском кооперативном техникуме"<br>
-                по специальности 09.02.07 "Специалист по информационным технологиям".</p>
+                <hr>
             </div>
-        </main> 
-        LINE;
-        $resultTemplate = sprintf($template, $title, $content);
+            END;
+
+            $str.= $element_template;
+        }
+        $str.= "</div>";
+        $resultTemplate = sprintf($template, 'Каталог продукции', $str);
         return $resultTemplate;
     }
 
@@ -51,7 +38,7 @@ class ProductTemplate extends BaseTemplate {
     */
     public static function getCardTemplate($data):string {
         $card= <<<CARD
-            <div class="card mb-3" style="max-width: 540px;">
+            <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-4">
                         <img src="{$data['image']}" class="img-fluid rounded-start" alt="{$data['name']}">

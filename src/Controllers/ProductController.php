@@ -9,8 +9,11 @@ class ProductController {
     {
         $model = new Product();
         $data = $model->loadData();
-        if ($id)
+        if ($id) {
             $data = $data[$id-1];
-        return ProductTemplate::getCardTemplate($data);
+            return ProductTemplate::getCardTemplate($data);
+        } else {
+            return ProductTemplate::getAllTemplate($data);            
+        }
     }
 }
