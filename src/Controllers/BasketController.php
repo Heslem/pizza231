@@ -3,9 +3,7 @@ namespace App\Controllers;
 
 class BasketController {
 
-    public function add():void {
-        session_start();
-        
+    public function add():void {      
         if (isset($_POST['id'])) {
             $product_id = $_POST['id'];
         
@@ -20,9 +18,9 @@ class BasketController {
                     'quantity' => 1
                 ];
             }
-        var_dump($_SESSION);
-        exit();
-            #$_SESSION['flash'] = "Товар успешно добавлен в корзину!";
+        //var_dump($_SESSION);
+        //exit();
+            $_SESSION['flash'] = "Товар '{$_POST['product_name']}' успешно добавлен в корзину!";
         }
     }
     
@@ -30,7 +28,6 @@ class BasketController {
     Очистка корзины
     */
     public function clear():void {
-        session_start();
         $_SESSION['basket'] = [];
     }
 

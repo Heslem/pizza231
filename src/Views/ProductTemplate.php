@@ -21,6 +21,7 @@ class ProductTemplate extends BaseTemplate {
                         <h3>{$item['price']} ₽</h3>
                         <form class="mt-4" action="/basket" method="POST">
                             <input type="hidden" name="id" value="{$item['id']}">
+                            <input type="hidden" name="product_name" value="{$item['name']}">
                             <button type="submit" class="btn btn-primary">Добавить в корзину</button>
                         </form>                        
                     </div>
@@ -53,6 +54,7 @@ class ProductTemplate extends BaseTemplate {
                         <p class="card-text">{$data['price']} рублей</p>
                         <form class="mb-4" action="/basket" method="POST">
                             <input type="hidden" name="id" value="{$data['id']}">
+                            <input type="hidden" name="product_name" value="{$data['name']}">
                             <button type="submit" class="btn btn-primary">Добавить в корзину</button>
                         </form>
                         <p class="card-text"><small class="text-body-secondary">{$data['description']}</small></p>                        

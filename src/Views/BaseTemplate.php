@@ -35,9 +35,26 @@ class BaseTemplate {
                     </div>
                 </div>
                 </nav>
-            </header>
+            </header>           
+        LINE;
+        
+        // Добавим flash сообщение
+        if (isset($_SESSION['flash'])) {
+            $html .= <<<FLASH
+            <section>
+                <div id="liveAlertBtn" class="alert alert-info alert-dismissible" role="alert">
+                    <div>{$_SESSION['flash']}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                    onclick="this.parentNode.style.display='none';"></button>
+                </div>
+            </section>
+            FLASH;
+            unset($_SESSION['flash']);
+        }
+
+        $html .= <<<LINE2
             <div class="container">
-            %s
+                %s
             </div>
             <footer class="p-5">
                 © 2025 «Кемеровский кооперативный техникум»
@@ -45,7 +62,7 @@ class BaseTemplate {
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         </body>
         </html>
-        LINE;
+        LINE2;
 
         return $html;
     }
