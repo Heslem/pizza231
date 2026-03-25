@@ -5,6 +5,7 @@ use App\Controllers\AboutController;
 use App\Controllers\HomeController;
 use App\Controllers\ProductController;
 use App\Controllers\BasketController;
+use App\Controllers\OrderController;
 
 class Router {
     public function route(string $url): string {
@@ -24,7 +25,17 @@ class Router {
                 $basketController->add();
                 $prevUrl = $_SERVER['HTTP_REFERER'];
                 header("Location: {$prevUrl}");
-                return "";          
+                return "";
+            case 'order':
+                $orderController = new OrderController();
+                return $orderController->get();
+                break;
+            case 'basket_clear':
+                $basketController = new BasketController();
+                $basketController->clear();
+                $prevUrl = $_SERVER['HTTP_REFERER'];
+                header("Location: {$prevUrl}");
+                return '';
             default:
                 $home = new HomeController();
                 return $home->get();
