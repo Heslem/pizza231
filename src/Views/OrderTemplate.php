@@ -6,7 +6,8 @@ class OrderTemplate extends BaseTemplate {
         $template = parent::getTemplate();
         $title= 'Оформление заказа';
         $content = '<main class="row">
-            <h3 class="mb-5">Корзина</h3>';
+            <h1 class="mt-3">Оформление заказа</h1>
+            <h3 class="mt-3">Корзина</h3>';
 
         $all_sum = 0;
         foreach ($arr as $product) {
@@ -67,6 +68,37 @@ class OrderTemplate extends BaseTemplate {
             </div>            
             LINE3;
         }
+
+        /*
+ФИО покупателя (input) c label "Ваше ФИО:"
+Адрес покупателя (input) c label "Адрес доставки:"
+Телефон покупателя (input) c label "Телефон:"
+Кнопка (submit) "Создать заказ"
+        */
+        $content .= <<<ORDERFORM
+        <h3 class="mt-5">Параметры для доставки</h3>
+        <div class="col-8">
+            <form action="/order" method="POST">
+                <div class="mb-3">
+                    <label for="fioId" class="form-label">Ваше ФИО:</label>
+                    <input type="text" name="fio" class="form-control" id="fioId" placeholder="Иван Иванов">
+                </div>
+                <div class="mb-3">
+                    <label for="addressId" class="form-label">Адрес доставки:</label>
+                    <input type="textarea" name="address" class="form-control" id="addressId" placeholder="Кемерово, пр.Ленина, д.7, кв.5">
+                </div>
+                <div class="mb-3">
+                    <label for="phoneId" class="form-label">Телефон:</label>
+                    <input type="textarea" name="phone" class="form-control" id="phoneId" placeholder="89990000123">
+                </div>                
+                <div class="mb-3 float-sm-right">
+                    <button type="submit" class="btn btn-primary">Создать заказ</button>
+                </div>
+            </form>
+        </div>
+        ORDERFORM;
+
+
         $resultTemplate = sprintf($template, $title, $content);
         return $resultTemplate;
     }

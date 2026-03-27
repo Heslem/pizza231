@@ -12,6 +12,7 @@ class Router {
         $path = parse_url($url, PHP_URL_PATH);
         $pieces = explode("/", $path);
         $resource = $pieces[1];
+        $method = $_SERVER['REQUEST_METHOD'];
         switch ($resource) {
             case "about":
                 $about = new AboutController();
@@ -28,6 +29,8 @@ class Router {
                 return "";
             case 'order':
                 $orderController = new OrderController();
+                if ($method == "POST")
+    	    	    return $orderController->create();                
                 return $orderController->get();
                 break;
             case 'basket_clear':
