@@ -90,7 +90,11 @@ class OrderTemplate extends BaseTemplate {
                 <div class="mb-3">
                     <label for="phoneId" class="form-label">Телефон:</label>
                     <input type="textarea" name="phone" class="form-control" id="phoneId" placeholder="89990000123">
-                </div>                
+                </div> 
+                <div class="mb-3">
+                    <label for="emailId" class="form-label">Емайл:</label>
+                    <input type="email" name="email" class="form-control" id="emailId" placeholder="ivan@mail.ru">
+                </div>
                 <div class="mb-3 float-sm-right">
                     <button type="submit" class="btn btn-primary">Создать заказ</button>
                 </div>
