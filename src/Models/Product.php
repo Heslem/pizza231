@@ -54,7 +54,7 @@ class Product {
 	    return $basketProducts;
     }
 
-public function saveData($arr) {
+    public function saveData($arr) {
         $nameFile= Config::FILE_ORDERS;
 
         $handle = fopen($nameFile, "r");
@@ -72,5 +72,25 @@ public function saveData($arr) {
         $handle = fopen($nameFile, "w");
         fwrite($handle, $json);
         fclose($handle);
-    }
+     }
+
+     public function prepareData(array $form_data, array $basket_data): array {
+        $arr = [];
+
+	    $arr['fio'] = $form_data['fio'];
+        $arr['address'] = $form_data['address'];
+        $arr['phone'] = $form_data['phone'];
+        $arr['created_at'] = date("d-m-Y H:i:s");	// добавим дату и время создания заказа
+
+        $arr['products'] = $basket_data;
+	    
+        // подсчитаем общую сумму заказа
+        $all_sum = 0;
+        foreach ($basket_data as $product) {
+		    $all_sum += $product['price'] * $product['quantity'];
+        }
+        $arr['all_sum'] = $all_sum;
+
+        return $arr;
+     }
 }
