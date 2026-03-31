@@ -1,26 +1,26 @@
 {
-    "title": "Ваша корзина",
+    "title": "Ваш заказ",
     "empty": {
         "title": "Ваша корзина пуста 😔",
-        "message": "Добавьте товары из каталога",
-        "link": "Перейти в каталог"
+        "message": "Добавьте блюда из меню",
+        "link": "Посмотреть меню"
     },
     "table": {
-        "product": "Товар",
+        "product": "Блюдо",
         "price": "Цена",
         "quantity": "Кол-во",
         "sum": "Сумма"
     },
     "summary": {
-        "totalItems": "Всего товаров:",
+        "totalItems": "Всего блюд:",
         "total": "Итого:",
         "clear": "Очистить",
         "checkout": "Оформить заказ"
     },
     "checkout": {
         "title": "Оформление заказа",
-        "fio": "ФИО",
-        "fioPlaceholder": "Иванов Иван Иванович",
+        "fio": "Ваше имя",
+        "fioPlaceholder": "Иван Иванович",
         "email": "Email",
         "emailPlaceholder": "example@mail.ru",
         "phone": "Телефон",

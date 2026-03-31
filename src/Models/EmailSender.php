@@ -64,7 +64,7 @@ class EmailSender
         // Настройки отправителя
         $mail->setFrom(
             $smtpConfig['from_email'] ?? $smtpConfig['username'] ?? '',
-            $smtpConfig['from_name'] ?? 'Магазин автозапчастей'
+            $smtpConfig['from_name'] ?? 'Кафе «Бе-Бе»'
         );
         
         // Дополнительные настройки

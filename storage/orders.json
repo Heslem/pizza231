@@ -359,5 +359,26 @@
             }
         ],
         "created_at": "2026-03-30 11:17:58"
+    },
+    {
+        "id": "order_69cb98198cd69",
+        "created_at": "2026-03-31 11:47:05",
+        "fio": "Москвикинasfasfa",
+        "email": "admin@example.com",
+        "phone": "79235232565",
+        "address": "улица Пушкина",
+        "payment": "cash",
+        "items": [
+            {
+                "id": 2,
+                "name": "Тормозные колодки (передние)",
+                "price": 1850,
+                "image": "\/assets\/img\/2.jpg",
+                "quantity": 1,
+                "added_at": 1774950419
+            }
+        ],
+        "total": 1850,
+        "status": "new"
     }
 ]

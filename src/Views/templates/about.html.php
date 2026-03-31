@@ -1,6 +1,6 @@
 <?php
 /**
- * Шаблон страницы "О нас"
+ * Шаблон страницы "О кафе"
  * Доступные переменные:
  * - $texts - массив текстов из storage/templates/about.json + base.json
  */
@@ -13,36 +13,40 @@ $mapId = 'YOUR_CONSTRUCTOR_ID';
 ?>
 
 <div class="container mt-4">
-    <h1 class="text-center mb-4"><?= htmlspecialchars($texts['title'] ?? 'О нашем техникуме') ?></h1>
+    <h1 class="text-center mb-4"><?= htmlspecialchars($texts['title'] ?? 'О кафе «Бе-Бе»') ?></h1>
     
     <div class="row">
         <div class="col-md-8">
             <p class="lead">
-                <?= htmlspecialchars($texts['intro'] ?? '') ?>
+                <?= htmlspecialchars($texts['intro'] ?? 'Добро пожаловать в кафе «Бе-Бе» — настоящий уголок Востока в Кемерово!') ?>
             </p>
             
             <p>
-                <?= htmlspecialchars($history['founded'] ?? 'Техникум был основан в') ?> 
-                <strong><?= htmlspecialchars($history['foundedYear'] ?? '1974 году') ?></strong> 
-                <?= htmlspecialchars($history['reason'] ?? '') ?>
+                <?= htmlspecialchars($history['founded'] ?? 'Кафе открылось в') ?> 
+                <strong><?= htmlspecialchars($history['foundedYear'] ?? '2018 году') ?></strong> 
+                <?= htmlspecialchars($history['reason'] ?? 'чтобы порадовать жителей города настоящей уйгурско-узбецкой кухней.') ?>
             </p>
             
             <p>
-                <?= htmlspecialchars($history['graduates'] ?? '') ?> 
-                <strong><?= htmlspecialchars($history['graduatesCount'] ?? '') ?></strong> 
-                <?= htmlspecialchars($history['forText'] ?? '') ?>
+                <?= htmlspecialchars($history['today'] ?? '') ?>
             </p>
             
             <p>
-                <?= htmlspecialchars($history['teachers'] ?? '') ?>
+                <?= htmlspecialchars($history['graduates'] ?? 'За годы работы мы поставили свыше') ?> 
+                <strong><?= htmlspecialchars($history['graduatesCount'] ?? '50 000 блюд') ?></strong> 
+                <?= htmlspecialchars($history['forText'] ?? 'довольным гостям.') ?>
+            </p>
+            
+            <p>
+                <?= htmlspecialchars($history['teachers'] ?? 'Наши повара — мастера своего дела, которые используют только свежие ингредиенты и натуральные специи.') ?>
             </p>
             
             <h4 class="mt-4"><?= htmlspecialchars($contacts['title'] ?? 'Контакты') ?></h4>
             <ul class="list-unstyled">
-                <li>📍 <?= htmlspecialchars($contacts['address'] ?? 'Адрес:') ?> <?= htmlspecialchars($contacts['addressValue'] ?? '') ?></li>
-                <li>📞 <?= htmlspecialchars($contacts['phone'] ?? 'Телефон:') ?> <?= htmlspecialchars($contacts['phoneValue'] ?? '') ?></li>
-                <li>✉️ <?= htmlspecialchars($contacts['email'] ?? 'E-mail:') ?> <?= htmlspecialchars($contacts['emailValue'] ?? '') ?></li>
-                <li>👩‍💼 <?= htmlspecialchars($contacts['director'] ?? 'Директор:') ?> <?= htmlspecialchars($contacts['directorName'] ?? '') ?></li>
+                <li><i class="bi bi-geo-alt-fill me-2" style="color: var(--cafe-orange);"></i><?= htmlspecialchars($contacts['address'] ?? 'Адрес:') ?> <?= htmlspecialchars($contacts['addressValue'] ?? 'г. Кемерово, ул. Примерная, д. 1') ?></li>
+                <li><i class="bi bi-telephone-fill me-2" style="color: var(--cafe-orange);"></i><?= htmlspecialchars($contacts['phone'] ?? 'Телефон:') ?> <?= htmlspecialchars($contacts['phoneValue'] ?? '+7 (3842) 12-34-56') ?></li>
+                <li><i class="bi bi-envelope-fill me-2" style="color: var(--cafe-orange);"></i><?= htmlspecialchars($contacts['email'] ?? 'E-mail:') ?> <?= htmlspecialchars($contacts['emailValue'] ?? 'info@cafe-be-be.ru') ?></li>
+                <li><i class="bi bi-person-fill me-2" style="color: var(--cafe-orange);"></i><?= htmlspecialchars($contacts['director'] ?? 'Шеф-повар:') ?> <?= htmlspecialchars($contacts['directorName'] ?? 'Ахмедов Бека') ?></li>
             </ul>
         </div>
         

@@ -12,7 +12,7 @@ return [
         'password' => 'ваш_пароль_приложения',
         'encryption' => 'tls', // tls или ssl
         'from_email' => 'ваш_email@gmail.com',
-        'from_name' => 'Магазин автозапчастей'
+        'from_name' => 'Кафе «Бе-Бе»'
     ],
     'notifications' => [
         // Email администратора для получения уведомлений о новых заказах

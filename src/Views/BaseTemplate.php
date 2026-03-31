@@ -14,16 +14,45 @@ class BaseTemplate
     private const TEXTS_PATH = __DIR__ . '/../../storage/templates/base.json';
 
     /**
+     * Тексты по умолчанию для кафе "Бе-Бе"
+     */
+    private static function getDefaultTexts(): array
+    {
+        return [
+            'nav' => [
+                'home' => 'Главная',
+                'catalog' => 'Меню',
+                'cart' => 'Корзина',
+                'about' => 'О кафе',
+                'login' => 'Вход'
+            ],
+            'footer' => [
+                'copyright' => 'Кафе «Бе-Бе». Уйгурско-узбецкая кухня. Все права защищены.'
+            ],
+            'cafe' => [
+                'name' => 'Кафе Бе-Бе',
+                'tagline' => 'Аутентичная уйгурско-узбецкая кухня',
+                'address' => 'г. Кемерово, ул. Примерная, д. 1',
+                'phone' => '+7 (3842) 12-34-56',
+                'workTime' => 'Ежедневно с 10:00 до 23:00'
+            ]
+        ];
+    }
+
+    /**
      * Загружает тексты из JSON файла
      */
     private static function loadTexts(): array
     {
         $path = self::TEXTS_PATH;
         if (!file_exists($path)) {
-            return [];
+            return self::getDefaultTexts();
         }
         $json = file_get_contents($path);
-        return json_decode($json, true) ?? [];
+        $loaded = json_decode($json, true) ?? [];
+
+        // Объединяем с текстами по умолчанию
+        return array_merge(self::getDefaultTexts(), $loaded);
     }
 
     public static function getTemplate(string $content, array $texts = []): string

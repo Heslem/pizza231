@@ -1,10 +1,10 @@
 {
-    "pageTitle": "Каталог товаров",
-    "title": "Каталог товаров",
+    "pageTitle": "Меню кафе",
+    "title": "Меню кафе",
     "search": {
-        "placeholder": "Поиск товаров...",
+        "placeholder": "Поиск блюд...",
         "button": "Найти",
-        "total": "Всего товаров:",
+        "total": "Всего блюд:",
         "results": "Найдено по запросу"
     },
     "empty": {
@@ -15,22 +15,22 @@
     "product": {
         "label": "Наше меню",
         "inStock": "В наличии",
-        "addToCart": "В корзину",
+        "addToCart": "Заказать",
         "details": "Подробнее"
     },
     "toast": {
-        "added": "Товар добавлен в корзину!",
-        "addedWithName": "добавлен в корзину!"
+        "added": "Блюдо добавлено в заказ!",
+        "addedWithName": "добавлен в заказ!"
     },
     "modal": {
-        "title": "Информация о товаре",
-        "notFound": "Товар не найден",
-        "error": "Ошибка загрузки товара"
+        "title": "Информация о блюде",
+        "notFound": "Блюдо не найдено",
+        "error": "Ошибка загрузки"
     },
     "checkout": {
         "title": "Оформление заказа",
-        "fio": "ФИО",
-        "fioPlaceholder": "Иванов Иван Иванович",
+        "fio": "Ваше имя",
+        "fioPlaceholder": "Иван Иванович",
         "email": "Email",
         "emailPlaceholder": "example@mail.ru",
         "phone": "Телефон",
