@@ -24,7 +24,7 @@ class OrderController {
         $model->saveData($arr);
 
         // отправка емайл
-        if ($this->sendMail($arr['email'])) {
+        if ($this->sendMail($arr['email'], $arr)) {
             // очистка корзины
             $_SESSION['basket'] = [];
             // вывод сообщения
@@ -36,11 +36,27 @@ class OrderController {
 	    return '';
     }
 
-    public function sendMail($email) {
+    public function sendMail($email, $data) {
         $mail = new PHPMailer();
         if (isset($email) && !empty($email)) {
+            $details= "";
+            foreach($data['products'] as $prod) {
+                $details .= "{$prod['name']} - {$prod['quantity']} шт. x {$prod['price']} руб.<br>";
+            }
+            $orderMessage = <<<MSG
+            Ваш заказ:<br>
+            ФИО: {$data['fio']}<br>
+            Адрес: {$data['address']}<br>
+            Телефон: {$data['phone']}<br>
+            Емайл: {$data['email']}<br>
+            Общая сумма заказа: {$data['all_sum']}<br>
+            <hr>
+            Параметры заказа:
+            {$details}
+            <hr>
+            MSG;
             try {
-                $mail->SMTPDebug = 4;
+                $mail->SMTPDebug = 2;
                 $mail->CharSet = 'UTF-8';
                 $mail->SetFrom("coopteh231@mail.ru","PIZZA-221");
                 $mail->addAddress($email);
@@ -49,14 +65,15 @@ class OrderController {
                 $mail->Host       = 'ssl://smtp.mail.ru';                   //Set the SMTP server to send through
                 $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
                 $mail->Username   = 'coopteh231@mail.ru';                     //SMTP username
-                $mail->Password   = 'zuvisamalariji55';
+                $mail->Password   = 'oBdxSwM2AWnco7ALXUk5';
                 $mail->Port       = 465;
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
                 $mail->Subject = 'Заявка с сайта: PIZZA-231';
                 $mail->Body = "Информационное сообщение c сайта PIZZA-231 <br><br>
                 ------------------------------------------<br><br>
                 Спасибо!<br><br>
-                Ваш заказ успешно создан и передан службе доставки.<br><br>
+                Ваш заказ успешно создан и передан службе доставки.<br><br>"
+                . $orderMessage ."<br>
                 Сообщение сгенерировано автоматически.";
                 if ($mail->send()) {
                     return true;
