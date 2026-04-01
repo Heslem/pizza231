@@ -25,22 +25,8 @@ $cafeInfo = $texts['cafe'] ?? [];
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Верхняя панель с контактами -->
-    <div class="top-bar">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="top-info">
-                <span class="me-3"><i class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($cafeInfo['address'] ?? 'г. Кемерово') ?></span>
-                <span><i class="bi bi-clock me-1"></i><?= htmlspecialchars($cafeInfo['workTime'] ?? 'Ежедневно с 10:00 до 23:00') ?></span>
-            </div>
-            <div class="top-phone">
-                <a href="tel:<?= htmlspecialchars(str_replace([' ', '-', '(', ')'], '', $cafeInfo['phone'] ?? '')) ?>">
-                    <i class="bi bi-telephone me-1"></i><?= htmlspecialchars($cafeInfo['phone'] ?? '+7 (3842) 12-34-56') ?>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <!-- Фиксированная навигация -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <div class="logo-icon me-2">
@@ -85,19 +71,38 @@ $cafeInfo = $texts['cafe'] ?? [];
         </div>
     </nav>
 
-    <main class="py-4">
+    <!-- Отступ для фиксированной навигации -->
+    <div style="height: 80px;"></div>
+
+    <main>
         <?= $content ?>
     </main>
 
-    <footer class="footer text-center py-4">
+    <footer class="footer py-4">
         <div class="container">
-            <div class="footer-brand mb-3">
-                <i class="bi bi-cup-hot-fill me-2"></i>
-                <span class="fw-bold"><?= htmlspecialchars($cafeInfo['name'] ?? 'Кафе Бе-Бе') ?></span>
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="footer-brand mb-2">
+                        <i class="bi bi-cup-hot-fill me-2"></i>
+                        <span class="fw-bold"><?= htmlspecialchars($cafeInfo['name'] ?? 'Кафе Бе-Бе') ?></span>
+                    </div>
+                    <p class="footer-text mb-0"><?= htmlspecialchars($cafeInfo['tagline'] ?? 'Аутентичная уйгурско-узбецкая кухня') ?></p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h6 class="footer-heading mb-2"><i class="bi bi-geo-alt me-1"></i>Адрес</h6>
+                    <p class="footer-text mb-1"><?= htmlspecialchars($cafeInfo['address'] ?? 'г. Кемерово, ул. Примерная, д. 1') ?></p>
+                    <p class="footer-text mb-0"><i class="bi bi-clock me-1"></i><?= htmlspecialchars($cafeInfo['workTime'] ?? 'Ежедневно с 10:00 до 23:00') ?></p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="footer-heading mb-2"><i class="bi bi-telephone me-1"></i>Контакты</h6>
+                    <p class="footer-text mb-1">
+                        <a href="tel:<?= htmlspecialchars(str_replace([' ', '-', '(', ')'], '', $cafeInfo['phone'] ?? '')) ?>" class="footer-link">
+                            <?= htmlspecialchars($cafeInfo['phone'] ?? '+7 (3842) 12-34-56') ?>
+                        </a>
+                    </p>
+                    <p class="footer-text mb-0">&copy; 2026 <?= htmlspecialchars($footerText['copyright'] ?? 'Кафе «Бе-Бе». Все права защищены.') ?></p>
+                </div>
             </div>
-            <p class="mb-1"><?= htmlspecialchars($cafeInfo['address'] ?? '') ?></p>
-            <p class="mb-1"><?= htmlspecialchars($cafeInfo['phone'] ?? '') ?></p>
-            <p class="mb-0 mt-3 text-muted">&copy; 2026 <?= htmlspecialchars($footerText['copyright'] ?? 'Кафе «Бе-Бе». Все права защищены.') ?></p>
         </div>
     </footer>
 

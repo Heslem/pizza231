@@ -1,17 +1,25 @@
 /* === Стили для about.html.php === */
 .about-map-container {
     min-height: 300px;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 .about-map-container iframe {
-    border-radius: 8px;
+    border-radius: 15px;
 }
 
 .about-contact-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(212, 100, 42, 0.2);
+    color: var(--cafe-dark);
 }
 
 .about-contact-list li:last-child {
     border-bottom: none;
+}
+
+.about-contact-list i {
+    color: var(--cafe-orange);
+    width: 24px;
 }

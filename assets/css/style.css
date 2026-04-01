@@ -2,6 +2,18 @@
 /* Базовые стили (общие для всех страниц) */
 @import url('_base.css');
 
+/* Стили отдельных шаблонов (загружаем сразу после базовых) */
+@import url('home.css');
+@import url('product.css');
+@import url('catalog.css');
+@import url('cart.css');
+@import url('about.css');
+@import url('admin.css');
+@import url('admin_orders.css');
+@import url('admin_users.css');
+@import url('auth.css');
+@import url('profile.css');
+
 /* === Кафе "Бе-Бе" - Уйгурско-узбецкая кухня === */
 /* Цветовая схема: тёплые восточные тона */
 :root {
@@ -11,24 +23,6 @@
     --cafe-dark: #2d2416;
     --cafe-cream: #f5f0e6;
     --cafe-light: #fffaf0;
-}
-
-/* Верхняя информационная панель */
-.top-bar {
-    background: linear-gradient(135deg, var(--cafe-dark) 0%, #4a3c28 100%);
-    color: var(--cafe-cream);
-    padding: 8px 0;
-    font-size: 0.85rem;
-}
-
-.top-bar a {
-    color: var(--cafe-gold);
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-.top-bar a:hover {
-    color: #fff;
 }
 
 /* Логотип кафе */
@@ -71,12 +65,15 @@
     letter-spacing: 0.5px;
 }
 
-/* Навигация */
+/* Фиксированная навигация */
 .navbar {
     background: #fff !important;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-    position: relative;
-    z-index: 1000;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
 }
 
 .navbar-brand img {
@@ -125,13 +122,36 @@
     flex-shrink: 0;
     background: linear-gradient(135deg, var(--cafe-dark) 0%, #4a3c28 100%);
     margin-top: auto;
-    color: var(--cafe-cream);
+    color: #fff;
 }
 
 .footer-brand {
     font-family: 'Merriweather', serif;
     font-size: 1.3rem;
     color: var(--cafe-gold);
+}
+
+.footer-heading {
+    color: var(--cafe-gold);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.footer-text {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 0.95rem;
+}
+
+.footer-link {
+    color: var(--cafe-gold) !important;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-link:hover {
+    color: #fff !important;
 }
 
 .footer a {
@@ -143,35 +163,13 @@ body {
     font-family: 'Open Sans', 'Segoe UI', sans-serif;
     background-color: var(--cafe-cream);
     color: var(--cafe-dark) !important;
+    padding-top: 0;
 }
 
 main {
     flex: 1 0 auto;
     background: var(--cafe-cream);
 }
-
-/* Переопределяем старые стили */
-.hero-section {
-    background: linear-gradient(rgba(45, 36, 22, 0.7), rgba(45, 36, 22, 0.7)), url('/assets/img/banner.webp');
-    background-size: cover;
-    background-position: center;
-    padding: 100px 0;
-    border-radius: 0 0 20px 20px;
-    margin-bottom: 30px;
-    color: #fff;
-}
-
-/* Стили отдельных шаблонов */
-@import url('home.css');
-@import url('product.css');
-@import url('catalog.css');
-@import url('cart.css');
-@import url('about.css');
-@import url('admin.css');
-@import url('admin_orders.css');
-@import url('admin_users.css');
-@import url('auth.css');
-@import url('profile.css');
 
 body {
     font-family: 'Segoe UI', sans-serif;
@@ -239,22 +237,7 @@ body {
 /* === Заголовки === */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
-    color: #212529 !important;
-}
-
-/* === Герой-секция === */
-.hero-section {
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/assets/img/banner.webp');
-    background-size: cover;
-    background-position: center;
-    padding: 100px 0;
-    border-radius: 0 0 20px 20px;
-    margin-bottom: 30px;
-    color: #fff;
-}
-
-.hero-section h1, .hero-section p {
-    color: #fff !important;
+    color: var(--cafe-dark) !important;
 }
 
 /* === Список === */

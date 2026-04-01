@@ -2,22 +2,40 @@
 .auth-card {
     max-width: 450px;
     margin: 0 auto;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .auth-form .form-label {
     font-weight: 500;
+    color: var(--cafe-dark);
+}
+
+.auth-form .form-control:focus {
+    border-color: var(--cafe-orange) !important;
+    box-shadow: 0 0 0 0.25rem rgba(212, 100, 42, 0.25);
 }
 
 .auth-form .btn {
     padding: 10px 20px;
+    background: linear-gradient(135deg, var(--cafe-orange) 0%, var(--cafe-red) 100%);
+    border: none;
+    color: #fff;
+}
+
+.auth-form .btn:hover {
+    background: linear-gradient(135deg, var(--cafe-red) 0%, var(--cafe-orange) 100%);
+    color: #fff;
 }
 
 .auth-switch-link {
     transition: color 0.2s ease;
+    color: var(--cafe-orange);
 }
 
 .auth-switch-link:hover {
-    color: #0d6efd !important;
+    color: var(--cafe-red) !important;
 }
 
 .auth-alert {

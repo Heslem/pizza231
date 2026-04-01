@@ -1,6 +1,12 @@
 /* === Стили для cart.html.php === */
 .cart-table thead th {
     white-space: nowrap;
+    background: var(--cafe-dark) !important;
+    color: #fff !important;
+}
+
+.cart-table tbody tr:hover {
+    background: var(--cafe-cream);
 }
 
 .cart-item-image {
@@ -16,7 +22,13 @@
 }
 
 .cart-summary {
-    border-top: 2px solid #dee2e6;
+    border-top: 2px solid var(--cafe-orange);
+}
+
+.cart-summary .total-price {
+    color: var(--cafe-red);
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 .checkout-form .form-label {
@@ -26,4 +38,14 @@
 .checkout-modal .modal-body {
     max-height: 60vh;
     overflow-y: auto;
+}
+
+/* Кнопки */
+.btn-success {
+    background: linear-gradient(135deg, var(--cafe-orange) 0%, var(--cafe-red) 100%);
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--cafe-red) 0%, var(--cafe-orange) 100%);
 }
