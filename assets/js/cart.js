@@ -228,6 +228,22 @@ const CartManager = {
         localStorage.removeItem(this.STORAGE_KEY);
         this.updateCounter();
         this.syncClearBackend();
+        // Сбрасываем все кнопки в каталоге
+        this.resetAllCatalogButtons();
+    },
+    
+    // Сбросить ВСЕ кнопки в каталоге
+    resetAllCatalogButtons() {
+        document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
+            const parent = btn.parentElement;
+            const controls = parent?.querySelector('.quantity-controls');
+            if (controls) {
+                controls.classList.add('d-none');
+                btn.classList.remove('d-none');
+                const input = controls.querySelector('.qty-input');
+                if (input) input.value = 1;
+            }
+        });
     },
     
     // Обновить счётчик в навбаре
