@@ -40,15 +40,18 @@ class CatalogTemplate extends BaseTemplate
      * Основной метод для запуска каталога
      * @param array $products Массив товаров
      * @param string $search Поисковый запрос
+     * @param string $category Текущая категория
+     * @param array $categories Список всех категорий
      */
-    public static function render(array $products = [], string $search = ''): string
+    public static function render(array $products = [], string $search = '', string $category = '', array $categories = []): string
     {
         // Загружаем тексты
         $texts = self::loadTexts();
 
         // Генерируем HTML контента
         $productsGrid = self::renderProductsGrid($products, $texts);
-        $searchInfo = self::renderSearchInfo(count($products), $search, $texts);
+        $searchInfo = self::renderSearchInfo(count($products), $search, $category, $texts);
+        $categoryTabs = self::renderCategoryTabs($categories, $category, $texts);
 
         // Подключаем шаблон
         ob_start();
@@ -56,6 +59,46 @@ class CatalogTemplate extends BaseTemplate
         $content = ob_get_clean();
         
         return self::getTemplate($content, $texts);
+    }
+    
+    /**
+     * Рендерит кнопки/табы категорий
+     */
+    private static function renderCategoryTabs(array $categories, string $currentCategory, array $texts = []): string
+    {
+        if (empty($categories)) {
+            return '';
+        }
+        
+        $categoryText = $texts['category'] ?? [];
+        $allLabel = $categoryText['all'] ?? 'Все';
+        $search = $_GET['search'] ?? '';
+
+        $html = '<div class="d-flex flex-wrap justify-content-center gap-2 mb-4">';
+        
+        // Кнопка "Все"
+        $activeClass = (empty($currentCategory)) ? 'active' : '';
+        $queryParams = $search ? '?search=' . urlencode($search) : '';
+        $html .= '<a href="/catalog' . $queryParams . '" class="btn btn-lg ' . ($activeClass ? 'btn-dark' : 'btn-outline-dark') . ' ' . $activeClass . '">' 
+               . htmlspecialchars($allLabel) . '</a>';
+
+        // Кнопки категорий
+        foreach ($categories as $cat) {
+            $isActive = ($cat === $currentCategory);
+            $activeClass = $isActive ? 'active' : '';
+            $params = ['category=' . urlencode($cat)];
+            if ($search) {
+                $params[] = 'search=' . urlencode($search);
+            }
+            $queryString = '?' . implode('&', $params);
+            
+            $html .= '<a href="/catalog' . $queryString . '" class="btn btn-lg ' . ($isActive ? 'btn-dark' : 'btn-outline-dark') . ' ' . $activeClass . '">' 
+                   . htmlspecialchars($cat) . '</a>';
+        }
+        
+        $html .= '</div>';
+        
+        return $html;
     }
     
     /**
@@ -160,17 +203,27 @@ class CatalogTemplate extends BaseTemplate
     }
     
     /**
-     * Инфо о результатах поиска
+     * Инфо о результатах поиска и фильтрации
      */
-    private static function renderSearchInfo(int $count, string $search, array $texts = []): string
+    private static function renderSearchInfo(int $count, string $search, string $category = '', array $texts = []): string
     {
         $searchText = $texts['search'] ?? [];
+        $categoryText = $texts['category'] ?? [];
 
-        if (empty($search)) {
-            return '<p class="text-muted mt-3">' . htmlspecialchars($searchText['total'] ?? 'Всего товаров:') . ' <strong>' . $count . '</strong></p>';
+        $parts = [];
+        
+        if (!empty($category)) {
+            $parts[] = htmlspecialchars($categoryText['filtered'] ?? 'Категория') . ': <strong>' . htmlspecialchars($category) . '</strong>';
         }
         
-        $query = htmlspecialchars($search);
-        return '<p class="text-muted mt-3">' . htmlspecialchars($searchText['results'] ?? 'Найдено по запросу') . ' "' . $query . '": <strong>' . $count . '</strong></p>';
+        if (!empty($search)) {
+            $parts[] = htmlspecialchars($searchText['results'] ?? 'Найдено по запросу') . ' "<strong>' . htmlspecialchars($search) . '</strong>"';
+        }
+        
+        if (empty($parts)) {
+            return '<p class="text-muted mt-3">' . htmlspecialchars($searchText['total'] ?? 'Всего блюд:') . ' <strong>' . $count . '</strong></p>';
+        }
+        
+        return '<p class="text-muted mt-3">' . implode(' | ', $parts) . ': <strong>' . $count . '</strong></p>';
     }
 }

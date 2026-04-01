@@ -3,6 +3,8 @@
  * Шаблон страницы каталога
  * Доступные переменные:
  * - $search - текущий поисковый запрос
+ * - $category - текущая категория
+ * - $categoryTabs - HTML кнопок категорий
  * - $searchInfo - HTML с информацией о результатах поиска
  * - $productsGrid - HTML сетки товаров
  * - $texts - массив текстов из storage/templates/catalog.json
@@ -15,16 +17,22 @@ $titleText = $texts['title'] ?? 'Каталог товаров';
 $searchText = $texts['search'] ?? [];
 $toastText = $texts['toast'] ?? [];
 $modalText = $texts['modal'] ?? [];
+
+// Сохраняем текущую категорию для формы поиска
+$category = $category ?? '';
 ?>
 
 <div class="container py-5">
     <!-- Заголовок + Поиск -->
-    <div class="row mb-5">
+    <div class="row mb-4">
         <div class="col-12 text-center">
             <h1 class="display-5 fw-bold mb-4"><?= htmlspecialchars($titleText) ?></h1>
 
             <!-- Форма поиска -->
             <form method="GET" action="/catalog" class="col-md-6 col-lg-4 mx-auto">
+                <?php if (!empty($category)): ?>
+                <input type="hidden" name="category" value="<?= htmlspecialchars($category) ?>">
+                <?php endif; ?>
                 <div class="input-group input-group-lg">
                     <span class="input-group-text bg-white border-end-0">
                         <i class="bi bi-search text-muted"></i>
@@ -39,8 +47,21 @@ $modalText = $texts['modal'] ?? [];
                     <button class="btn btn-primary px-4" type="submit"><?= htmlspecialchars($searchText['button'] ?? 'Найти') ?></button>
                 </div>
             </form>
-            
-            <!-- Результаты поиска -->
+        </div>
+    </div>
+    
+    <!-- Кнопки категорий -->
+    <?php if (!empty($categoryTabs)): ?>
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <?= $categoryTabs ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Результаты поиска и фильтрации -->
+    <div class="row">
+        <div class="col-12 text-center">
             <?= $searchInfo ?>
         </div>
     </div>

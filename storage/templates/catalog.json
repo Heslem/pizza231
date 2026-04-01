@@ -1,6 +1,10 @@
 {
     "pageTitle": "Меню кафе",
     "title": "Меню кафе",
+    "category": {
+        "all": "Все",
+        "filtered": "Категория"
+    },
     "search": {
         "placeholder": "Поиск блюд...",
         "button": "Найти",
