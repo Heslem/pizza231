@@ -50,13 +50,6 @@ $cafeInfo = $texts['cafe'] ?? [];
                     <li class="nav-item">
                         <a class="nav-link" href="/catalog"><?= htmlspecialchars($navText['catalog'] ?? 'Меню') ?></a>
                     </li>
-                    <li class="nav-item position-relative">
-                        <a class="nav-link" href="/cart">
-                            <i class="bi bi-cart"></i>
-                            <span class="cart-counter badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" 
-                                style="display: none; font-size: 0.7rem;">0</span>
-                        </a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about"><?= htmlspecialchars($navText['about'] ?? 'О кафе') ?></a>
                     </li>
@@ -105,6 +98,89 @@ $cafeInfo = $texts['cafe'] ?? [];
             </div>
         </div>
     </footer>
+
+    <!-- Плавающая кнопка корзины в правом нижнем углу -->
+    <button class="cart-floating-btn" id="cartFloatingBtn" aria-label="Открыть корзину">
+        <i class="bi bi-cart3"></i>
+        <span class="cart-floating-counter badge bg-danger rounded-pill" id="cartFloatingCounter" style="display: none;">0</span>
+    </button>
+
+    <!-- Slide-out панель корзины -->
+    <div class="cart-slide-panel" id="cartSlidePanel">
+        <div class="cart-slide-header">
+            <h5 class="mb-0"><i class="bi bi-cart3 me-2"></i>Корзина</h5>
+            <button class="btn-close" id="closeCartPanel" aria-label="Закрыть"></button>
+        </div>
+        <div class="cart-slide-body" id="cartSlideBody">
+            <!-- Загружается через JS -->
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        </div>
+        <div class="cart-slide-footer" id="cartSlideFooter" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted">Итого:</span>
+                <span class="h4 mb-0 text-success" id="cartSlideTotal">0 ₽</span>
+            </div>
+            <button class="btn btn-success w-100 btn-lg" id="checkoutFromPanel">
+                <i class="bi bi-check-circle me-2"></i>Оформить заказ
+            </button>
+        </div>
+    </div>
+
+    <!-- Slide-out панель оформления заказа -->
+    <div class="cart-slide-panel" id="checkoutSlidePanel">
+        <div class="cart-slide-header">
+            <h5 class="mb-0"><i class="bi bi-check2-square me-2"></i>Оформление заказа</h5>
+            <button class="btn-close" id="closeCheckoutPanel" aria-label="Закрыть"></button>
+        </div>
+        <div class="cart-slide-body">
+            <form id="checkout-form-panel">
+                <div class="mb-3">
+                    <label for="checkout-fio" class="form-label">ФИО <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="checkout-fio" name="fio" required placeholder="Иванов Иван Иванович">
+                </div>
+                <div class="mb-3">
+                    <label for="checkout-email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="checkout-email" name="email" required placeholder="example@mail.ru">
+                </div>
+                <div class="mb-3">
+                    <label for="checkout-phone" class="form-label">Телефон <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" id="checkout-phone" name="phone" required placeholder="+7 (999) 123-45-67">
+                </div>
+                <div class="mb-3">
+                    <label for="checkout-address" class="form-label">Адрес доставки <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="checkout-address" name="address" required placeholder="г. Кемерово, ул. Примерная, д. 1, кв. 1">
+                </div>
+                <div class="mb-3">
+                    <label for="checkout-payment" class="form-label">Способ оплаты <span class="text-danger">*</span></label>
+                    <select class="form-select" id="checkout-payment" name="payment" required>
+                        <option value="">Выберите способ оплаты</option>
+                        <option value="cash">Наличными при получении</option>
+                        <option value="card">Банковской картой</option>
+                        <option value="online">Онлайн-оплата</option>
+                    </select>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>К оплате:</span>
+                    <span class="h5 mb-0 text-success" id="checkoutTotalAmount">0 ₽</span>
+                </div>
+            </form>
+        </div>
+        <div class="cart-slide-footer">
+            <button class="btn btn-outline-secondary w-100 mb-2" id="backToCartPanel">
+                <i class="bi bi-arrow-left me-2"></i>Назад к корзине
+            </button>
+            <button class="btn btn-success w-100 btn-lg" id="submitOrderPanel">
+                <span class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
+                <span class="btn-text">Подтвердить заказ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Затемнение фона для панелей -->
+    <div class="cart-overlay" id="cartOverlay"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/cart.js"></script>

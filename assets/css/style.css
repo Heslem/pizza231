@@ -454,3 +454,232 @@ main {
         font-size: 1.2rem;
     }
 }
+
+/* === Плавающая кнопка корзины === */
+.cart-floating-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cafe-orange) 0%, var(--cafe-red) 100%);
+    border: none;
+    color: #fff;
+    font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(212, 100, 42, 0.5);
+    cursor: pointer;
+    z-index: 1050;
+    transition: all 0.3s ease;
+}
+
+.cart-floating-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(212, 100, 42, 0.6);
+}
+
+.cart-floating-btn:active {
+    transform: scale(0.95);
+}
+
+.cart-floating-counter {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    font-size: 0.75rem;
+    min-width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 0.3s ease;
+}
+
+/* === Slide-out панель корзины === */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1055;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.cart-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.cart-slide-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 100vw;
+    height: 100vh;
+    background: #fff;
+    z-index: 1060;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.cart-slide-panel.show {
+    transform: translateX(0);
+}
+
+.cart-slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--cafe-dark);
+    color: #fff;
+}
+
+.cart-slide-header h5 {
+    font-weight: 600;
+}
+
+.cart-slide-header .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+.cart-slide-header .btn-close:hover {
+    opacity: 1;
+}
+
+.cart-slide-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cart-slide-footer {
+    padding: 20px;
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+.cart-slide-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-slide-item:last-child {
+    border-bottom: none;
+}
+
+.cart-slide-item img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cart-slide-item-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.cart-slide-item-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cart-slide-item-price {
+    color: var(--cafe-orange);
+    font-weight: 600;
+}
+
+.cart-slide-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.cart-slide-item-qty button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 1rem;
+}
+
+.cart-slide-item-qty input {
+    width: 45px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.cart-slide-item-remove {
+    color: #dc3545;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.cart-slide-item-remove:hover {
+    opacity: 1;
+}
+
+.cart-slide-empty {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.cart-slide-empty i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 16px;
+}
+
+.cart-slide-empty h5 {
+    color: #6c757d;
+    margin-bottom: 8px;
+}
+
+.cart-slide-empty p {
+    color: #adb5bd;
+    margin-bottom: 20px;
+}
+
+.cart-slide-item-subtotal {
+    font-weight: 600;
+    color: var(--cafe-red);
+    min-width: 80px;
+    text-align: right;
+}
+
+/* === Адаптив для корзины === */
+@media (max-width: 480px) {
+    .cart-floating-btn {
+        bottom: 16px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
+    }
+    
+    .cart-slide-panel {
+        width: 100vw;
+    }
+}

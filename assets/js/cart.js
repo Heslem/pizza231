@@ -312,6 +312,7 @@ const CartManager = {
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
     CartManager.updateCounter();
+    initCartFloatPanel();
     
     // Восстановить состояние кнопок на странице каталога
     restoreCatalogButtons();
@@ -632,7 +633,7 @@ async function updateNavbarUser(user) {
         
         let dropdownContent = `
             <li><span class="dropdown-item-text text-muted small">${user.email}</span></li>
-            <li><hr class="dropdown-divider"></li>
+            <li><hr class="dropdown-divider"></hr></li>
             <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Профиль</a></li>
         `;
         
@@ -643,7 +644,7 @@ async function updateNavbarUser(user) {
             `;
         }
         
-        dropdownContent += `<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-danger" href="/logout">Выйти</a></li>`;
+        dropdownContent += `<li><hr class="dropdown-divider"></hr><li><a class="dropdown-item text-danger" href="/logout">Выйти</a></li>`;
         
         // Заменить на выпадающий список с именем пользователя и аватаром
         authItem.outerHTML = `
@@ -660,3 +661,275 @@ async function updateNavbarUser(user) {
     }
     // Если user === null, оставляем "Вход" как есть
 }
+
+/* === Slide-out панель корзины === */
+function initCartFloatPanel() {
+    const floatBtn = document.getElementById('cartFloatingBtn');
+    const closeBtn = document.getElementById('closeCartPanel');
+    const closeCheckoutBtn = document.getElementById('closeCheckoutPanel');
+    const panel = document.getElementById('cartSlidePanel');
+    const checkoutPanel = document.getElementById('checkoutSlidePanel');
+    const overlay = document.getElementById('cartOverlay');
+    const backBtn = document.getElementById('backToCartPanel');
+    const checkoutBtn = document.getElementById('checkoutFromPanel');
+    const submitBtn = document.getElementById('submitOrderPanel');
+    
+    if (!floatBtn || !panel) return;
+    
+    // Открыть панель корзины
+    floatBtn.addEventListener('click', function() {
+        openCartPanel();
+    });
+    
+    // Закрыть панель корзины
+    closeBtn?.addEventListener('click', closeCartPanel);
+    closeCheckoutBtn?.addEventListener('click', closeCheckoutPanel);
+    overlay?.addEventListener('click', function() {
+        closeCartPanel();
+        closeCheckoutPanel();
+    });
+    
+    // Назад к корзине
+    backBtn?.addEventListener('click', function() {
+        checkoutPanel.classList.remove('show');
+        panel.classList.add('show');
+        overlay.classList.add('show');
+    });
+    
+    // Оформить заказ из панели
+    checkoutBtn?.addEventListener('click', function() {
+        openCheckoutPanel();
+    });
+    
+    // Отправить заказ
+    submitBtn?.addEventListener('click', submitOrderFromPanel);
+    
+    // Обновлять содержимое при изменении корзины
+    const originalSave = CartManager.save;
+    CartManager.save = function(cart) {
+        originalSave.call(this, cart);
+        if (panel.classList.contains('show')) {
+            renderCartPanel();
+        }
+    };
+}
+
+function openCartPanel() {
+    const panel = document.getElementById('cartSlidePanel');
+    const overlay = document.getElementById('cartOverlay');
+    const checkoutPanel = document.getElementById('checkoutSlidePanel');
+    
+    checkoutPanel?.classList.remove('show');
+    panel.classList.add('show');
+    overlay.classList.add('show');
+    
+    renderCartPanel();
+}
+
+function closeCartPanel() {
+    const panel = document.getElementById('cartSlidePanel');
+    const overlay = document.getElementById('cartOverlay');
+    
+    panel.classList.remove('show');
+    overlay.classList.remove('show');
+}
+
+function openCheckoutPanel() {
+    const cartPanel = document.getElementById('cartSlidePanel');
+    const checkoutPanel = document.getElementById('checkoutSlidePanel');
+    const overlay = document.getElementById('cartOverlay');
+    const cart = CartManager.get();
+    
+    if (cart.length === 0) {
+        CartManager.showToast('Корзина пуста!', 'warning', false);
+        return;
+    }
+    
+    // Заполнить сумму
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    document.getElementById('checkoutTotalAmount').textContent = new Intl.NumberFormat('ru-RU').format(total) + ' ₽';
+    
+    // Заполнить форму из профиля
+    fillCheckoutFormFromProfile();
+    
+    cartPanel.classList.remove('show');
+    checkoutPanel.classList.add('show');
+    overlay.classList.add('show');
+}
+
+function closeCheckoutPanel() {
+    const checkoutPanel = document.getElementById('checkoutSlidePanel');
+    const overlay = document.getElementById('cartOverlay');
+    
+    checkoutPanel.classList.remove('show');
+    overlay.classList.remove('show');
+}
+
+function renderCartPanel() {
+    const body = document.getElementById('cartSlideBody');
+    const footer = document.getElementById('cartSlideFooter');
+    const totalEl = document.getElementById('cartSlideTotal');
+    
+    if (!body) return;
+    
+    const cart = CartManager.get();
+    
+    if (cart.length === 0) {
+        body.innerHTML = `
+            <div class="cart-slide-empty">
+                <i class="bi bi-cart-x"></i>
+                <h5>Корзина пуста</h5>
+                <p>Добавьте товары из каталога</p>
+                <a href="/catalog" class="btn btn-primary">Перейти в каталог</a>
+            </div>
+        `;
+        footer.style.display = 'none';
+        return;
+    }
+    
+    let html = '';
+    let total = 0;
+    
+    cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        
+        html += `
+            <div class="cart-slide-item">
+                <img src="${item.image || '/assets/img/no-image.jpg'}" alt="${item.name}" onerror="this.src='/assets/img/no-image.jpg'">
+                <div class="cart-slide-item-details">
+                    <div class="cart-slide-item-name">${item.name}</div>
+                    <div class="cart-slide-item-price">${new Intl.NumberFormat('ru-RU').format(item.price)} ₽</div>
+                    <div class="cart-slide-item-qty">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="updatePanelQuantity(${item.id}, -1)">−</button>
+                        <input type="number" class="form-control form-control-sm" value="${item.quantity}" min="1" 
+                            onchange="setPanelQuantity(${item.id}, this.value)" style="width: 50px;">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="updatePanelQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+                <div class="cart-slide-item-subtotal">
+                    ${new Intl.NumberFormat('ru-RU').format(subtotal)} ₽
+                    <button class="cart-slide-item-remove d-block ms-auto mt-2" onclick="removePanelItem(${item.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    body.innerHTML = html;
+    footer.style.display = 'block';
+    totalEl.textContent = new Intl.NumberFormat('ru-RU').format(total) + ' ₽';
+}
+
+function updatePanelQuantity(id, delta) {
+    const cart = CartManager.get();
+    const item = cart.find(i => i.id === id);
+    
+    if (item) {
+        const newQty = item.quantity + delta;
+        if (newQty <= 0) {
+            CartManager.remove(id);
+        } else {
+            CartManager.updateQuantity(id, newQty);
+        }
+        renderCartPanel();
+    }
+}
+
+function setPanelQuantity(id, qty) {
+    const value = parseInt(qty) || 1;
+    if (value <= 0) {
+        CartManager.remove(id);
+    } else {
+        CartManager.updateQuantity(id, value);
+    }
+    renderCartPanel();
+}
+
+function removePanelItem(id) {
+    CartManager.remove(id);
+    renderCartPanel();
+}
+
+async function submitOrderFromPanel() {
+    const form = document.getElementById('checkout-form-panel');
+    const submitBtn = document.getElementById('submitOrderPanel');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const cart = CartManager.get();
+    if (cart.length === 0) {
+        CartManager.showToast('Корзина пуста!', 'warning', false);
+        return;
+    }
+    
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
+    // Собираем данные формы
+    const formData = {
+        fio: document.getElementById('checkout-fio').value,
+        email: document.getElementById('checkout-email').value,
+        phone: document.getElementById('checkout-phone').value,
+        address: document.getElementById('checkout-address').value,
+        payment: document.getElementById('checkout-payment').value,
+        items: cart,
+        total: total
+    };
+    
+    // Блокируем кнопку
+    submitBtn.disabled = true;
+    spinner.classList.remove('d-none');
+    btnText.textContent = 'Отправка...';
+    
+    try {
+        const response = await fetch('/api/cart/order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Закрываем панель
+            closeCheckoutPanel();
+            
+            // Очищаем корзину
+            CartManager.clear();
+            
+            // Показываем успех
+            CartManager.showToast('Заказ #' + result.orderId + ' оформлен!', 'success', false);
+            
+            // Обновляем кнопку
+            renderCartPanel();
+        }
+    } catch (error) {
+        CartManager.showToast('Ошибка соединения', 'danger', false);
+    } finally {
+        // Разблокируем кнопку
+        submitBtn.disabled = false;
+        spinner.classList.add('d-none');
+        btnText.textContent = 'Подтвердить заказ';
+    }
+}
+
+// Обновление счётчика на плавающей кнопке
+const originalUpdateCounter = CartManager.updateCounter;
+CartManager.updateCounter = function() {
+    originalUpdateCounter.call(this);
+    
+    const badge = document.getElementById('cartFloatingCounter');
+    if (!badge) return;
+    
+    const cart = this.get();
+    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+};
