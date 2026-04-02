@@ -541,17 +541,29 @@ function initCartPage() {
         const spinner = submitBtn.querySelector('.spinner-border');
         const btnText = submitBtn.querySelector('.btn-text');
         
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        
         // Блокируем кнопку
         submitBtn.disabled = true;
         spinner.classList.remove('d-none');
         btnText.textContent = 'Отправка...';
+        
+        // Определяем тип доставки
+        const isDelivery = document.getElementById('deliveryTypeDeliveryModal').checked;
+        const address = isDelivery 
+            ? document.getElementById('address').value 
+            : document.getElementById('pickup-point-modal').value;
         
         // Собираем данные формы
         const formData = {
             fio: document.getElementById('fio').value,
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
+            address: address,
+            deliveryType: isDelivery ? 'delivery' : 'pickup',
             payment: document.getElementById('payment').value,
             items: window.cartData || [],
             total: window.cartTotal || 0
@@ -567,6 +579,12 @@ function initCartPage() {
             const result = await response.json();
             
             if (result.success) {
+                // Если есть URL для оплаты - перенаправляем
+                if (result.paymentUrl) {
+                    window.location.href = result.paymentUrl;
+                    return;
+                }
+                
                 // Закрываем модальное окно
                 const modal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
                 modal.hide();
@@ -887,12 +905,19 @@ async function submitOrderFromPanel() {
     
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     
+    // Определяем тип доставки
+    const isDelivery = document.getElementById('deliveryTypeDelivery').checked;
+    const address = isDelivery 
+        ? document.getElementById('checkout-address').value 
+        : document.getElementById('pickup-point').value;
+    
     // Собираем данные формы
     const formData = {
         fio: document.getElementById('checkout-fio').value,
         email: document.getElementById('checkout-email').value,
         phone: document.getElementById('checkout-phone').value,
-        address: document.getElementById('checkout-address').value,
+        address: address,
+        deliveryType: isDelivery ? 'delivery' : 'pickup',
         payment: document.getElementById('checkout-payment').value,
         items: cart,
         total: total
@@ -913,6 +938,12 @@ async function submitOrderFromPanel() {
         const result = await response.json();
         
         if (result.success) {
+            // Если есть URL для оплаты - перенаправляем
+            if (result.paymentUrl) {
+                window.location.href = result.paymentUrl;
+                return;
+            }
+            
             // Закрываем панель
             closeCheckoutPanel();
             

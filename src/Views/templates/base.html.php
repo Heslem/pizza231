@@ -1,16 +1,9 @@
 <?php
-/**
- * Базовый шаблон страницы
- * Доступные переменные:
- * - $content - основной контент страницы
- * - $texts - массив текстов из storage/templates/base.json
- */
-
-// Значения по умолчанию
-$texts = $texts ?? [];
 $navText = $texts['nav'] ?? [];
 $footerText = $texts['footer'] ?? [];
 $cafeInfo = $texts['cafe'] ?? [];
+$pickupPoints = $texts['pickupPoints'] ?? [];
+$checkoutText = $texts['checkout'] ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -148,10 +141,39 @@ $cafeInfo = $texts['cafe'] ?? [];
                     <label for="checkout-phone" class="form-label">Телефон <span class="text-danger">*</span></label>
                     <input type="tel" class="form-control" id="checkout-phone" name="phone" required placeholder="+7 (999) 123-45-67">
                 </div>
+                
+                <!-- Переключатель Самовывоз/Доставка -->
                 <div class="mb-3">
-                    <label for="checkout-address" class="form-label">Адрес доставки <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="checkout-address" name="address" required placeholder="г. Кемерово, ул. Примерная, д. 1, кв. 1">
+                    <label class="form-label">Способ получения <span class="text-danger">*</span></label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypeDelivery" value="delivery" checked>
+                        <label class="btn btn-outline-dark" for="deliveryTypeDelivery">
+                            <i class="bi bi-truck me-1"></i>Доставка
+                        </label>
+                        <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypePickup" value="pickup">
+                        <label class="btn btn-outline-dark" for="deliveryTypePickup">
+                            <i class="bi bi-shop me-1"></i>Самовывоз
+                        </label>
+                    </div>
                 </div>
+                
+                <!-- Адрес доставки (показывается при доставке) -->
+                <div class="mb-3 delivery-fields">
+                    <label for="checkout-address" class="form-label">Адрес доставки <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="checkout-address" name="address" placeholder="г. Кемерово, ул. Примерная, д. 1, кв. 1">
+                </div>
+                
+                <!-- Выбор точки самовывоза (скрыт по умолчанию) -->
+                <div class="mb-3 pickup-fields d-none">
+                    <label for="pickup-point" class="form-label">Точка самовывоза <span class="text-danger">*</span></label>
+                    <select class="form-select" id="pickup-point" name="pickupPoint">
+                        <option value="">Выберите точку самовывоза</option>
+                        <?php foreach ($pickupPoints as $point): ?>
+                        <option value="<?= htmlspecialchars($point['address']) ?>"><?= htmlspecialchars($point['name'] . ' - ' . $point['address']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
                 <div class="mb-3">
                     <label for="checkout-payment" class="form-label">Способ оплаты <span class="text-danger">*</span></label>
                     <select class="form-select" id="checkout-payment" name="payment" required>
@@ -181,6 +203,44 @@ $cafeInfo = $texts['cafe'] ?? [];
 
     <!-- Затемнение фона для панелей -->
     <div class="cart-overlay" id="cartOverlay"></div>
+
+    <script>
+    // Переключение полей Самовывоз/Доставка
+    document.addEventListener('DOMContentLoaded', function() {
+        const deliveryTypeRadios = document.querySelectorAll('input[name="deliveryType"]');
+        const deliveryFields = document.querySelectorAll('.delivery-fields');
+        const pickupFields = document.querySelectorAll('.pickup-fields');
+        const addressInput = document.getElementById('checkout-address');
+        const pickupSelect = document.getElementById('pickup-point');
+        
+        function updateFields() {
+            const isDelivery = document.getElementById('deliveryTypeDelivery').checked;
+            
+            if (isDelivery) {
+                deliveryFields.forEach(f => f.classList.remove('d-none'));
+                pickupFields.forEach(f => f.classList.add('d-none'));
+                addressInput.setAttribute('required', 'required');
+                pickupSelect.removeAttribute('required');
+                pickupSelect.removeAttribute('name');
+                addressInput.setAttribute('name', 'address');
+            } else {
+                deliveryFields.forEach(f => f.classList.add('d-none'));
+                pickupFields.forEach(f => f.classList.remove('d-none'));
+                addressInput.removeAttribute('required');
+                addressInput.removeAttribute('name');
+                pickupSelect.setAttribute('required', 'required');
+                pickupSelect.setAttribute('name', 'address');
+            }
+        }
+        
+        deliveryTypeRadios.forEach(radio => {
+            radio.addEventListener('change', updateFields);
+        });
+        
+        // Инициализация при загрузке
+        updateFields();
+    });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/cart.js"></script>

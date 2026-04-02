@@ -16,6 +16,11 @@ class CartTemplate extends BaseTemplate
     private const TEXTS_PATH = __DIR__ . '/../../storage/templates/cart.json';
 
     /**
+     * Путь к базовым текстам (для pickupPoints)
+     */
+    private const BASE_TEXTS_PATH = __DIR__ . '/../../storage/templates/base.json';
+
+    /**
      * Загружает тексты из JSON файла
      */
     private static function loadTexts(): array
@@ -28,10 +33,29 @@ class CartTemplate extends BaseTemplate
         return json_decode($json, true) ?? [];
     }
 
+    /**
+     * Загружает базовые тексты (для pickupPoints)
+     */
+    private static function loadBaseTexts(): array
+    {
+        $path = self::BASE_TEXTS_PATH;
+        if (!file_exists($path)) {
+            return [];
+        }
+        $json = file_get_contents($path);
+        return json_decode($json, true) ?? [];
+    }
+
     public static function render(): string
     {
         // Загружаем тексты
         $texts = self::loadTexts();
+        
+        // Загружаем базовые тексты для pickupPoints
+        $baseTexts = self::loadBaseTexts();
+        if (isset($baseTexts['pickupPoints'])) {
+            $texts['pickupPoints'] = $baseTexts['pickupPoints'];
+        }
 
         $cartItems = Cart::getItems();
         $total = Cart::getTotal();

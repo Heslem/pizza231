@@ -1,23 +1,6 @@
 <?php
-/**
- * Шаблон страницы корзины
- * Доступные переменные:
- * - $isEmpty - boolean, корзина пуста
- * - $cartRows - HTML строк таблицы
- * - $count - количество товаров
- * - $total - итоговая сумма (число)
- * - $totalFormatted - итоговая сумма (строка)
- * - $cartJson - JSON данные корзины для JS
- * - $texts - массив текстов из storage/templates/cart.json
- */
-
-// Значения по умолчанию
-$texts = $texts ?? [];
-$emptyText = $texts['empty'] ?? [];
-$tableText = $texts['table'] ?? [];
-$summaryText = $texts['summary'] ?? [];
 $checkoutText = $texts['checkout'] ?? [];
-$toastText = $texts['toast'] ?? [];
+$pickupPoints = $texts['pickupPoints'] ?? [];
 ?>
 
 <?php if ($isEmpty): ?>
@@ -98,10 +81,39 @@ $toastText = $texts['toast'] ?? [];
                             <label for="phone" class="form-label"><?= htmlspecialchars($checkoutText['phone'] ?? 'Телефон') ?> <span class="text-danger">*</span></label>
                             <input type="tel" class="form-control" id="phone" name="phone" required placeholder="<?= htmlspecialchars($checkoutText['phonePlaceholder'] ?? '+7 (999) 123-45-67') ?>">
                         </div>
+                        
+                        <!-- Переключатель Самовывоз/Доставка -->
                         <div class="col-12">
-                            <label for="address" class="form-label"><?= htmlspecialchars($checkoutText['address'] ?? 'Адрес доставки') ?> <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="address" name="address" required placeholder="<?= htmlspecialchars($checkoutText['addressPlaceholder'] ?? 'г. Кемерово, ул. Примерная, д. 1, кв. 1') ?>">
+                            <label class="form-label"><?= htmlspecialchars($checkoutText['deliveryType'] ?? 'Способ получения') ?> <span class="text-danger">*</span></label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypeDeliveryModal" value="delivery" checked>
+                                <label class="btn btn-outline-dark" for="deliveryTypeDeliveryModal">
+                                    <i class="bi bi-truck me-1"></i><?= htmlspecialchars($checkoutText['delivery'] ?? 'Доставка') ?>
+                                </label>
+                                <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypePickupModal" value="pickup">
+                                <label class="btn btn-outline-dark" for="deliveryTypePickupModal">
+                                    <i class="bi bi-shop me-1"></i><?= htmlspecialchars($checkoutText['pickup'] ?? 'Самовывоз') ?>
+                                </label>
+                            </div>
                         </div>
+                        
+                        <!-- Адрес доставки (показывается при доставке) -->
+                        <div class="col-12 delivery-fields-modal">
+                            <label for="address" class="form-label"><?= htmlspecialchars($checkoutText['deliveryAddress'] ?? 'Адрес доставки') ?> <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="<?= htmlspecialchars($checkoutText['deliveryAddressPlaceholder'] ?? 'г. Кемерово, ул. Примерная, д. 1, кв. 1') ?>">
+                        </div>
+                        
+                        <!-- Выбор точки самовывоза (скрыт по умолчанию) -->
+                        <div class="col-12 pickup-fields-modal d-none">
+                            <label for="pickup-point-modal" class="form-label"><?= htmlspecialchars($checkoutText['pickupAddress'] ?? 'Выберите точку самовывоза') ?> <span class="text-danger">*</span></label>
+                            <select class="form-select" id="pickup-point-modal" name="pickupPoint">
+                                <option value=""><?= htmlspecialchars($checkoutText['pickupAddress'] ?? 'Выберите точку самовывоза') ?></option>
+                                <?php foreach ($pickupPoints as $point): ?>
+                                <option value="<?= htmlspecialchars($point['address']) ?>"><?= htmlspecialchars($point['name'] . ' - ' . $point['address']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
                         <div class="col-12">
                             <label for="payment" class="form-label"><?= htmlspecialchars($checkoutText['payment'] ?? 'Способ оплаты') ?> <span class="text-danger">*</span></label>
                             <select class="form-select" id="payment" name="payment" required>
@@ -128,6 +140,43 @@ $toastText = $texts['toast'] ?? [];
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Переключение полей Самовывоз/Доставка в модальном окне
+    const deliveryTypeRadios = document.querySelectorAll('#checkoutModal input[name="deliveryType"]');
+    const deliveryFields = document.querySelectorAll('.delivery-fields-modal');
+    const pickupFields = document.querySelectorAll('.pickup-fields-modal');
+    const addressInput = document.getElementById('address');
+    const pickupSelect = document.getElementById('pickup-point-modal');
+    
+    function updateFields() {
+        const isDelivery = document.getElementById('deliveryTypeDeliveryModal').checked;
+        
+        if (isDelivery) {
+            deliveryFields.forEach(f => f.classList.remove('d-none'));
+            pickupFields.forEach(f => f.classList.add('d-none'));
+            addressInput.setAttribute('required', 'required');
+            pickupSelect.removeAttribute('required');
+            pickupSelect.removeAttribute('name');
+            addressInput.setAttribute('name', 'address');
+        } else {
+            deliveryFields.forEach(f => f.classList.add('d-none'));
+            pickupFields.forEach(f => f.classList.remove('d-none'));
+            addressInput.removeAttribute('required');
+            addressInput.removeAttribute('name');
+            pickupSelect.setAttribute('required', 'required');
+            pickupSelect.setAttribute('name', 'address');
+        }
+    }
+    
+    deliveryTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateFields);
+    });
+    
+    updateFields();
+});
+</script>
 
 <!-- Toast уведомления -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">

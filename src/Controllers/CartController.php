@@ -3,10 +3,12 @@ namespace App\Controllers;
 
 require_once __DIR__ . '/../Models/Cart.php';
 require_once __DIR__ . '/../Models/EmailSender.php';
+require_once __DIR__ . '/../Models/Payment.php';
 require_once __DIR__ . '/../Views/CartTemplate.php';
 
 use App\Models\Cart;
 use App\Models\EmailSender;
+use App\Models\Payment;
 use App\Views\CartTemplate;
 
 class CartController
@@ -40,12 +42,19 @@ class CartController
         }
 
         // Валидация обязательных полей
-        $required = ['fio', 'email', 'phone', 'address', 'payment'];
+        $required = ['fio', 'email', 'phone', 'payment'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 http_response_code(400);
                 return json_encode(['success' => false, 'error' => 'Заполните все обязательные поля']);
             }
+        }
+
+        // Для адреса - принимаем либо address (доставка), либо pickupPoint (самовывоз)
+        $address = $data['address'] ?? $data['pickupPoint'] ?? '';
+        if (empty($address)) {
+            http_response_code(400);
+            return json_encode(['success' => false, 'error' => 'Укажите адрес доставки или выберите точку самовывоза']);
         }
 
         // Получаем товары из корзины
@@ -57,14 +66,15 @@ class CartController
 
         $total = Cart::getTotal();
 
-// Создаём заказ
+        // Создаём заказ
         $order = [
             'id' => uniqid('order_'),
             'created_at' => date('Y-m-d H:i:s'),
             'fio' => htmlspecialchars(trim($data['fio'])),
             'email' => htmlspecialchars(trim($data['email'])),
             'phone' => htmlspecialchars(trim($data['phone'])),
-            'address' => htmlspecialchars(trim($data['address'])),
+            'address' => htmlspecialchars(trim($address)),
+            'deliveryType' => htmlspecialchars($data['deliveryType'] ?? 'delivery'),
             'payment' => htmlspecialchars($data['payment']),
             'items' => $items,
             'total' => $total,
@@ -106,9 +116,16 @@ class CartController
         // Очищаем корзину
         Cart::clear();
 
+        // Если выбрана онлайн-оплата - возвращаем URL для оплаты
+        $paymentUrl = '';
+        if ($data['payment'] === 'online' && Payment::isPaymentEnabled()) {
+            $paymentUrl = Payment::getRobokassaUrl($order);
+        }
+
         return json_encode([
             'success' => true,
-            'orderId' => $order['id']
+            'orderId' => $order['id'],
+            'paymentUrl' => $paymentUrl
         ]);
     }
 
