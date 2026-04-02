@@ -1,4 +1,14 @@
 /* === Базовые стили (общие для всех страниц) === */
+/* Цветовая схема: тёплые восточные тона */
+:root {
+    --cafe-orange: #d4642a;
+    --cafe-red: #b8232a;
+    --cafe-gold: #d4a84b;
+    --cafe-dark: #2d2416;
+    --cafe-cream: #f5f0e6;
+    --cafe-light: #fffaf0;
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -45,8 +55,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* === Навигация === */
 .navbar {
-    background: #fff !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: #212529 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 1000;
 }
@@ -56,22 +66,30 @@ h1, h2, h3, h4, h5, h6 {
     transition: opacity 0.2s;
 }
 
+.brand-name {
+    color: #fff !important;
+}
+
+.brand-tagline {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
 .navbar-nav .nav-link {
-    color: #212529 !important;
+    color: #fff !important;
     font-weight: 500;
     transition: color 0.2s;
 }
 
 .navbar-nav .nav-link:hover {
-    color: #0d6efd !important;
+    color: var(--cafe-gold) !important;
 }
 
 .navbar-toggler {
-    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(33, 37, 41, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
 /* === Подвал === */

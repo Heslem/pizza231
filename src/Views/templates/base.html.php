@@ -26,7 +26,7 @@ $cafeInfo = $texts['cafe'] ?? [];
 </head>
 <body>
     <!-- Фиксированная навигация -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <div class="logo-icon me-2">
