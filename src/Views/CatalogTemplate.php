@@ -62,7 +62,7 @@ class CatalogTemplate extends BaseTemplate
     }
     
     /**
-     * Рендерит кнопки/табы категорий
+     * Рендерит боковое меню категорий (как в KFC - слева)
      */
     private static function renderCategoryTabs(array $categories, string $currentCategory, array $texts = []): string
     {
@@ -70,29 +70,17 @@ class CatalogTemplate extends BaseTemplate
             return '';
         }
         
-        $categoryText = $texts['category'] ?? [];
-        $allLabel = $categoryText['all'] ?? 'Все';
-        $search = $_GET['search'] ?? '';
-
-        $html = '<div class="d-flex flex-wrap justify-content-center gap-2 mb-4">';
+        // Сортируем категории для предсказуемого порядка
+        sort($categories);
         
-        // Кнопка "Все"
-        $activeClass = (empty($currentCategory)) ? 'active' : '';
-        $queryParams = $search ? '?search=' . urlencode($search) : '';
-        $html .= '<a href="/catalog' . $queryParams . '" class="btn btn-lg ' . ($activeClass ? 'btn-dark' : 'btn-outline-dark') . ' ' . $activeClass . '">' 
-               . htmlspecialchars($allLabel) . '</a>';
-
+        $html = '<div class="category-sidebar">';
+        
         // Кнопки категорий
         foreach ($categories as $cat) {
+            $slug = self::slugify($cat);
             $isActive = ($cat === $currentCategory);
             $activeClass = $isActive ? 'active' : '';
-            $params = ['category=' . urlencode($cat)];
-            if ($search) {
-                $params[] = 'search=' . urlencode($search);
-            }
-            $queryString = '?' . implode('&', $params);
-            
-            $html .= '<a href="/catalog' . $queryString . '" class="btn btn-lg ' . ($isActive ? 'btn-dark' : 'btn-outline-dark') . ' ' . $activeClass . '">' 
+            $html .= '<a href="#category-' . $slug . '" class="category-link ' . $activeClass . '">' 
                    . htmlspecialchars($cat) . '</a>';
         }
         
@@ -102,7 +90,46 @@ class CatalogTemplate extends BaseTemplate
     }
     
     /**
-     * Рендерит сетку карточек товаров
+     * Создает slug из строки для anchor-ссылок (поддержка русских букв)
+     */
+    private static function slugify(string $text): string
+    {
+        $text = mb_strtolower($text);
+        
+        // Транслитерация русских букв
+        $replace = [
+            'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'e',
+            'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm',
+            'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u',
+            'ф' => 'f', 'х' => 'h', 'ц' => 'ts', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '',
+            'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya',
+            ' ' => '-'
+        ];
+        
+        $text = strtr($text, $replace);
+        $text = preg_replace('/[^a-z0-9\-]/', '', $text);
+        $text = preg_replace('/-+/', '-', $text);
+        return trim($text, '-');
+    }
+    
+    /**
+     * Группирует товары по категориям
+     */
+    private static function groupProductsByCategory(array $products): array
+    {
+        $grouped = [];
+        foreach ($products as $product) {
+            $category = $product['category'] ?? 'Без категории';
+            if (!isset($grouped[$category])) {
+                $grouped[$category] = [];
+            }
+            $grouped[$category][] = $product;
+        }
+        return $grouped;
+    }
+    
+    /**
+     * Рендерит сетку карточек товаров, сгруппированных по категориям
      */
     private static function renderProductsGrid(array $products, array $texts = []): string
     {
@@ -116,7 +143,33 @@ class CatalogTemplate extends BaseTemplate
         $detailsText = $productText['details'] ?? 'Подробнее';
         $inStockText = $productText['inStock'] ?? 'В наличии';
 
-        $html = '';
+        // Группируем товары по категориям
+        $groupedProducts = self::groupProductsByCategory($products);
+        
+        // Сортируем категории для предсказуемого порядка
+        ksort($groupedProducts);
+        
+        $html = '<div class="products-sections">';
+        
+        // Категории (отсортированные)
+        foreach ($groupedProducts as $category => $items) {
+            $html .= self::renderProductSection('category-' . self::slugify($category), $category, $items, $addToCartText, $detailsText, $inStockText);
+        }
+        
+        $html .= '</div>';
+        
+        return $html;
+    }
+    
+    /**
+     * Рендерит одну секцию товаров (категорию)
+     */
+    private static function renderProductSection(string $anchorId, string $title, array $products, string $addToCartText, string $detailsText, string $inStockText): string
+    {
+        $html = '
+        <div id="' . $anchorId . '" class="product-section">
+            <h3 class="category-title mb-4">' . htmlspecialchars($title) . '</h3>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">';
         
         foreach ($products as $product) {
             $name = htmlspecialchars($product['name'] ?? 'Без названия');
@@ -125,7 +178,6 @@ class CatalogTemplate extends BaseTemplate
             $image = htmlspecialchars($product['image'] ?? '/assets/img/no-image.jpg');
             $id = (int)($product['id'] ?? 0);
             
-            // JSON данные для JavaScript
             $productJson = htmlspecialchars(json_encode([
                 'id' => $id,
                 'name' => $product['name'] ?? '',
@@ -133,7 +185,6 @@ class CatalogTemplate extends BaseTemplate
                 'image' => $product['image'] ?? ''
             ], JSON_UNESCAPED_UNICODE), ENT_QUOTES);
             
-            // Короткое описание (макс. 100 символов)
             $shortDesc = mb_strlen($description) > 100 
                 ? mb_substr($description, 0, 100) . '...' 
                 : $description;
@@ -155,7 +206,6 @@ class CatalogTemplate extends BaseTemplate
                         <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                             <span class="h5 mb-0">' . $price . ' ₽</span>
                             <div class="btn-group">
-                                <!-- Кнопка добавления в корзину -->
                                 <button type="button" 
                                         class="btn btn-primary btn-sm px-3 btn-add-to-cart"
                                         data-product=\'' . $productJson . '\'
@@ -166,7 +216,6 @@ class CatalogTemplate extends BaseTemplate
                                     </svg>
                                     <span class="btn-text">' . htmlspecialchars($addToCartText) . '</span>
                                 </button>
-                                <!-- Блок управления количеством (скрыт по умолчанию) -->
                                 <div class="input-group input-group-sm quantity-controls d-none" data-product-id="' . $id . '">
                                     <button class="btn btn-outline-secondary btn-qty" data-action="decrease" type="button">−</button>
                                     <input type="number" class="form-control text-center qty-input" 
@@ -180,6 +229,10 @@ class CatalogTemplate extends BaseTemplate
                 </div>
             </div>';
         }
+        
+        $html .= '
+            </div>
+        </div>';
         
         return $html;
     }

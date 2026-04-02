@@ -4,9 +4,9 @@
  * Доступные переменные:
  * - $search - текущий поисковый запрос
  * - $category - текущая категория
- * - $categoryTabs - HTML кнопок категорий
+ * - $categoryTabs - HTML меню категорий (слева)
  * - $searchInfo - HTML с информацией о результатах поиска
- * - $productsGrid - HTML сетки товаров
+ * - $productsGrid - HTML секций товаров
  * - $texts - массив текстов из storage/templates/catalog.json
  */
 
@@ -21,6 +21,74 @@ $modalText = $texts['modal'] ?? [];
 // Сохраняем текущую категорию для формы поиска
 $category = $category ?? '';
 ?>
+
+<style>
+/* Стили для бокового меню категорий (как KFC) */
+.category-sidebar {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.category-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #212529;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.category-link:hover {
+    background: #e9ecef;
+    color: #212529;
+    border-color: #adb5bd;
+}
+
+.category-link.active {
+    background: #212529 !important;
+    color: #fff !important;
+    border-color: #212529;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.product-section {
+    margin-bottom: 3rem;
+    scroll-margin-top: 100px;
+}
+
+/* Адаптив для мобильных - скрываем боковое меню, показываем горизонтальное */
+@media (max-width: 991px) {
+    .category-sidebar {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .category-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .product-section {
+        scroll-margin-top: 80px;
+    }
+}
+</style>
 
 <div class="container py-5">
     <!-- Заголовок + Поиск -->
@@ -50,25 +118,23 @@ $category = $category ?? '';
         </div>
     </div>
     
-    <!-- Кнопки категорий -->
-    <?php if (!empty($categoryTabs)): ?>
-    <div class="row mb-4">
-        <div class="col-12 text-center">
+    <!-- Основной контент: боковое меню + товары -->
+    <div class="row">
+        <!-- Боковое меню категорий -->
+        <?php if (!empty($categoryTabs)): ?>
+        <div class="col-lg-3 mb-4 mb-lg-0">
             <?= $categoryTabs ?>
         </div>
-    </div>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <!-- Результаты поиска и фильтрации -->
-    <div class="row">
-        <div class="col-12 text-center">
+        <!-- Товары -->
+        <div class="<?= !empty($categoryTabs) ? 'col-lg-9' : 'col-12' ?>">
+            <!-- Результаты поиска -->
             <?= $searchInfo ?>
+            
+            <!-- Секции товаров -->
+            <?= $productsGrid ?>
         </div>
-    </div>
-    
-    <!-- Сетка товаров -->
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        <?= $productsGrid ?>
     </div>
 </div>
 
@@ -123,8 +189,27 @@ document.addEventListener("DOMContentLoaded", function() {
             loadProductModal(productId);
         });
     });
+    
+    // === Плавный скролл при клике на категорию (KFC стиль) ===
+    document.querySelectorAll('.category-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Убираем active со всех ссылок
+            document.querySelectorAll('.category-link').forEach(l => l.classList.remove('active'));
+            // Добавляем active текущей
+            this.classList.add('active');
+            
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
 });
-
+            
 // Загрузка данных товара и показ модального окна
 async function loadProductModal(productId) {
     const modalEl = document.getElementById('productModal');
