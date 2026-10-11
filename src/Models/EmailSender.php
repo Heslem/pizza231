@@ -1,17 +1,33 @@
 <?php
 namespace App\Models;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+// Подключаем автозагрузку Composer только если она реально существует.
+// Если vendor/ отсутствует (например, не выполнялся `composer install`),
+// сайт должен продолжать работать — просто email-отправка будет отключена.
+$__vendorAutoload = __DIR__ . '/../../vendor/autoload.php';
+if (is_file($__vendorAutoload)) {
+    require_once $__vendorAutoload;
+}
+unset($__vendorAutoload);
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 use App\Models\Logger;
 
 /**
  * Класс для отправки email-уведомлений
+ *
+ * Все публичные методы безопасно возвращают false/описание ошибки,
+ * если библиотека PHPMailer или конфигурация email недоступны.
  */
 class EmailSender
 {
+    /**
+     * Доступен ли PHPMailer в текущем окружении
+     */
+    private static function isMailerAvailable(): bool
+    {
+        return class_exists(\PHPMailer\PHPMailer\PHPMailer::class);
+    }
+
     /**
      * Конфигурация SMTP
      */
@@ -33,14 +49,27 @@ class EmailSender
     
     /**
      * Создать экземпляр PHPMailer с настройками SMTP
+     *
+     * Возвращает объект PHPMailer. Если библиотека недоступна или
+     * конфигурация отсутствует — бросает RuntimeException, который
+     * должен быть перехвачен вызывающим кодом.
      */
-    private static function createMailer(): PHPMailer
+    private static function createMailer(): object
     {
-        $mail = new PHPMailer(true);
+        if (!self::isMailerAvailable()) {
+            throw new \RuntimeException(
+                'PHPMailer не установлен: отсутствует vendor/autoload.php. '
+                . 'Выполните `composer install` для включения email-отправки.'
+            );
+        }
+
+        $mailerClass = '\PHPMailer\PHPMailer\PHPMailer';
+        /** @var object $mail */
+        $mail = new $mailerClass(true);
         $config = self::getConfig();
         
         if (empty($config)) {
-            throw new \Exception('Email configuration not found');
+            throw new \RuntimeException('Email configuration not found');
         }
         
         $smtpConfig = $config['smtp'] ?? [];
@@ -56,9 +85,9 @@ class EmailSender
         // Шифрование
         $encryption = $smtpConfig['encryption'] ?? 'tls';
         if ($encryption === 'ssl') {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->SMTPSecure = $mailerClass::ENCRYPTION_SMTPS;
         } else {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->SMTPSecure = $mailerClass::ENCRYPTION_STARTTLS;
         }
         
         // Настройки отправителя
@@ -126,7 +155,7 @@ class EmailSender
             
             return $sent;
             
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             Logger::error('Failed to send order notification email: ' . $e->getMessage(), [
                 'order_id' => $order['id'] ?? 'unknown',
                 'customer_email' => $customerEmail
@@ -317,7 +346,7 @@ class EmailSender
                 'message' => 'SMTP соединение успешно установлено'
             ];
             
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             Logger::error('SMTP connection test failed: ' . $e->getMessage());
             return [
                 'success' => false,
@@ -351,7 +380,7 @@ class EmailSender
             Logger::info('Verification code sent', ['email' => $email]);
             return true;
             
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             Logger::error('Failed to send verification email: ' . $e->getMessage(), [
                 'email' => $email
             ]);

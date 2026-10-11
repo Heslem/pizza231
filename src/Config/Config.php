@@ -6,17 +6,17 @@ use App\Database\Database;
 class Config
 {
     // === Файловые данные (fallback) ===
-    const FILE_PRODUCTS = ".\storage\data.json";
-    const SHOW_CATALOG_AT_HOME = false;
-
+    public const FILE_PRODUCTS = ".\storage\data.json";
+    public const SHOW_CATALOG_AT_HOME = false;
+ 
     // === Настройки базы данных PDO ===
-    const DB_DRIVER = 'mysql';
-    const DB_HOST = 'localhost';
-    const DB_PORT = 3307;
-    const DB_DATABASE = 'auto_parts';      // Имя БД
-    const DB_USERNAME = 'root';            // Имя пользователя
-    const DB_PASSWORD = '';                // Пароль
-    const DB_CHARSET = 'utf8mb4';
+    public const DB_DRIVER = 'mysql';
+    public const DB_HOST = 'localhost';
+    public const DB_PORT = 3306;
+    public const DB_DATABASE = 'cafebebe';      // Имя БД
+    public const DB_USERNAME = 'root';            // Имя пользователя
+    public const DB_PASSWORD = '';                // Пароль
+    public const DB_CHARSET = 'utf8mb4';
 
     // === Инициализация PDO ===
     public static function initDatabase(): void
