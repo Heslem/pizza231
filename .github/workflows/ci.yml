@@ -1,0 +1,105 @@
+name: CI
+
+# Запускается на push в основную ветку и на pull request
+on:
+  push:
+    branches: [ main, master, development ]
+  pull_request:
+    branches: [ main, master, development ]
+  # Ручной запуск через вкладку Actions
+  workflow_dispatch:
+
+jobs:
+  # ============================================================
+  # 1. Проверка синтаксиса PHP
+  # ============================================================
+  lint:
+    name: Проверка синтаксиса PHP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout кода
+        uses: actions/checkout@v4
+
+      - name: Установить PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Проверить синтаксис всех PHP-файлов
+        run: |
+          find src tests -type f -name "*.php" -print0 \
+            | xargs -0 -n 1 -P 4 php -l
+
+  # ============================================================
+  # 2. Тесты PHPUnit (матрица версий PHP)
+  # ============================================================
+  test:
+    name: Тесты на PHP ${{ matrix.php-version }}
+    runs-on: ubuntu-latest
+    needs: lint
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Проект поддерживает >= 7.4, тестируем на актуальных LTS
+        php-version:
+          - '8.1'
+          - '8.2'
+          - '8.3'
+
+    steps:
+      - name: Checkout кода
+        uses: actions/checkout@v4
+
+      - name: Установить PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+          # Расширения, которые нужны проекту (pdo — для моков)
+          extensions: pdo, pdo_mysql, mbstring, json
+
+      - name: Получить кэш Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-php${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
+
+      - name: Установить зависимости Composer
+        run: |
+          composer validate --strict
+          composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Подготовить каталоги storage (нужны для JSON-режима)
+        run: |
+          mkdir -p storage/logs
+          touch storage/logs/.gitkeep
+
+      - name: Запустить PHPUnit
+        run: |
+          vendor/bin/phpunit --testdox --colors=always
+
+  # ============================================================
+  # 3. Проверка структуры проекта (опционально)
+  # ============================================================
+  validate:
+    name: Валидация composer.json
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout кода
+        uses: actions/checkout@v4
+
+      - name: Установить PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Проверить composer.json на ошибки
+        run: composer validate --strict
