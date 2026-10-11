@@ -2,6 +2,7 @@
     "name": "kkt/pizza231",
     "description": "Пиццерия на PHP с использованием MVC",
     "type": "project",
+    "license": "proprietary",
     "require": {
         "php": ">=7.4",
         "phpmailer/phpmailer": "^6.8"
