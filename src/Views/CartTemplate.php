@@ -1,14 +1,26 @@
 <?php
 namespace App\Views;
 
-class CartTemplate extends BaseTemplate
+use App\Models\Cart;
+
+class CartTemplate
 {
-    private const TEMPLATE_PATH = __DIR__ . '/templates/cart.html.php';
-    private const TEXTS_PATH    = __DIR__ . '/../../storage/templates/cart.json';
+    private const TEXTS_PATH = __DIR__ . '/../../storage/templates/cart.json';
 
     public static function getTemplate(): string
     {
-        $texts = self::texts(self::TEXTS_PATH);
-        return parent::render(self::TEMPLATE_PATH, [], $texts);
+        $items = Cart::getItems();
+        $isEmpty = empty($items);
+        $count = Cart::getCount();
+        $total = Cart::getTotal();
+        $cartJson = json_encode($items, JSON_UNESCAPED_UNICODE);
+
+        return Twig::renderPage('cart', [
+            'items' => $items,
+            'isEmpty' => $isEmpty,
+            'count' => $count,
+            'total' => $total,
+            'cartJson' => $cartJson,
+        ], self::TEXTS_PATH);
     }
 }

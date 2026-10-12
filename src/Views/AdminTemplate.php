@@ -1,27 +1,16 @@
 <?php
 namespace App\Views;
 
-class AdminTemplate extends BaseTemplate
+class AdminTemplate
 {
-    private const TEMPLATE_PATH          = __DIR__ . '/templates/admin.html.php';
-    private const ORDERS_TEMPLATE_PATH   = __DIR__ . '/templates/admin_orders.html.php';
-    private const USERS_TEMPLATE_PATH    = __DIR__ . '/templates/admin_users.html.php';
-    private const LOGS_TEMPLATE_PATH     = __DIR__ . '/templates/admin_logs.html.php';
-    private const CATALOG_TEMPLATE_PATH  = __DIR__ . '/templates/admin_catalog.html.php';
-    private const TEXTS_PATH             = __DIR__ . '/../../storage/templates/admin.json';
-
-    private static function loadTexts(): array
-    {
-        return parent::texts(self::TEXTS_PATH);
-    }
+    private const TEXTS_PATH = __DIR__ . '/../../storage/templates/admin.json';
 
     /**
      * Дашборд админки
      */
     public static function renderDashboard(array $stats): string
     {
-        $texts = self::loadTexts();
-        return parent::render(self::TEMPLATE_PATH, ['stats' => $stats], $texts);
+        return Twig::renderPage('admin', ['stats' => $stats], self::TEXTS_PATH);
     }
 
     /**
@@ -29,18 +18,20 @@ class AdminTemplate extends BaseTemplate
      */
     public static function renderOrders(array $orders): string
     {
-        $texts = self::loadTexts();
+        $texts = json_decode(file_get_contents(self::TEXTS_PATH), true) ?? [];
         $activeOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? 'new', ['new', 'processing']));
         $completedOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? '', ['completed', 'cancelled']));
 
         $activeOrdersHtml = self::renderOrdersList($activeOrders, true, $texts);
         $completedOrdersHtml = self::renderOrdersList($completedOrders, false, $texts);
 
-        return parent::render(self::ORDERS_TEMPLATE_PATH, [
-            'orders' => $orders,
+        return Twig::renderPage('admin_orders', [
+            'activeOrders' => array_values($activeOrders),
+            'completedOrders' => array_values($completedOrders),
             'activeOrdersHtml' => $activeOrdersHtml,
             'completedOrdersHtml' => $completedOrdersHtml,
-        ], $texts);
+            'ordersJson' => json_encode(array_values($orders), JSON_UNESCAPED_UNICODE),
+        ], self::TEXTS_PATH);
     }
 
     /**
@@ -48,7 +39,7 @@ class AdminTemplate extends BaseTemplate
      */
     public static function renderUsers(array $users): string
     {
-        $texts = self::loadTexts();
+        $texts = json_decode(file_get_contents(self::TEXTS_PATH), true) ?? [];
         $usersText = $texts['users'] ?? [];
 
         $usersHtml = '';
@@ -67,7 +58,7 @@ class AdminTemplate extends BaseTemplate
             }
         }
 
-        return parent::render(self::USERS_TEMPLATE_PATH, ['usersHtml' => $usersHtml], $texts);
+        return Twig::renderPage('admin_users', ['usersHtml' => $usersHtml], self::TEXTS_PATH);
     }
 
     /**
@@ -75,8 +66,7 @@ class AdminTemplate extends BaseTemplate
      */
     public static function renderLogs(array $logs): string
     {
-        $texts = self::loadTexts();
-        return parent::render(self::LOGS_TEMPLATE_PATH, ['logs' => $logs], $texts);
+        return Twig::renderPage('admin_logs', ['logs' => $logs], self::TEXTS_PATH);
     }
 
     /**
@@ -84,14 +74,16 @@ class AdminTemplate extends BaseTemplate
      */
     public static function renderCatalog(array $products, array $categories): string
     {
-        $texts = self::loadTexts();
+        $texts = json_decode(file_get_contents(self::TEXTS_PATH), true) ?? [];
         $catalogText = $texts['catalog'] ?? [];
         $productsHtml = self::renderProductsList($products, $catalogText);
 
-        return parent::render(self::CATALOG_TEMPLATE_PATH, [
+        return Twig::renderPage('admin_catalog', [
             'productsHtml' => $productsHtml,
             'categories' => $categories,
-        ], $texts);
+            'productsJson' => json_encode(array_values($products), JSON_UNESCAPED_UNICODE),
+            'categoriesJson' => json_encode($categories, JSON_UNESCAPED_UNICODE),
+        ], self::TEXTS_PATH);
     }
 
     /**

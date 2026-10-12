@@ -1,31 +1,28 @@
 <?php
 namespace App\Views;
 
-class ProductTemplate extends BaseTemplate
+class ProductTemplate
 {
-    private const TEMPLATE_PATH = __DIR__ . '/templates/product.html.php';
-    private const TEXTS_PATH    = __DIR__ . '/../../storage/templates/product.json';
+    private const TEXTS_PATH = __DIR__ . '/../../storage/templates/product.json';
 
     /**
      * Рендер страницы товара
      */
-    public static function renderProduct(array $product, array $related = []): string
+    public static function renderProduct(array $product): string
     {
-        $texts = self::texts(self::TEXTS_PATH);
         $fallbackImage = '/assets/img/no-image.jpg';
         $notFound = empty($product) || !isset($product['id']);
 
         if ($notFound) {
-            return parent::render(self::TEMPLATE_PATH, [
+            return Twig::renderPage('product', [
                 'notFound' => true,
-                'texts' => $texts,
-            ], $texts, self::LAYOUT_PATH);
+            ], self::TEXTS_PATH);
         }
 
         $price = floatval($product['price'] ?? 0);
         $priceFormatted = number_format($price, 0, '.', ' ');
 
-        return parent::render(self::TEMPLATE_PATH, [
+        return Twig::renderPage('product', [
             'id' => $product['id'],
             'title' => $product['name'] ?? '',
             'description' => $product['description'] ?? '',
@@ -35,8 +32,6 @@ class ProductTemplate extends BaseTemplate
             'fallbackImage' => $fallbackImage,
             'productJson' => json_encode($product, JSON_UNESCAPED_UNICODE),
             'notFound' => false,
-            'related' => $related,
-            'texts' => $texts,
-        ], $texts, self::LAYOUT_PATH, '<link rel="stylesheet" href="/assets/css/product.css"><script src="/assets/js/product.js"></script>');
+        ], self::TEXTS_PATH);
     }
 }

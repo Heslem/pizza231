@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block styles %}
+<link rel="stylesheet" href="/assets/css/profile.css">
+{% endblock %}
+
+{% block content %}
+{% set texts = texts|default({}) %}
+{% set avatarText = texts.avatar|default({}) %}
+{% set formText = texts.form|default({}) %}
+{% set profile = profile|default({}) %}
+
+<div class="container py-4">
+    <!-- Секция аватара -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h5 class="card-title mb-3">{{ avatarText.title|default('Аватар') }}</h5>
+
+            <div class="avatar-container mb-3">
+                <img id="avatar-preview" src="{{ profile.avatar|default('/assets/img/default-avatar.png') }}" alt="Аватар" class="rounded-circle profile-avatar">
+            </div>
+
+            <form id="avatar-form" enctype="multipart/form-data">
+                <input type="file" id="avatar-input" name="avatar" accept="image/*" class="d-none">
+                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('avatar-input').click()">
+                    <i class="bi bi-camera me-2"></i>{{ avatarText.change|default('Сменить аватар') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Форма профиля -->
+    <form id="profile-form">
+        <div class="mb-3">
+            <label for="name" class="form-label">{{ formText.name|default('Имя') }}</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ profile.name|default('') }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">{{ formText.email|default('Email') }}</label>
+            <input type="email" class="form-control" id="email" value="{{ profile.email|default('') }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">{{ formText.phone|default('Телефон') }}</label>
+            <input type="tel" class="form-control" id="phone" value="{{ profile.phone|default('') }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="address" class="form-label">{{ formText.address|default('Адрес') }}</label>
+            <textarea class="form-control" id="address" name="address" rows="3">{{ profile.address|default('') }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ formText.save|default('Сохранить') }}</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/assets/js/profile.js"></script>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% set hero = texts.hero|default({}) %}
+{% set features = texts.features|default({}) %}
+{% set catalog = texts.catalog|default({}) %}
+{% set image = texts.image|default({}) %}
+{% set about = texts.about|default({}) %}
+
+{% block content %}
+<!-- Герой-блок на всю высоту -->
+<div class="hero-section hero-fullscreen text-center">
+    <div class="container">
+        <h1 class="display-3 fw-bold">{{ hero.title|default('Добро пожаловать в кафе «Бе-Бе»') }}</h1>
+        <p class="lead fs-4">{{ hero.subtitle|default('Аутентичная уйгурско-узбецкая кухня в самом сердце города.') }}</p>
+        <a href="/catalog" class="btn btn-warning btn-lg mt-4">{{ hero.catalogButton|default('Посмотреть меню') }}</a>
+    </div>
+</div>
+{% endblock %}

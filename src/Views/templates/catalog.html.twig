@@ -1,27 +1,6 @@
-<?php
-/**
- * Шаблон страницы каталога
- * Доступные переменные:
- * - $search - текущий поисковый запрос
- * - $category - текущая категория
- * - $categoryTabs - HTML меню категорий (слева)
- * - $searchInfo - HTML с информацией о результатах поиска
- * - $productsGrid - HTML секций товаров
- * - $texts - массив текстов из storage/templates/catalog.json
- */
+{% extends 'base.html.twig' %}
 
-// Значения по умолчанию
-$texts = $texts ?? [];
-$pageTitle = $texts['pageTitle'] ?? 'Каталог товаров';
-$titleText = $texts['title'] ?? 'Каталог товаров';
-$searchText = $texts['search'] ?? [];
-$toastText = $texts['toast'] ?? [];
-$modalText = $texts['modal'] ?? [];
-
-// Сохраняем текущую категорию для формы поиска
-$category = $category ?? '';
-?>
-
+{% block styles %}
 <style>
 /* Стили для бокового меню категорий (как KFC) */
 .category-sidebar {
@@ -78,62 +57,74 @@ $category = $category ?? '';
         gap: 0.5rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .category-link {
         padding: 0.5rem 0.75rem;
         font-size: 0.9rem;
     }
-    
+
     .product-section {
         scroll-margin-top: 80px;
     }
 }
 </style>
+{% endblock %}
+
+{% block content %}
+{% set searchText = texts.search|default([]) %}
+{% set toastText = texts.toast|default([]) %}
+{% set modalText = texts.modal|default([]) %}
+{% set titleText = texts.title|default('Каталог товаров') %}
+{% set search = search|default('') %}
+{% set category = category|default('') %}
+{% set categoryTabs = categoryTabs|default('') %}
+{% set searchInfo = searchInfo|default('') %}
+{% set productsGrid = productsGrid|default('') %}
 
 <div class="container py-5">
     <!-- Заголовок + Поиск -->
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h1 class="display-5 fw-bold mb-4"><?= htmlspecialchars($titleText) ?></h1>
+            <h1 class="display-5 fw-bold mb-4">{{ titleText }}</h1>
 
             <!-- Форма поиска -->
             <form method="GET" action="/catalog" class="col-md-6 col-lg-4 mx-auto">
-                <?php if (!empty($category)): ?>
-                <input type="hidden" name="category" value="<?= htmlspecialchars($category) ?>">
-                <?php endif; ?>
+                {% if category is not empty %}
+                <input type="hidden" name="category" value="{{ category }}">
+                {% endif %}
                 <div class="input-group input-group-lg">
                     <span class="input-group-text bg-white border-end-0">
                         <i class="bi bi-search text-muted"></i>
                     </span>
-                    <input 
-                        type="text" 
-                        name="search" 
-                        class="form-control border-start-0 ps-0" 
-                        placeholder="<?= htmlspecialchars($searchText['placeholder'] ?? 'Поиск товаров...') ?>"
-                        value="<?= htmlspecialchars($search) ?>"
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control border-start-0 ps-0"
+                        placeholder="{{ searchText.placeholder|default('Поиск товаров...') }}"
+                        value="{{ search }}"
                         aria-label="Поиск">
-                    <button class="btn btn-primary px-4" type="submit"><?= htmlspecialchars($searchText['button'] ?? 'Найти') ?></button>
+                    <button class="btn btn-primary px-4" type="submit">{{ searchText.button|default('Найти') }}</button>
                 </div>
             </form>
         </div>
     </div>
-    
+
     <!-- Основной контент: боковое меню + товары -->
     <div class="row">
         <!-- Боковое меню категорий -->
-        <?php if (!empty($categoryTabs)): ?>
+        {% if categoryTabs is not empty %}
         <div class="col-lg-3 mb-4 mb-lg-0">
-            <?= $categoryTabs ?>
+            {{ categoryTabs|raw }}
         </div>
-        <?php endif; ?>
+        {% endif %}
 
         <!-- Товары -->
-        <div class="<?= !empty($categoryTabs) ? 'col-lg-9' : 'col-12' ?>">
+        <div class="{{ categoryTabs is not empty ? 'col-lg-9' : 'col-12' }}">
             <!-- Результаты поиска -->
-            <?= $searchInfo ?>
-            
+            {{ searchInfo|raw }}
+
             <!-- Секции товаров -->
-            <?= $productsGrid ?>
+            {{ productsGrid|raw }}
         </div>
     </div>
 </div>
@@ -143,14 +134,14 @@ $category = $category ?? '';
     <button class="toast-close" id="closeFullscreenToast" aria-label="Закрыть">
         <i class="bi bi-x-lg"></i>
     </button>
-    
+
     <video class="toast-video" id="toastVideo" autoplay muted playsinline loop>
         <source src="/assets/img/cart_video.mp4" type="video/mp4">
         Ваш браузер не поддерживает видео.
     </video>
-    
+
     <div class="toast-message" id="fullscreenToastMessage">
-        <?= htmlspecialchars($toastText['addedWithEmoji'] ?? '🎉 Товар добавлен в корзину!') ?>
+        {{ toastText.addedWithEmoji|default('🎉 Товар добавлен в корзину!') }}
     </div>
 </div>
 
@@ -160,20 +151,37 @@ $category = $category ?? '';
         <div class="d-flex">
             <div class="toast-body">
                 <i class="bi bi-check-circle-fill me-2"></i>
-                <span id="toastMessage"><?= htmlspecialchars($toastText['added'] ?? 'Товар добавлен в корзину!') ?></span>
+                <span id="toastMessage">{{ toastText.added|default('Товар добавлен в корзину!') }}</span>
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
     </div>
 </div>
 
+<!-- Модальное окно товара -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ modalText.title|default('Информация о товаре') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Загружается через JS -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const toastEl = document.getElementById("cartToast");
     if (toastEl && typeof bootstrap !== "undefined") {
         window.cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
     }
-    
+
     // Закрытие полноэкранного toast
     document.getElementById('closeFullscreenToast')?.addEventListener('click', function() {
         const toast = document.getElementById('fullscreenToast');
@@ -181,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
         toast.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('toast-open');
     });
-    
+
     // Обработчики для кнопок "Подробнее"
     document.querySelectorAll('.btn-product-details').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -189,93 +197,89 @@ document.addEventListener("DOMContentLoaded", function() {
             loadProductModal(productId);
         });
     });
-    
+
     // === Плавный скролл при клике на категорию (KFC стиль) ===
     document.querySelectorAll('.category-link').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            // Убираем active со всех ссылок
+
             document.querySelectorAll('.category-link').forEach(l => l.classList.remove('active'));
-            // Добавляем active текущей
             this.classList.add('active');
-            
+
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
-            
+
             if (targetElement) {
                 targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
     });
 });
-            
+
 // Загрузка данных товара и показ модального окна
 async function loadProductModal(productId) {
     const modalEl = document.getElementById('productModal');
     const modalBody = modalEl.querySelector('.modal-body');
     const modal = new bootstrap.Modal(modalEl);
-    
-    // Показать загрузку
+
     modalBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
     modal.show();
-    
+
     try {
         const response = await fetch('/api/product/' + productId);
         const data = await response.json();
-        
+
         if (data.notFound) {
-            modalBody.innerHTML = '<div class="alert alert-warning">Товар не найден</div>';
+            modalBody.innerHTML = '<div class="alert alert-warning">{{ modalText.notFound|default('Товар не найден') }}</div>';
             return;
         }
-        
+
         const product = data;
         const priceFormatted = new Intl.NumberFormat('ru-RU').format(product.price);
         const image = product.image || '/assets/img/no-image.jpg';
         const fallbackImage = '/assets/img/error.jpg';
-        
-        // Проверить, есть ли товар в корзине
+
         const cart = CartManager ? CartManager.get() : [];
         const cartItem = cart.find(item => item.id === product.id);
         const inCart = !!cartItem;
         const quantity = cartItem ? cartItem.quantity : 1;
-        
+
         const productJson = JSON.stringify({
             id: product.id,
             name: product.name,
             price: product.price,
             image: product.image
         }).replace(/"/g, '&quot;');
-        
+
         modalBody.innerHTML = `
             <div class="row">
                 <div class="col-md-5 mb-3 mb-md-0">
-                    <img src="${image}" 
-                         class="img-fluid rounded-3 shadow-sm" 
+                    <img src="${image}"
+                         class="img-fluid rounded-3 shadow-sm"
                          alt="${product.name}"
                          style="width: 100%; max-height: 300px; object-fit: contain;"
                          onerror="this.src='${fallbackImage}'; this.onerror=null;">
                 </div>
                 <div class="col-md-7">
-                    <h5 class="text-uppercase fw-bold ls-1 mb-2 text-muted" style="font-size: 0.8rem;">Наше меню</h5>
+                    <h5 class="text-uppercase fw-bold ls-1 mb-2 text-muted" style="font-size: 0.8rem;">{{ texts.product.label|default('Наше меню') }}</h5>
                     <h3 class="card-title fw-bold mb-3">${product.name}</h3>
                     <p class="card-text text-muted" style="line-height: 1.6;">${product.description}</p>
-                    
+
                     <div class="d-flex align-items-center mb-3">
                         <span class="h3 fw-bold me-3">${priceFormatted} ₽</span>
-                        <span class="badge bg-success px-3 py-2 rounded-pill">В наличии</span>
+                        <span class="badge bg-success px-3 py-2 rounded-pill">{{ texts.product.inStock|default('В наличии') }}</span>
                     </div>
-                    
+
                     <div class="d-flex align-items-center gap-2">
                         ${inCart ? `
                             <div class="input-group input-group-sm" style="max-width: 130px;">
                                 <button class="btn btn-outline-secondary btn-qty-modal" data-action="decrease" data-id="${product.id}">−</button>
-                                <input type="number" class="form-control text-center qty-input-modal" 
+                                <input type="number" class="form-control text-center qty-input-modal"
                                        value="${quantity}" min="1" data-id="${product.id}">
                                 <button class="btn btn-outline-secondary btn-qty-modal" data-action="increase" data-id="${product.id}">+</button>
                             </div>
                         ` : `
-                            <button type="button" 
+                            <button type="button"
                                     class="btn btn-primary btn-add-to-cart"
                                     data-product="${productJson}"
                                     data-id="${product.id}">
@@ -283,37 +287,34 @@ async function loadProductModal(productId) {
                                     <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z"/>
                                     <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                                 </svg>
-                                В корзину
+                                {{ texts.product.addToCart|default('В корзину') }}
                             </button>
                         `}
                     </div>
                 </div>
             </div>
         `;
-        
-        // Добавить обработчики для кнопок в модальном окне
+
         initModalCartHandlers(product.id);
-        
+
     } catch (error) {
-        modalBody.innerHTML = '<div class="alert alert-danger">Ошибка загрузки товара</div>';
+        modalBody.innerHTML = '<div class="alert alert-danger">{{ modalText.error|default('Ошибка загрузки товара') }}</div>';
     }
 }
 
 // Инициализация обработчиков корзины в модальном окне
 function initModalCartHandlers(productId) {
-    // Кнопка "В корзину"
     const addBtn = document.querySelector(`#productModal .btn-add-to-cart[data-id="${productId}"]`);
     if (addBtn) {
         addBtn.addEventListener('click', function() {
             const product = JSON.parse(this.dataset.product);
             CartManager.add(product);
             CartManager.showToast('"' + product.name + '" добавлен в корзину!', 'success', false);
-            
-            // Переключиться на блок управления количеством
+
             const modalBody = document.querySelector('#productModal .modal-body');
             const cart = CartManager.get();
             const item = cart.find(i => i.id === productId);
-            
+
             if (item) {
                 const productJson = JSON.stringify({
                     id: product.id,
@@ -321,54 +322,51 @@ function initModalCartHandlers(productId) {
                     price: product.price,
                     image: product.image
                 }).replace(/"/g, '&quot;');
-                
+
                 const controlsHtml = `
                     <div class="input-group input-group-sm" style="max-width: 130px;">
                         <button class="btn btn-outline-secondary btn-qty-modal" data-action="decrease" data-id="${product.id}">−</button>
-                        <input type="number" class="form-control text-center qty-input-modal" 
+                        <input type="number" class="form-control text-center qty-input-modal"
                                value="${item.quantity}" min="1" data-id="${product.id}">
                         <button class="btn btn-outline-secondary btn-qty-modal" data-action="increase" data-id="${product.id}">+</button>
                     </div>
                 `;
-                
+
                 this.outerHTML = controlsHtml;
                 initModalCartHandlers(productId);
             }
         });
     }
-    
-    // Кнопки +/- в модальном окне
+
     document.querySelectorAll(`#productModal .btn-qty-modal`).forEach(btn => {
         btn.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
             const input = document.querySelector(`#productModal .qty-input-modal[data-id="${id}"]`);
             let value = parseInt(input.value) || 1;
-            
+
             if (this.dataset.action === 'increase') {
                 value++;
             } else {
                 value = Math.max(0, value - 1);
             }
-            
+
             input.value = value;
-            
+
             if (value === 0) {
                 CartManager.remove(id);
                 CartManager.showToast('Товар удалён', 'success', false);
-                // Вернуть кнопку "В корзину"
                 loadProductModal(id);
             } else {
                 CartManager.updateQuantity(id, value);
             }
         });
     });
-    
-    // Прямой ввод количества
+
     document.querySelectorAll(`#productModal .qty-input-modal`).forEach(input => {
         input.addEventListener('change', function() {
             const id = parseInt(this.dataset.id);
             const value = parseInt(this.value) || 1;
-            
+
             if (value <= 0) {
                 CartManager.remove(id);
                 CartManager.showToast('Товар удалён', 'success', false);
@@ -380,18 +378,4 @@ function initModalCartHandlers(productId) {
     });
 }
 </script>
-
-<!-- Модальное окно товара -->
-<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Информация о товаре</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Загружается через JS -->
-            </div>
-        </div>
-    </div>
-</div>
+{% endblock %}

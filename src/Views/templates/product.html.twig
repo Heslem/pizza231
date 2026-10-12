@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block styles %}
+<link rel="stylesheet" href="/assets/css/product.css">
+{% endblock %}
+
+{% block content %}
+{% if notFound %}
+<div class="container mt-5">
+    <div class="alert alert-warning text-center shadow-sm" role="alert">
+        <h4 class="alert-heading">{{ texts.notFound.title|default('Товар не найден!') }}</h4>
+        <p>{{ texts.notFound.message|default('К сожалению, товар с таким идентификатором отсутствует в нашем каталоге.') }}</p>
+        <hr>
+        <a href="/catalog" class="btn btn-outline-warning">{{ texts.notFound.backLink|default('Вернуться в каталог') }}</a>
+    </div>
+</div>
+{% else %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <!-- Карточка товара -->
+            <div class="card shadow-lg rounded-4 overflow-hidden">
+                <div class="row g-0 h-100">
+
+                    <!-- Блок с изображением -->
+                    <div class="col-md-5 col-lg-4 d-flex align-items-center justify-content-center p-4 bg-light" style="min-height: 300px;">
+                        <img src="{{ image }}"
+                             class="img-fluid rounded-3 shadow-sm"
+                             alt="{{ title }}"
+                             style="max-height: 350px; width: 100%; object-fit: contain;"
+                             onerror="this.src='{{ fallbackImage }}'; this.onerror=null;">
+                    </div>
+
+                    <!-- Блок с информацией -->
+                    <div class="col-md-7 col-lg-8">
+                        <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-center">
+
+                            <!-- Заголовок секции -->
+                            <h5 class="text-uppercase fw-bold ls-1 mb-2 text-muted" style="font-size: 0.9rem;">{{ texts.product.label|default('Наше меню') }}</h5>
+
+                            <!-- Название товара -->
+                            <h2 class="card-title display-6 fw-bold mb-3">{{ title }}</h2>
+
+                            <!-- Описание -->
+                            <p class="card-text lead mb-4 text-muted" style="line-height: 1.6;">
+                                {{ description }}
+                            </p>
+
+                            <!-- Цена и статус -->
+                            <div class="mt-auto">
+                                <div class="d-flex align-items-center mb-4">
+                                    <span class="display-5 fw-bold me-3">{{ priceFormatted }} ₽</span>
+                                    <span class="badge bg-success px-3 py-2 rounded-pill">{{ texts.product.inStock|default('В наличии') }}</span>
+                                </div>
+
+                                <!-- Кнопки -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                                    <button type="button"
+                                            class="btn btn-primary btn-lg px-4 me-md-2 fw-bold shadow-sm btn-add-to-cart"
+                                            data-product='{{ productJson }}'
+                                            id="add-to-cart-{{ id }}">
+                                        <i class="bi bi-cart-plus me-2"></i>
+                                        <span class="btn-text">{{ texts.product.addToCart|default('В корзину') }}</span>
+                                    </button>
+                                    <a href="/" class="btn btn-outline-dark btn-lg px-4">{{ texts.product.goHome|default('На главную') }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Дополнительная информация -->
+            <div class="row mt-4 text-center small text-muted">
+                <div class="col-4">
+                    <i class="bi bi-truck me-1"></i> {{ texts.features.delivery|default('Быстрая доставка') }}
+                </div>
+                <div class="col-4">
+                    <i class="bi bi-shield-check me-1"></i> {{ texts.features.warranty|default('Гарантия качества') }}
+                </div>
+                <div class="col-4">
+                    <i class="bi bi-heart me-1"></i> {{ texts.features.fresh|default('Свежие ингредиенты') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast-уведомление -->
+<div id="fullscreenToast" class="fullscreen-toast" aria-hidden="true">
+    <button class="toast-close" id="closeFullscreenToast" aria-label="Закрыть">
+        <i class="bi bi-x-lg"></i>
+    </button>
+
+    <video class="toast-video" id="toastVideo" autoplay muted playsinline loop>
+        <source src="/assets/img/cart_video.mp4" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+
+    <div class="toast-message" id="fullscreenToastMessage">
+        {{ texts.toast.addedWithEmoji|default('🎉 Товар добавлен в корзину!') }}
+    </div>
+</div>
+
+<!-- Стандартный Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span id="toastMessage">{{ texts.toast.added|default('Товар добавлен в корзину!') }}</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if notFound %}
+{% else %}
+<script src="/assets/js/product.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const toastEl = document.getElementById("cartToast");
+    if (toastEl && typeof bootstrap !== "undefined") {
+        window.cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

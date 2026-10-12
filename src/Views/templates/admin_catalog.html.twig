@@ -1,28 +1,18 @@
-<?php
-/**
- * Шаблон страницы управления каталогом товаров
- * Доступные переменные:
- * - $texts - массив текстов из storage/templates/admin.json
- * - $catalogText - тексты для каталога
- */
+{% extends 'base.html.twig' %}
 
-$texts = $texts ?? [];
-$catalogText = $texts['catalog'] ?? [];
-
-// Получаем категории из модели Product
-$categories = $categories ?? [];
-$products = $products ?? [];
-?>
+{% block content %}
+{% set catalogText = texts.catalog|default({}) %}
+{% set productsData = products|default([]) %}
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><?= htmlspecialchars($catalogText['title'] ?? 'Управление каталогом') ?></h2>
+        <h2>{{ catalogText.title|default('Управление каталогом') }}</h2>
         <div>
             <a href="/admin" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> <?= htmlspecialchars($catalogText['back'] ?? 'Назад в панель') ?>
+                <i class="bi bi-arrow-left"></i> {{ catalogText.back|default('Назад в панель') }}
             </a>
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#productModal">
-                <i class="bi bi-plus-lg"></i> <?= htmlspecialchars($catalogText['addProduct'] ?? 'Добавить товар') ?>
+                <i class="bi bi-plus-lg"></i> {{ catalogText.addProduct|default('Добавить товар') }}
             </button>
         </div>
     </div>
@@ -30,15 +20,15 @@ $products = $products ?? [];
     <!-- Поиск и фильтр -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <input type="text" class="form-control" id="searchInput" 
-                   placeholder="<?= htmlspecialchars($catalogText['searchPlaceholder'] ?? 'Поиск по названию...') ?>">
+            <input type="text" class="form-control" id="searchInput"
+                   placeholder="{{ catalogText.searchPlaceholder|default('Поиск по названию...') }}">
         </div>
         <div class="col-md-4">
             <select class="form-select" id="categoryFilter">
-                <option value=""><?= htmlspecialchars($catalogText['allCategories'] ?? 'Все категории') ?></option>
-                <?php foreach ($categories as $category): ?>
-                    <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
-                <?php endforeach; ?>
+                <option value="">{{ catalogText.allCategories|default('Все категории') }}</option>
+                {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
             </select>
         </div>
     </div>
@@ -50,16 +40,16 @@ $products = $products ?? [];
                 <table class="table table-hover mb-0" id="productsTable">
                     <thead class="table-light">
                         <tr>
-                            <th><?= htmlspecialchars($catalogText['id'] ?? 'ID') ?></th>
-                            <th><?= htmlspecialchars($catalogText['image'] ?? 'Изображение') ?></th>
-                            <th><?= htmlspecialchars($catalogText['name'] ?? 'Название') ?></th>
-                            <th><?= htmlspecialchars($catalogText['category'] ?? 'Категория') ?></th>
-                            <th><?= htmlspecialchars($catalogText['price'] ?? 'Цена') ?></th>
-                            <th><?= htmlspecialchars($catalogText['actions'] ?? 'Действия') ?></th>
+                            <th>{{ catalogText.id|default('ID') }}</th>
+                            <th>{{ catalogText.image|default('Изображение') }}</th>
+                            <th>{{ catalogText.name|default('Название') }}</th>
+                            <th>{{ catalogText.category|default('Категория') }}</th>
+                            <th>{{ catalogText.price|default('Цена') }}</th>
+                            <th>{{ catalogText.actions|default('Действия') }}</th>
                         </tr>
                     </thead>
                     <tbody id="productsTableBody">
-                        <?= $productsHtml ?? '' ?>
+                        {{ productsHtml|default('')|raw }}
                     </tbody>
                 </table>
             </div>
@@ -73,70 +63,70 @@ $products = $products ?? [];
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="productModalLabel">
-                    <?= htmlspecialchars($catalogText['addProduct'] ?? 'Добавить товар') ?>
+                    {{ catalogText.addProduct|default('Добавить товар') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="productForm">
                     <input type="hidden" id="productId" name="id" value="">
-                    
+
                     <div class="mb-3">
                         <label for="productName" class="form-label">
-                            <?= htmlspecialchars($catalogText['name'] ?? 'Название') ?> *
+                            {{ catalogText.name|default('Название') }} *
                         </label>
                         <input type="text" class="form-control" id="productName" name="name" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="productDescription" class="form-label">
-                            <?= htmlspecialchars($catalogText['description'] ?? 'Описание') ?>
+                            {{ catalogText.description|default('Описание') }}
                         </label>
                         <textarea class="form-control" id="productDescription" name="description" rows="4"></textarea>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="productPrice" class="form-label">
-                                <?= htmlspecialchars($catalogText['price'] ?? 'Цена') ?> *
+                                {{ catalogText.price|default('Цена') }} *
                             </label>
-                            <input type="number" class="form-control" id="productPrice" name="price" 
+                            <input type="number" class="form-control" id="productPrice" name="price"
                                    min="1" step="1" required>
                         </div>
-                        
+
                         <div class="col-md-6 mb-3">
                             <label for="productCategory" class="form-label">
-                                <?= htmlspecialchars($catalogText['category'] ?? 'Категория') ?> *
+                                {{ catalogText.category|default('Категория') }} *
                             </label>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="productCategory" name="category" 
+                                <input type="text" class="form-control" id="productCategory" name="category"
                                        list="categoryList" required>
                                 <datalist id="categoryList">
-                                    <?php foreach ($categories as $category): ?>
-                                        <option value="<?= htmlspecialchars($category) ?>">
-                                    <?php endforeach; ?>
+                                    {% for category in categories %}
+                                        <option value="{{ category }}">
+                                    {% endfor %}
                                 </datalist>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="productImage" class="form-label">
-                            <?= htmlspecialchars($catalogText['image'] ?? 'Изображение') ?>
+                            {{ catalogText.image|default('Изображение') }}
                         </label>
-                        <input type="text" class="form-control" id="productImage" name="image" 
-                               placeholder="<?= htmlspecialchars($catalogText['imageHint'] ?? 'URL или путь к изображению') ?>"
+                        <input type="text" class="form-control" id="productImage" name="image"
+                               placeholder="{{ catalogText.imageHint|default('URL или путь к изображению') }}"
                                value="/assets/img/no-image.jpg">
-                        <small class="text-muted"><?= htmlspecialchars($catalogText['imageHint'] ?? 'Например: /assets/img/photo.jpg или https://example.com/img.jpg') ?></small>
+                        <small class="text-muted">{{ catalogText.imageHint|default('Например: /assets/img/photo.jpg или https://example.com/img.jpg') }}</small>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <?= htmlspecialchars($catalogText['cancel'] ?? 'Отмена') ?>
+                    {{ catalogText.cancel|default('Отмена') }}
                 </button>
                 <button type="button" class="btn btn-primary" id="saveProductBtn">
-                    <?= htmlspecialchars($catalogText['save'] ?? 'Сохранить') ?>
+                    {{ catalogText.save|default('Сохранить') }}
                 </button>
             </div>
         </div>
@@ -149,79 +139,78 @@ $products = $products ?? [];
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteModalLabel">
-                    <?= htmlspecialchars($catalogText['deleteConfirm'] ?? 'Подтверждение удаления') ?>
+                    {{ catalogText.deleteConfirm|default('Подтверждение удаления') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <?= htmlspecialchars($catalogText['confirmDelete'] ?? 'Вы уверены, что хотите удалить этот товар?') ?>
+                {{ catalogText.confirmDelete|default('Вы уверены, что хотите удалить этот товар?') }}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <?= htmlspecialchars($catalogText['cancel'] ?? 'Отмена') ?>
+                    {{ catalogText.cancel|default('Отмена') }}
                 </button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-                    <?= htmlspecialchars($catalogText['delete'] ?? 'Удалить') ?>
+                    {{ catalogText.delete|default('Удалить') }}
                 </button>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-// Данные товаров для JavaScript
-const productsData = <?= json_encode(array_values($products), JSON_UNESCAPED_UNICODE) ?>;
-let categoriesData = <?= json_encode($categories, JSON_UNESCAPED_UNICODE) ?>;
+const productsData = {{ productsJson|raw }};
+let categoriesData = {{ categoriesJson|raw }};
 
 document.addEventListener('DOMContentLoaded', function() {
     const productModal = new bootstrap.Modal(document.getElementById('productModal'));
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    
+
     let currentProductId = null;
     let products = productsData;
-    
-    // Поиск
+
     document.getElementById('searchInput').addEventListener('input', function(e) {
         filterProducts();
     });
-    
-    // Фильтр по категории
+
     document.getElementById('categoryFilter').addEventListener('change', function(e) {
         filterProducts();
     });
-    
+
     function filterProducts() {
         const search = document.getElementById('searchInput').value.toLowerCase();
         const category = document.getElementById('categoryFilter').value;
-        
+
         const filtered = products.filter(p => {
             const matchSearch = !search || (p.name && p.name.toLowerCase().includes(search));
             const matchCategory = !category || p.category === category;
             return matchSearch && matchCategory;
         });
-        
+
         renderProducts(filtered);
     }
-    
+
     function renderProducts(productsList) {
         const tbody = document.getElementById('productsTableBody');
-        
+
         if (productsList.length === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="text-center py-4 text-muted">
                         <i class="bi bi-box fs-1 d-block mb-2"></i>
-                        ${<?= json_encode($catalogText['noProducts'] ?? 'Товаров пока нет', JSON_UNESCAPED_UNICODE) ?>}
+                        {{ catalogText.noProducts|default('Товаров пока нет')|e('js') }}
                     </td>
                 </tr>`;
             return;
         }
-        
+
         tbody.innerHTML = productsList.map(p => `
             <tr data-id="${p.id}">
                 <td>${p.id}</td>
                 <td>
-                    <img src="${p.image || '/assets/img/no-image.jpg'}" alt="${p.name}" 
+                    <img src="${p.image || '/assets/img/no-image.jpg'}" alt="${p.name}"
                          class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
                 </td>
                 <td>${escapeHtml(p.name)}</td>
@@ -229,27 +218,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${Number(p.price).toLocaleString()} ₽</td>
                 <td>
                     <button class="btn btn-sm btn-primary me-1 btn-edit" data-id="${p.id}">
-                        <i class="bi bi-pencil"></i> ${<?= json_encode($catalogText['edit'] ?? 'Редактировать', JSON_UNESCAPED_UNICODE) ?>}
+                        <i class="bi bi-pencil"></i> {{ catalogText.edit|default('Редактировать')|e('js') }}
                     </button>
                     <button class="btn btn-sm btn-danger btn-delete" data-id="${p.id}">
-                        <i class="bi bi-trash"></i> ${<?= json_encode($catalogText['delete'] ?? 'Удалить', JSON_UNESCAPED_UNICODE) ?>}
+                        <i class="bi bi-trash"></i> {{ catalogText.delete|default('Удалить')|e('js') }}
                     </button>
                 </td>
             </tr>
         `).join('');
-        
-        // Перепривязываем обработчики
+
         attachProductHandlers();
     }
-    
+
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-    
+
     function attachProductHandlers() {
-        // Редактирование
         document.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = parseInt(this.dataset.id);
@@ -259,8 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-        
-        // Удаление
+
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', function() {
                 currentProductId = parseInt(this.dataset.id);
@@ -268,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
     function openEditModal(product) {
         document.getElementById('productId').value = product.id;
         document.getElementById('productName').value = product.name || '';
@@ -276,32 +262,30 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('productPrice').value = product.price || '';
         document.getElementById('productCategory').value = product.category || '';
         document.getElementById('productImage').value = product.image || '/assets/img/no-image.jpg';
-        
-        document.querySelector('#productModal .modal-title').textContent = 
-            <?= json_encode($catalogText['editProduct'] ?? 'Редактировать товар', JSON_UNESCAPED_UNICODE) ?>;
-        
+
+        document.querySelector('#productModal .modal-title').textContent =
+            '{{ catalogText.editProduct|default('Редактировать товар') }}';
+
         productModal.show();
     }
-    
-    // Открытие модального окна добавления
+
     document.querySelector('[data-bs-target="#productModal"]').addEventListener('click', function() {
         document.getElementById('productForm').reset();
         document.getElementById('productId').value = '';
         document.getElementById('productImage').value = '/assets/img/no-image.jpg';
-        
-        document.querySelector('#productModal .modal-title').textContent = 
-            <?= json_encode($catalogText['addProduct'] ?? 'Добавить товар', JSON_UNESCAPED_UNICODE) ?>;
+
+        document.querySelector('#productModal .modal-title').textContent =
+            '{{ catalogText.addProduct|default('Добавить товар') }}';
     });
-    
-    // Сохранение товара
+
     document.getElementById('saveProductBtn').addEventListener('click', async function() {
         const form = document.getElementById('productForm');
-        
+
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
-        
+
         const id = document.getElementById('productId').value;
         const data = {
             id: id ? parseInt(id) : null,
@@ -311,93 +295,82 @@ document.addEventListener('DOMContentLoaded', function() {
             category: document.getElementById('productCategory').value,
             image: document.getElementById('productImage').value || '/assets/img/no-image.jpg'
         };
-        
+
         if (!data.name || !data.price || !data.category) {
-            alert(<?= json_encode($catalogText['required'] ?? 'Заполните все обязательные поля', JSON_UNESCAPED_UNICODE) ?>);
+            alert('{{ catalogText.required|default('Заполните все обязательные поля') }}');
             return;
         }
-        
+
         if (data.price <= 0) {
-            alert(<?= json_encode($catalogText['minPrice'] ?? 'Цена должна быть больше 0', JSON_UNESCAPED_UNICODE) ?>);
+            alert('{{ catalogText.minPrice|default('Цена должна быть больше 0') }}');
             return;
         }
-        
+
         try {
             const url = id ? `/api/admin/product/${id}` : '/api/admin/product';
             const method = id ? 'PUT' : 'POST';
-            
-            console.log('Saving product:', url, method, data);
-            
+
             const response = await fetch(url, {
                 method: method,
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            
+
             const result = await response.json();
-            console.log('Save result:', result);
-            
+
             if (result.success) {
                 productModal.hide();
                 showAlert(result.message, 'success');
-                // Небольшая задержка чтобы убедиться, что данные сохранились
                 setTimeout(() => loadProducts(), 100);
             } else {
-                alert(result.error || <?= json_encode($catalogText['error'] ?? 'Ошибка', JSON_UNESCAPED_UNICODE) ?>);
+                alert(result.error || '{{ catalogText.error|default('Ошибка') }}');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert(<?= json_encode($catalogText['error'] ?? 'Ошибка', JSON_UNESCAPED_UNICODE) ?>);
+            alert('{{ catalogText.error|default('Ошибка') }}');
         }
     });
-    
-    // Подтверждение удаления
+
     document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
         if (!currentProductId) return;
-        
+
         try {
             const response = await fetch(`/api/admin/product/${currentProductId}`, {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'}
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 deleteModal.hide();
                 showAlert(result.message, 'success');
                 loadProducts();
             } else {
-                alert(result.error || <?= json_encode($catalogText['error'] ?? 'Ошибка', JSON_UNESCAPED_UNICODE) ?>);
+                alert(result.error || '{{ catalogText.error|default('Ошибка') }}');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert(<?= json_encode($catalogText['error'] ?? 'Ошибка', JSON_UNESCAPED_UNICODE) ?>);
+            alert('{{ catalogText.error|default('Ошибка') }}');
         }
-        
+
         currentProductId = null;
     });
-    
-    // Загрузка товаров
+
     async function loadProducts() {
         try {
-            console.log('Loading products...');
             const response = await fetch('/api/admin/products');
             const data = await response.json();
-            
-            console.log('API response:', data);
-            
+
             products = data.products || [];
             categoriesData = data.categories || [];
-            
-            console.log('Products after load:', products);
-            
+
             filterProducts();
         } catch (error) {
             console.error('Error loading products:', error);
         }
     }
-    
+
     function showAlert(message, type) {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
@@ -407,13 +380,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
         document.body.appendChild(alertDiv);
-        
+
         setTimeout(() => {
             alertDiv.remove();
         }, 3000);
     }
-    
-    // Инициализация
+
     attachProductHandlers();
 });
 </script>
+{% endblock %}

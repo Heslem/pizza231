@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% set usersText = texts.users|default({}) %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{{ usersText.title|default('Пользователи') }}</h1>
+        <a href="/admin" class="btn btn-outline-secondary">{{ usersText.back|default('Назад в панель') }}</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{{ usersText.id|default('ID') }}</th>
+                            <th>{{ usersText.name|default('Имя') }}</th>
+                            <th>{{ usersText.email|default('Email') }}</th>
+                            <th>{{ usersText.registered|default('Дата регистрации') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ usersHtml|raw }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

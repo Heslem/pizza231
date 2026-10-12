@@ -1,22 +1,20 @@
 <?php
 namespace App\Views;
 
-class AuthTemplate extends BaseTemplate
+class AuthTemplate
 {
-    private const TEMPLATE_PATH = __DIR__ . '/templates/auth.html.php';
-    private const TEXTS_PATH    = __DIR__ . '/../../storage/templates/auth.json';
+    private const TEXTS_PATH = __DIR__ . '/../../storage/templates/auth.json';
 
     /**
      * Регистрация
      */
     public static function renderRegister(string $error = '', string $success = ''): string
     {
-        $texts = self::texts(self::TEXTS_PATH);
-        return parent::render(self::TEMPLATE_PATH, [
+        return Twig::renderPage('auth', [
             'mode' => 'register',
             'error' => $error,
             'success' => $success,
-        ], $texts);
+        ], self::TEXTS_PATH);
     }
 
     /**
@@ -24,11 +22,10 @@ class AuthTemplate extends BaseTemplate
      */
     public static function renderLogin(string $error = ''): string
     {
-        $texts = self::texts(self::TEXTS_PATH);
-        return parent::render(self::TEMPLATE_PATH, [
+        return Twig::renderPage('auth', [
             'mode' => 'login',
             'error' => $error,
-        ], $texts);
+        ], self::TEXTS_PATH);
     }
 
     /**
@@ -36,12 +33,11 @@ class AuthTemplate extends BaseTemplate
      */
     public static function renderVerify(string $email, string $error = '', string $success = ''): string
     {
-        $texts = self::texts(self::TEXTS_PATH);
-        return parent::render(self::TEMPLATE_PATH, [
+        return Twig::renderPage('auth', [
             'email' => $email,
             'mode' => 'verify',
             'error' => $error,
             'success' => $success,
-        ], $texts);
+        ], self::TEXTS_PATH);
     }
 }

@@ -1,21 +1,12 @@
-<?php
-/**
- * Шаблон страницы логов ошибок
- * Доступные переменные:
- * - $logs - массив логов из Logger::getErrors()
- * - $texts - массив текстов из storage/templates/admin.json
- */
+{% extends 'base.html.twig' %}
 
-// Значения по умолчанию
-$texts = $texts ?? [];
-$logsText = $texts['logs'] ?? [];
-
-$logCount = count($logs ?? []);
-?>
+{% block content %}
+{% set logsText = texts.logs|default({}) %}
+{% set logCount = logs|default([])|length %}
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0"><?= htmlspecialchars($logsText['title'] ?? 'Логи ошибок') ?></h1>
+        <h1 class="mb-0">{{ logsText.title|default('Логи ошибок') }}</h1>
         <div>
             <button id="refreshLogsBtn" class="btn btn-outline-primary btn-sm">
                 <i class="bi bi-arrow-clockwise"></i> Обновить
@@ -31,17 +22,17 @@ $logCount = count($logs ?? []);
             <div class="alert alert-info d-flex align-items-center mb-4">
                 <i class="bi bi-info-circle fs-4 me-2"></i>
                 <div>
-                    <strong>Информация:</strong> Здесь отображаются последние ошибки и предупреждения сайта. Всего записей: <strong><?= $logCount ?></strong>
+                    <strong>Информация:</strong> Здесь отображаются последние ошибки и предупреждения сайта. Всего записей: <strong>{{ logCount }}</strong>
                 </div>
             </div>
 
-            <?php if (empty($logs)): ?>
+            {% if logs is empty %}
                 <div class="text-center py-5">
                     <i class="bi bi-check-circle-fill fs-1 text-success mb-3 d-block"></i>
-                    <h5 class="text-muted"><?= htmlspecialchars($logsText['noLogs'] ?? 'Ошибок не найдено') ?></h5>
+                    <h5 class="text-muted">{{ logsText.noLogs|default('Ошибок не найдено') }}</h5>
                     <p class="text-muted">Система работает стабильно, ошибок не обнаружено.</p>
                 </div>
-            <?php else: ?>
+            {% else %}
                 <div class="table-responsive">
                     <table class="table table-hover table-striped">
                         <thead>
@@ -53,53 +44,46 @@ $logCount = count($logs ?? []);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($logs as $log): ?>
+                            {% for log in logs %}
                                 <tr>
                                     <td>
-                                        <small class="text-muted"><?= htmlspecialchars($log['timestamp'] ?? '') ?></small>
+                                        <small class="text-muted">{{ log.timestamp|default('') }}</small>
                                     </td>
                                     <td>
-                                        <?php
-                                        $level = $log['level'] ?? 'UNKNOWN';
-                                        $badgeClass = match($level) {
-                                            'ERROR' => 'bg-danger',
-                                            'INFO' => 'bg-info',
-                                            'WARNING' => 'bg-warning',
-                                            default => 'bg-secondary'
-                                        };
-                                        ?>
-                                        <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($level) ?></span>
+                                        {% set level = log.level|default('UNKNOWN') %}
+                                        {% set badgeClass = level == 'ERROR' ? 'bg-danger' : (level == 'INFO' ? 'bg-info' : (level == 'WARNING' ? 'bg-warning' : 'bg-secondary')) %}
+                                        <span class="badge {{ badgeClass }}">{{ level }}</span>
                                     </td>
                                     <td>
-                                        <div class="log-message"><?= htmlspecialchars($log['message'] ?? '') ?></div>
-                                        <?php if (isset($log['context']) && !empty($log['context'])): ?>
+                                        <div class="log-message">{{ log.message|default('') }}</div>
+                                        {% if log.context is defined and log.context is not empty %}
                                             <small class="text-muted d-block mt-1">
-                                                <button class="btn btn-sm btn-link p-0 text-decoration-none" type="button" 
-                                                        data-bs-toggle="collapse" data-bs-target="#context-<?= md5($log['timestamp'] . $log['message']) ?>">
+                                                <button class="btn btn-sm btn-link p-0 text-decoration-none" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#context-{{ log.timestamp|default('') ~ log.message|default('') ~ loop.index }}">
                                                     <i class="bi bi-chevron-down"></i> Контекст
                                                 </button>
                                             </small>
-                                            <div class="collapse mt-2" id="context-<?= md5($log['timestamp'] . $log['message']) ?>">
-                                                <pre class="bg-light p-2 rounded small"><code><?= htmlspecialchars(json_encode($log['context'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) ?></code></pre>
+                                            <div class="collapse mt-2" id="context-{{ log.timestamp|default('') ~ log.message|default('') ~ loop.index }}">
+                                                <pre class="bg-light p-2 rounded small"><code>{{ log.context }}</code></pre>
                                             </div>
-                                        <?php endif; ?>
+                                        {% endif %}
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary copy-log-btn" 
-                                                data-message="<?= htmlspecialchars($log['message'] ?? '') ?>"
+                                        <button class="btn btn-sm btn-outline-primary copy-log-btn"
+                                                data-message="{{ log.message|default('') }}"
                                                 title="Копировать сообщение">
                                             <i class="bi bi-clipboard"></i>
                                         </button>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <small class="text-muted">
-                        Показано последних <?= $logCount ?> записей
+                        Показано последних {{ logCount }} записей
                     </small>
                     <div>
                         <a href="/api/admin/logs?limit=100" class="btn btn-sm btn-outline-secondary" target="_blank">
@@ -107,7 +91,7 @@ $logCount = count($logs ?? []);
                         </a>
                     </div>
                 </div>
-            <?php endif; ?>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -117,27 +101,28 @@ $logCount = count($logs ?? []);
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><?= htmlspecialchars($logsText['clearTitle'] ?? 'Очистить логи ошибок') ?></h5>
+                <h5 class="modal-title">{{ logsText.clearTitle|default('Очистить логи ошибок') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><?= htmlspecialchars($logsText['clearWarning'] ?? 'Вы уверены, что хотите очистить все логи ошибок? Это действие невозможно отменить.') ?></p>
+                <p>{{ logsText.clearWarning|default('Вы уверены, что хотите очистить все логи ошибок? Это действие невозможно отменить.') }}</p>
                 <div class="alert alert-warning">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    <?= htmlspecialchars($logsText['clearNote'] ?? 'Рекомендуется сохранить логи перед очисткой, нажав кнопку "JSON" выше.') ?>
+                    {{ logsText.clearNote|default('Рекомендуется сохранить логи перед очисткой, нажав кнопку "JSON" выше.') }}
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= htmlspecialchars($logsText['cancel'] ?? 'Отмена') ?></button>
-                <button type="button" class="btn btn-danger" id="confirmClearLogsBtn"><?= htmlspecialchars($logsText['clear'] ?? 'Очистить логи') ?></button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ logsText.cancel|default('Отмена') }}</button>
+                <button type="button" class="btn btn-danger" id="confirmClearLogsBtn">{{ logsText.clear|default('Очистить логи') }}</button>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Копирование сообщения лога
     document.querySelectorAll('.copy-log-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const message = this.getAttribute('data-message');
@@ -151,13 +136,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-    
-    // Обновление логов
+
     document.getElementById('refreshLogsBtn').addEventListener('click', function() {
         window.location.reload();
     });
-    
-    // Очистка логов
+
     document.getElementById('confirmClearLogsBtn').addEventListener('click', function() {
         fetch('/api/admin/clear-logs', {
             method: 'POST',
@@ -184,3 +167,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+{% endblock %}

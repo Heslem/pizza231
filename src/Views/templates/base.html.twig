@@ -1,21 +1,19 @@
-<?php
-$navText = $texts['nav'] ?? [];
-$footerText = $texts['footer'] ?? [];
-$cafeInfo = $texts['cafe'] ?? [];
-$pickupPoints = $texts['pickupPoints'] ?? [];
-$checkoutText = $texts['checkout'] ?? [];
-?>
+{% set navText = texts.nav|default({}) %}
+{% set footerText = texts.footer|default({}) %}
+{% set cafeInfo = texts.cafe|default({}) %}
+{% set pickupPoints = texts.pickupPoints|default({}) %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($cafeInfo['name'] ?? 'Кафе Бе-Бе') ?> - Уйгурско-узбецкая кухня</title>
-    
+    <title>{{ cafeInfo.name|default('Кафе Бе-Бе') }} - Уйгурско-узбецкая кухня</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    {% block styles %}{% endblock %}
 </head>
 <body>
     <!-- Фиксированная навигация -->
@@ -26,30 +24,30 @@ $checkoutText = $texts['checkout'] ?? [];
                     <i class="bi bi-cup-hot-fill"></i>
                 </div>
                 <div class="logo-text">
-                    <span class="brand-name"><?= htmlspecialchars($cafeInfo['name'] ?? 'Бе-Бе') ?></span>
-                    <span class="brand-tagline"><?= htmlspecialchars($cafeInfo['tagline'] ?? 'Уйгурско-узбецкая кухня') ?></span>
+                    <span class="brand-name">{{ cafeInfo.name|default('Бе-Бе') }}</span>
+                    <span class="brand-tagline">{{ cafeInfo.tagline|default('Уйгурско-узбецкая кухня') }}</span>
                 </div>
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/"><?= htmlspecialchars($navText['home'] ?? 'Главная') ?></a>
+                        <a class="nav-link" href="/">{{ navText.home|default('Главная') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/catalog"><?= htmlspecialchars($navText['catalog'] ?? 'Меню') ?></a>
+                        <a class="nav-link" href="/catalog">{{ navText.catalog|default('Меню') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/about"><?= htmlspecialchars($navText['about'] ?? 'О кафе') ?></a>
+                        <a class="nav-link" href="/about">{{ navText.about|default('О кафе') }}</a>
                     </li>
                     <!-- Авторизация загружается через JavaScript -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link" href="/login">
-                            <i class="bi bi-person me-1"></i><?= htmlspecialchars($navText['login'] ?? 'Вход') ?>
+                            <i class="bi bi-person me-1"></i>{{ navText.login|default('Вход') }}
                         </a>
                     </li>
                 </ul>
@@ -61,7 +59,7 @@ $checkoutText = $texts['checkout'] ?? [];
     <div style="height: 80px;"></div>
 
     <main>
-        <?= $content ?>
+        {% block content %}{% endblock %}
     </main>
 
     <footer class="footer py-4">
@@ -70,23 +68,23 @@ $checkoutText = $texts['checkout'] ?? [];
                 <div class="col-md-4 mb-3 mb-md-0">
                     <div class="footer-brand mb-2">
                         <i class="bi bi-cup-hot-fill me-2"></i>
-                        <span class="fw-bold"><?= htmlspecialchars($cafeInfo['name'] ?? 'Кафе Бе-Бе') ?></span>
+                        <span class="fw-bold">{{ cafeInfo.name|default('Кафе Бе-Бе') }}</span>
                     </div>
-                    <p class="footer-text mb-0"><?= htmlspecialchars($cafeInfo['tagline'] ?? 'Аутентичная уйгурско-узбецкая кухня') ?></p>
+                    <p class="footer-text mb-0">{{ cafeInfo.tagline|default('Аутентичная уйгурско-узбецкая кухня') }}</p>
                 </div>
                 <div class="col-md-4 mb-3 mb-md-0">
                     <h6 class="footer-heading mb-2"><i class="bi bi-geo-alt me-1"></i>Адрес</h6>
-                    <p class="footer-text mb-1"><?= htmlspecialchars($cafeInfo['address'] ?? 'г. Кемерово, ул. Примерная, д. 1') ?></p>
-                    <p class="footer-text mb-0"><i class="bi bi-clock me-1"></i><?= htmlspecialchars($cafeInfo['workTime'] ?? 'Ежедневно с 10:00 до 23:00') ?></p>
+                    <p class="footer-text mb-1">{{ cafeInfo.address|default('г. Кемерово, ул. Примерная, д. 1') }}</p>
+                    <p class="footer-text mb-0"><i class="bi bi-clock me-1"></i>{{ cafeInfo.workTime|default('Ежедневно с 10:00 до 23:00') }}</p>
                 </div>
                 <div class="col-md-4">
                     <h6 class="footer-heading mb-2"><i class="bi bi-telephone me-1"></i>Контакты</h6>
                     <p class="footer-text mb-1">
-                        <a href="tel:<?= htmlspecialchars(str_replace([' ', '-', '(', ')'], '', $cafeInfo['phone'] ?? '')) ?>" class="footer-link">
-                            <?= htmlspecialchars($cafeInfo['phone'] ?? '+7 (3842) 12-34-56') ?>
+                        <a href="tel:{{ cafeInfo.phone|default('')|replace({' ': '', '-': '', '(': '', ')': ''}) }}" class="footer-link">
+                            {{ cafeInfo.phone|default('+7 (3842) 12-34-56') }}
                         </a>
                     </p>
-                    <p class="footer-text mb-0">&copy; 2026 <?= htmlspecialchars($footerText['copyright'] ?? 'Кафе «Бе-Бе». Все права защищены.') ?></p>
+                    <p class="footer-text mb-0">&copy; 2026 {{ footerText.copyright|default('Кафе «Бе-Бе». Все права защищены.') }}</p>
                 </div>
             </div>
         </div>
@@ -141,7 +139,7 @@ $checkoutText = $texts['checkout'] ?? [];
                     <label for="checkout-phone" class="form-label">Телефон <span class="text-danger">*</span></label>
                     <input type="tel" class="form-control" id="checkout-phone" name="phone" required placeholder="+7 (999) 123-45-67">
                 </div>
-                
+
                 <!-- Переключатель Самовывоз/Доставка -->
                 <div class="mb-3">
                     <label class="form-label">Способ получения <span class="text-danger">*</span></label>
@@ -156,24 +154,24 @@ $checkoutText = $texts['checkout'] ?? [];
                         </label>
                     </div>
                 </div>
-                
+
                 <!-- Адрес доставки (показывается при доставке) -->
                 <div class="mb-3 delivery-fields">
                     <label for="checkout-address" class="form-label">Адрес доставки <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="checkout-address" name="address" placeholder="г. Кемерово, ул. Примерная, д. 1, кв. 1">
                 </div>
-                
+
                 <!-- Выбор точки самовывоза (скрыт по умолчанию) -->
                 <div class="mb-3 pickup-fields d-none">
                     <label for="pickup-point" class="form-label">Точка самовывоза <span class="text-danger">*</span></label>
                     <select class="form-select" id="pickup-point" name="pickupPoint">
                         <option value="">Выберите точку самовывоза</option>
-                        <?php foreach ($pickupPoints as $point): ?>
-                        <option value="<?= htmlspecialchars($point['address']) ?>"><?= htmlspecialchars($point['name'] . ' - ' . $point['address']) ?></option>
-                        <?php endforeach; ?>
+                        {% for point in pickupPoints %}
+                        <option value="{{ point.address }}">{{ point.name }} - {{ point.address }}</option>
+                        {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="checkout-payment" class="form-label">Способ оплаты <span class="text-danger">*</span></label>
                     <select class="form-select" id="checkout-payment" name="payment" required>
@@ -212,10 +210,10 @@ $checkoutText = $texts['checkout'] ?? [];
         const pickupFields = document.querySelectorAll('.pickup-fields');
         const addressInput = document.getElementById('checkout-address');
         const pickupSelect = document.getElementById('pickup-point');
-        
+
         function updateFields() {
             const isDelivery = document.getElementById('deliveryTypeDelivery').checked;
-            
+
             if (isDelivery) {
                 deliveryFields.forEach(f => f.classList.remove('d-none'));
                 pickupFields.forEach(f => f.classList.add('d-none'));
@@ -232,16 +230,17 @@ $checkoutText = $texts['checkout'] ?? [];
                 pickupSelect.setAttribute('name', 'address');
             }
         }
-        
+
         deliveryTypeRadios.forEach(radio => {
             radio.addEventListener('change', updateFields);
         });
-        
+
         // Инициализация при загрузке
         updateFields();
     });
     </script>
 
+    {% block scripts %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/cart.js"></script>
 </body>

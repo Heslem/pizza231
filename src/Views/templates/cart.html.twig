@@ -1,0 +1,232 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+{% set emptyText = texts.empty|default({}) %}
+{% set tableText = texts.table|default({}) %}
+{% set summaryText = texts.summary|default({}) %}
+{% set checkoutText = texts.checkout|default({}) %}
+{% set toastText = texts.toast|default({}) %}
+{% set pickupPoints = texts.pickupPoints|default([]) %}
+
+{% if isEmpty %}
+<div class="container py-5">
+    <div class="text-center py-5">
+        <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+        <h3>{{ emptyText.title|default('Ваша корзина пуста 😔') }}</h3>
+        <p class="text-muted">{{ emptyText.message|default('Добавьте товары из каталога') }}</p>
+        <a href="/catalog" class="btn btn-primary mt-3">{{ emptyText.link|default('Перейти в каталог') }}</a>
+    </div>
+</div>
+{% else %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">{{ texts.title|default('Ваша корзина') }}</h1>
+
+    <div class="card shadow-lg">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>{{ tableText.product|default('Товар') }}</th>
+                            <th>{{ tableText.price|default('Цена') }}</th>
+                            <th>{{ tableText.quantity|default('Кол-во') }}</th>
+                            <th>{{ tableText.sum|default('Сумма') }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items">
+                        {% for item in items %}
+                        <tr data-id="{{ item.id }}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.image|default('/assets/img/no-image.jpg') }}" alt="{{ item.name }}" width="50" height="50" class="rounded me-2" style="object-fit: cover;">
+                                    <span>{{ item.name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ item.price|number_format(0, '.', ' ') }} ₽</td>
+                            <td>
+                                <div class="input-group input-group-sm" style="max-width: 130px;">
+                                    <button class="btn btn-outline-secondary btn-qty" data-action="decrease" data-id="{{ item.id }}">−</button>
+                                    <input type="number" class="form-control text-center qty-input" value="{{ item.quantity }}" min="1" data-id="{{ item.id }}">
+                                    <button class="btn btn-outline-secondary btn-qty" data-action="increase" data-id="{{ item.id }}">+</button>
+                                </div>
+                            </td>
+                            <td>{{ (item.price * item.quantity)|number_format(0, '.', ' ') }} ₽</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger btn-remove" data-id="{{ item.id }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                <div>
+                    <span class="text-muted">{{ summaryText.totalItems|default('Всего товаров:') }} </span>
+                    <span class="fw-bold">{{ count }}</span>
+                </div>
+                <div class="text-end">
+                    <span class="text-muted d-block">{{ summaryText.total|default('Итого:') }}</span>
+                    <span class="h3 fw-bold text-success mb-0">{{ total|number_format(0, '.', ' ') }} ₽</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-end mt-4">
+                <button class="btn btn-outline-dark" id="clear-cart">
+                    <i class="bi bi-trash me-2"></i>{{ summaryText.clear|default('Очистить') }}
+                </button>
+                <button class="btn btn-success btn-lg px-4" id="checkout-btn" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+                    <i class="bi bi-check-circle me-2"></i>{{ summaryText.checkout|default('Оформить заказ') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно оформления заказа -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ checkoutText.title|default('Оформление заказа') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="checkout-form">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="fio" class="form-label">{{ checkoutText.fio|default('ФИО') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="fio" name="fio" required placeholder="{{ checkoutText.fioPlaceholder|default('Иванов Иван Иванович') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">{{ checkoutText.email|default('Email') }} <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="{{ checkoutText.emailPlaceholder|default('example@mail.ru') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">{{ checkoutText.phone|default('Телефон') }} <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required placeholder="{{ checkoutText.phonePlaceholder|default('+7 (999) 123-45-67') }}">
+                        </div>
+
+                        <!-- Переключатель Самовывоз/Доставка -->
+                        <div class="col-12">
+                            <label class="form-label">{{ checkoutText.deliveryType|default('Способ получения') }} <span class="text-danger">*</span></label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypeDeliveryModal" value="delivery" checked>
+                                <label class="btn btn-outline-dark" for="deliveryTypeDeliveryModal">
+                                    <i class="bi bi-truck me-1"></i>{{ checkoutText.delivery|default('Доставка') }}
+                                </label>
+                                <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypePickupModal" value="pickup">
+                                <label class="btn btn-outline-dark" for="deliveryTypePickupModal">
+                                    <i class="bi bi-shop me-1"></i>{{ checkoutText.pickup|default('Самовывоз') }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Адрес доставки -->
+                        <div class="col-12 delivery-fields-modal">
+                            <label for="address" class="form-label">{{ checkoutText.deliveryAddress|default('Адрес доставки') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="{{ checkoutText.deliveryAddressPlaceholder|default('г. Кемерово, ул. Примерная, д. 1, кв. 1') }}">
+                        </div>
+
+                        <!-- Выбор точки самовывоза -->
+                        <div class="col-12 pickup-fields-modal d-none">
+                            <label for="pickup-point-modal" class="form-label">{{ checkoutText.pickupAddress|default('Выберите точку самовывоза') }} <span class="text-danger">*</span></label>
+                            <select class="form-select" id="pickup-point-modal" name="pickupPoint">
+                                <option value="">{{ checkoutText.pickupAddress|default('Выберите точку самовывоза') }}</option>
+                                {% for point in pickupPoints %}
+                                <option value="{{ point.address }}">{{ point.name }} - {{ point.address }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="payment" class="form-label">{{ checkoutText.payment|default('Способ оплаты') }} <span class="text-danger">*</span></label>
+                            <select class="form-select" id="payment" name="payment" required>
+                                <option value="">{{ checkoutText.paymentSelect|default('Выберите способ оплаты') }}</option>
+                                <option value="cash">{{ checkoutText.paymentCash|default('Наличными при получении') }}</option>
+                                <option value="card">{{ checkoutText.paymentCard|default('Банковской картой') }}</option>
+                                <option value="online">{{ checkoutText.paymentOnline|default('Онлайн-оплата') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h6>{{ checkoutText.totalToPay|default('Итого к оплате:') }} <span class="text-success fw-bold">{{ total|number_format(0, '.', ' ') }} ₽</span></h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ checkoutText.cancel|default('Отмена') }}</button>
+                    <button type="submit" class="btn btn-success" id="submit-order">
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        <span class="btn-text">{{ checkoutText.submit|default('Подтвердить заказ') }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast уведомления -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span id="toastMessage">{{ toastText.saved|default('Изменения сохранены!') }}</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if not isEmpty %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Переключение полей Самовывоз/Доставка в модальном окне
+    const deliveryTypeRadios = document.querySelectorAll('#checkoutModal input[name="deliveryType"]');
+    const deliveryFields = document.querySelectorAll('.delivery-fields-modal');
+    const pickupFields = document.querySelectorAll('.pickup-fields-modal');
+    const addressInput = document.getElementById('address');
+    const pickupSelect = document.getElementById('pickup-point-modal');
+
+    function updateFields() {
+        const isDelivery = document.getElementById('deliveryTypeDeliveryModal').checked;
+
+        if (isDelivery) {
+            deliveryFields.forEach(f => f.classList.remove('d-none'));
+            pickupFields.forEach(f => f.classList.add('d-none'));
+            addressInput.setAttribute('required', 'required');
+            pickupSelect.removeAttribute('required');
+            pickupSelect.removeAttribute('name');
+            addressInput.setAttribute('name', 'address');
+        } else {
+            deliveryFields.forEach(f => f.classList.add('d-none'));
+            pickupFields.forEach(f => f.classList.remove('d-none'));
+            addressInput.removeAttribute('required');
+            addressInput.removeAttribute('name');
+            pickupSelect.setAttribute('required', 'required');
+            pickupSelect.setAttribute('name', 'address');
+        }
+    }
+
+    deliveryTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateFields);
+    });
+
+    updateFields();
+});
+</script>
+
+<!-- Данные корзины для JS -->
+<script>
+window.cartData = {{ cartJson|raw }};
+window.cartTotal = {{ total }};
+</script>
+{% endif %}
+{% endblock %}

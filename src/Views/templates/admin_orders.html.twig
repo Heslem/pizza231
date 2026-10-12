@@ -1,25 +1,15 @@
-<?php
-/**
- * Шаблон страницы заказов админ-панели
- * Доступные переменные:
- * - $orders - массив заказов
- * - $activeCount - количество активных заказов
- * - $completedCount - количество завершённых заказов
- * - $texts - массив текстов из storage/templates/admin.json
- */
+{% extends 'base.html.twig' %}
 
-$texts = $texts ?? [];
-$ordersText = $texts['orders'] ?? [];
-
-$activeOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? 'new', ['new', 'processing']));
-$completedOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? '', ['completed', 'cancelled']));
-?>
+{% block content %}
+{% set ordersText = texts.orders|default({}) %}
+{% set activeCount = activeOrders|default([])|length %}
+{% set completedCount = completedOrders|default([])|length %}
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0"><?= htmlspecialchars($ordersText['title'] ?? 'Заказы') ?></h1>
+        <h1 class="mb-0">{{ ordersText.title|default('Заказы') }}</h1>
         <a href="/admin" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i><?= htmlspecialchars($ordersText['back'] ?? 'Назад') ?>
+            <i class="bi bi-arrow-left me-1"></i>{{ ordersText.back|default('Назад') }}
         </a>
     </div>
 
@@ -27,14 +17,14 @@ $completedOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? '', 
     <ul class="nav nav-tabs mb-4" id="ordersTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-orders" type="button" role="tab">
-                <i class="bi bi-clock-history me-1"></i><?= htmlspecialchars($ordersText['active'] ?? 'Активные') ?>
-                <span class="badge bg-danger ms-2"><?= count($activeOrders) ?></span>
+                <i class="bi bi-clock-history me-1"></i>{{ ordersText.active|default('Активные') }}
+                <span class="badge bg-danger ms-2">{{ activeCount }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed-orders" type="button" role="tab">
-                <i class="bi bi-check2-circle me-1"></i><?= htmlspecialchars($ordersText['completed'] ?? 'Завершённые') ?>
-                <span class="badge bg-secondary ms-2"><?= count($completedOrders) ?></span>
+                <i class="bi bi-check2-circle me-1"></i>{{ ordersText.completed|default('Завершённые') }}
+                <span class="badge bg-secondary ms-2">{{ completedCount }}</span>
             </button>
         </li>
     </ul>
@@ -42,12 +32,12 @@ $completedOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? '', 
     <div class="tab-content" id="ordersTabsContent">
         <!-- Активные заказы -->
         <div class="tab-pane fade show active" id="active-orders" role="tabpanel">
-            <?= $activeOrdersHtml ?? '' ?>
+            {{ activeOrdersHtml|default('')|raw }}
         </div>
 
         <!-- Завершённые заказы -->
         <div class="tab-pane fade" id="completed-orders" role="tabpanel">
-            <?= $completedOrdersHtml ?? '' ?>
+            {{ completedOrdersHtml|default('')|raw }}
         </div>
     </div>
 </div>
@@ -68,12 +58,12 @@ $completedOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? '', 
                         <div class="card h-100 border-0 bg-light">
                             <div class="card-body">
                                 <h6 class="text-muted mb-3">
-                                    <i class="bi bi-person me-1"></i><?= htmlspecialchars($ordersText['customer'] ?? 'Клиент') ?>
+                                    <i class="bi bi-person me-1"></i>{{ ordersText.customer|default('Клиент') }}
                                 </h6>
-                                <p class="mb-2"><strong><?= htmlspecialchars($ordersText['fio'] ?? 'ФИО:') ?></strong> <span id="orderModalFio"></span></p>
-                                <p class="mb-2"><strong><?= htmlspecialchars($ordersText['email'] ?? 'Email:') ?></strong> <span id="orderModalEmail"></span></p>
-                                <p class="mb-2"><strong><?= htmlspecialchars($ordersText['phone'] ?? 'Телефон:') ?></strong> <span id="orderModalPhone"></span></p>
-                                <p class="mb-0"><strong><?= htmlspecialchars($ordersText['address'] ?? 'Адрес:') ?></strong> <span id="orderModalAddress"></span></p>
+                                <p class="mb-2"><strong>{{ ordersText.fio|default('ФИО:') }}</strong> <span id="orderModalFio"></span></p>
+                                <p class="mb-2"><strong>{{ ordersText.email|default('Email:') }}</strong> <span id="orderModalEmail"></span></p>
+                                <p class="mb-2"><strong>{{ ordersText.phone|default('Телефон:') }}</strong> <span id="orderModalPhone"></span></p>
+                                <p class="mb-0"><strong>{{ ordersText.address|default('Адрес:') }}</strong> <span id="orderModalAddress"></span></p>
                             </div>
                         </div>
                     </div>
@@ -81,35 +71,35 @@ $completedOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? '', 
                         <div class="card h-100 border-0 bg-light">
                             <div class="card-body">
                                 <h6 class="text-muted mb-3">
-                                    <i class="bi bi-info-circle me-1"></i><?= htmlspecialchars($ordersText['details'] ?? 'Детали') ?>
+                                    <i class="bi bi-info-circle me-1"></i>{{ ordersText.details|default('Детали') }}
                                 </h6>
-                                <p class="mb-2"><strong><?= htmlspecialchars($ordersText['date'] ?? 'Дата:') ?></strong> <span id="orderModalDate"></span></p>
-                                <p class="mb-2"><strong><?= htmlspecialchars($ordersText['status'] ?? 'Статус:') ?></strong> <span id="orderModalStatus"></span></p>
-                                <p class="mb-0"><strong><?= htmlspecialchars($ordersText['payment'] ?? 'Оплата:') ?></strong> <span id="orderModalPayment"></span></p>
+                                <p class="mb-2"><strong>{{ ordersText.date|default('Дата:') }}</strong> <span id="orderModalDate"></span></p>
+                                <p class="mb-2"><strong>{{ ordersText.status|default('Статус:') }}</strong> <span id="orderModalStatus"></span></p>
+                                <p class="mb-0"><strong>{{ ordersText.payment|default('Оплата:') }}</strong> <span id="orderModalPayment"></span></p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <h6 class="text-muted mb-3">
-                    <i class="bi bi-box-seam me-1"></i><?= htmlspecialchars($ordersText['items'] ?? 'Товары') ?>
+                    <i class="bi bi-box-seam me-1"></i>{{ ordersText.items|default('Товары') }}
                 </h6>
                 <div class="card border-0 shadow-sm">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 50%"><?= htmlspecialchars($ordersText['item'] ?? 'Товар') ?></th>
-                                    <th><?= htmlspecialchars($ordersText['price'] ?? 'Цена') ?></th>
-                                    <th><?= htmlspecialchars($ordersText['quantity'] ?? 'Кол-во') ?></th>
-                                    <th class="text-end"><?= htmlspecialchars($ordersText['sum'] ?? 'Сумма') ?></th>
+                                    <th style="width: 50%">{{ ordersText.item|default('Товар') }}</th>
+                                    <th>{{ ordersText.price|default('Цена') }}</th>
+                                    <th>{{ ordersText.quantity|default('Кол-во') }}</th>
+                                    <th class="text-end">{{ ordersText.sum|default('Сумма') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="orderModalItems">
                             </tbody>
                             <tfoot class="table-light">
                                 <tr>
-                                    <th colspan="3" class="text-end"><?= htmlspecialchars($ordersText['total'] ?? 'Итого:') ?></th>
+                                    <th colspan="3" class="text-end">{{ ordersText.total|default('Итого:') }}</th>
                                     <th class="text-end text-success" id="orderModalTotal"></th>
                                 </tr>
                             </tfoot>
@@ -119,31 +109,31 @@ $completedOrders = array_filter($orders, fn($o) => in_array($o['status'] ?? '', 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg me-1"></i><?= htmlspecialchars($ordersText['close'] ?? 'Закрыть') ?>
+                    <i class="bi bi-x-lg me-1"></i>{{ ordersText.close|default('Закрыть') }}
                 </button>
                 <button type="button" class="btn btn-success" id="btnCompleteOrder">
-                    <i class="bi bi-check-lg me-1"></i><?= htmlspecialchars($ordersText['complete'] ?? 'Завершить') ?>
+                    <i class="bi bi-check-lg me-1"></i>{{ ordersText.complete|default('Завершить') }}
                 </button>
                 <button type="button" class="btn btn-outline-danger" id="btnCancelOrder">
-                    <i class="bi bi-x-lg me-1"></i><?= htmlspecialchars($ordersText['cancel'] ?? 'Отменить') ?>
+                    <i class="bi bi-x-lg me-1"></i>{{ ordersText.cancel|default('Отменить') }}
                 </button>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     let currentOrderId = null;
     let currentOrderStatus = null;
-    const orders = <?= json_encode($orders, JSON_UNESCAPED_UNICODE) ?>;
+    const orders = {{ ordersJson|raw }};
 
-    // Функция для получения даты
     function getOrderDate(order) {
         return order.created_at || order.date || null;
     }
 
-    // Функция форматирования даты
     function formatDate(dateStr) {
         if (!dateStr) return "—";
         const date = new Date(dateStr);
@@ -157,11 +147,10 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Открытие модального окна
     document.querySelectorAll(".btn-view-order").forEach(btn => {
         btn.addEventListener("click", function() {
             const orderId = this.dataset.id;
-            const order = orders.find(o => o.id === orderId);
+            const order = orders.find(o => o.id == orderId);
             if (!order) return;
 
             currentOrderId = orderId;
@@ -173,19 +162,18 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("orderModalPhone").textContent = order.phone || "—";
             document.getElementById("orderModalAddress").textContent = order.address || "—";
             document.getElementById("orderModalDate").textContent = formatDate(getOrderDate(order));
-            document.getElementById("orderModalPayment").textContent = order.payment === "cash" ? "<?= htmlspecialchars($ordersText['paymentCash'] ?? 'Наличными') ?>" : "<?= htmlspecialchars($ordersText['paymentCard'] ?? 'Картой') ?>";
+            document.getElementById("orderModalPayment").textContent = order.payment === "cash" ? "{{ ordersText.paymentCash|default('Наличными') }}" : "{{ ordersText.paymentCard|default('Картой') }}";
 
             const statusMap = {
-                "new": {text: "<?= htmlspecialchars($ordersText['statusNew'] ?? 'Новый') ?>", class: "bg-primary"},
-                "processing": {text: "<?= htmlspecialchars($ordersText['statusProcessing'] ?? 'В обработке') ?>", class: "bg-warning text-dark"},
-                "completed": {text: "<?= htmlspecialchars($ordersText['statusCompleted'] ?? 'Выполнен') ?>", class: "bg-success"},
-                "cancelled": {text: "<?= htmlspecialchars($ordersText['statusCancelled'] ?? 'Отменён') ?>", class: "bg-danger"}
+                "new": {text: "{{ ordersText.statusNew|default('Новый') }}", class: "bg-primary"},
+                "processing": {text: "{{ ordersText.statusProcessing|default('В обработке') }}", class: "bg-warning text-dark"},
+                "completed": {text: "{{ ordersText.statusCompleted|default('Выполнен') }}", class: "bg-success"},
+                "cancelled": {text: "{{ ordersText.statusCancelled|default('Отменён') }}", class: "bg-danger"}
             };
             const status = statusMap[order.status] || {text: order.status, class: "bg-secondary"};
             document.getElementById("orderModalStatus").innerHTML = `<span class="badge ${status.class}">${status.text}</span>`;
 
-            // Товары
-            const itemsHtml = order.items.map(item => `
+            const itemsHtml = (order.items || []).map(item => `
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
@@ -201,7 +189,6 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("orderModalItems").innerHTML = itemsHtml;
             document.getElementById("orderModalTotal").textContent = new Intl.NumberFormat("ru-RU").format(order.total) + " ₽";
 
-            // Показать/скрыть кнопки действий
             const btnComplete = document.getElementById("btnCompleteOrder");
             const btnCancel = document.getElementById("btnCancelOrder");
 
@@ -218,13 +205,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Завершение заказа
     document.getElementById("btnCompleteOrder").addEventListener("click", function() {
         if (!currentOrderId) return;
         updateOrderStatus(currentOrderId, "completed");
     });
 
-    // Отмена заказа
     document.getElementById("btnCancelOrder").addEventListener("click", function() {
         if (!currentOrderId) return;
         if (confirm("Вы уверены, что хотите отменить этот заказ?")) {
@@ -232,7 +217,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Кнопки в таблице
     document.querySelectorAll(".btn-complete-order").forEach(btn => {
         btn.addEventListener("click", function(e) {
             e.stopPropagation();
@@ -269,3 +253,4 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+{% endblock %}
