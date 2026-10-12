@@ -63,21 +63,24 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
         // line 4
         $context["ordersText"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "orders", [], "any", true, true, false, 4)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "orders", [], "any", false, false, false, 4), [])) : ([]));
         // line 5
-        $context["activeCount"] = (( !Twig\Extension\CoreExtension::testEmpty(((array_key_exists("activeOrdersHtml", $context)) ? (Twig\Extension\CoreExtension::default(($context["activeOrdersHtml"] ?? null), "")) : ("")))) ? (Twig\Extension\CoreExtension::length($this->env->getCharset(), ((array_key_exists("activeOrders", $context)) ? (Twig\Extension\CoreExtension::default(($context["activeOrders"] ?? null), [])) : ([])))) : (0));
+        yield "
+";
         // line 6
-        $context["completedCount"] = (( !Twig\Extension\CoreExtension::testEmpty(((array_key_exists("completedOrdersHtml", $context)) ? (Twig\Extension\CoreExtension::default(($context["completedOrdersHtml"] ?? null), "")) : ("")))) ? (Twig\Extension\CoreExtension::length($this->env->getCharset(), ((array_key_exists("completedOrders", $context)) ? (Twig\Extension\CoreExtension::default(($context["completedOrders"] ?? null), [])) : ([])))) : (0));
+        $context["activeOrders"] = Twig\Extension\CoreExtension::filter($this->env, $this->env->hasExtension(\Twig\Extension\SandboxExtension::class) && $this->env->getExtension(\Twig\Extension\SandboxExtension::class)->getChecker()->isSandboxed($this->source), ($context["orders"] ?? null), function ($__o__) use ($context, $macros) { $context["o"] = $__o__; return CoreExtension::inFilter(((CoreExtension::getAttribute($this->env, $this->source, ($context["o"] ?? null), "status", [], "any", true, true, false, 6)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["o"] ?? null), "status", [], "any", false, false, false, 6), "new")) : ("new")), ["new", "processing"]); });
         // line 7
+        $context["completedOrders"] = Twig\Extension\CoreExtension::filter($this->env, $this->env->hasExtension(\Twig\Extension\SandboxExtension::class) && $this->env->getExtension(\Twig\Extension\SandboxExtension::class)->getChecker()->isSandboxed($this->source), ($context["orders"] ?? null), function ($__o__) use ($context, $macros) { $context["o"] = $__o__; return CoreExtension::inFilter(((CoreExtension::getAttribute($this->env, $this->source, ($context["o"] ?? null), "status", [], "any", true, true, false, 7)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["o"] ?? null), "status", [], "any", false, false, false, 7), "")) : ("")), ["completed", "cancelled"]); });
+        // line 8
         yield "
 <div class=\"container py-4\">
     <div class=\"d-flex justify-content-between align-items-center mb-4\">
         <h1 class=\"mb-0\">";
-        // line 10
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "title", [], "any", true, true, false, 10)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "title", [], "any", false, false, false, 10), "Заказы")) : ("Заказы")), "html", null, true);
+        // line 11
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "title", [], "any", true, true, false, 11)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "title", [], "any", false, false, false, 11), "Заказы")) : ("Заказы")), "html", null, true);
         yield "</h1>
         <a href=\"/admin\" class=\"btn btn-outline-secondary\">
             <i class=\"bi bi-arrow-left me-1\"></i>";
-        // line 12
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "back", [], "any", true, true, false, 12)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "back", [], "any", false, false, false, 12), "Назад")) : ("Назад")), "html", null, true);
+        // line 13
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "back", [], "any", true, true, false, 13)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "back", [], "any", false, false, false, 13), "Назад")) : ("Назад")), "html", null, true);
         yield "
         </a>
     </div>
@@ -87,24 +90,24 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
         <li class=\"nav-item\" role=\"presentation\">
             <button class=\"nav-link active\" id=\"active-tab\" data-bs-toggle=\"tab\" data-bs-target=\"#active-orders\" type=\"button\" role=\"tab\">
                 <i class=\"bi bi-clock-history me-1\"></i>";
-        // line 20
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "active", [], "any", true, true, false, 20)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "active", [], "any", false, false, false, 20), "Активные")) : ("Активные")), "html", null, true);
+        // line 21
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "active", [], "any", true, true, false, 21)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "active", [], "any", false, false, false, 21), "Активные")) : ("Активные")), "html", null, true);
         yield "
                 <span class=\"badge bg-danger ms-2\">";
-        // line 21
-        yield (string) $this->escaper->escape(($context["activeCount"] ?? null), "html", null, true);
+        // line 22
+        yield (string) $this->escaper->escape(Twig\Extension\CoreExtension::length($this->env->getCharset(), ($context["activeOrders"] ?? null)), "html", null, true);
         yield "</span>
             </button>
         </li>
         <li class=\"nav-item\" role=\"presentation\">
             <button class=\"nav-link\" id=\"completed-tab\" data-bs-toggle=\"tab\" data-bs-target=\"#completed-orders\" type=\"button\" role=\"tab\">
                 <i class=\"bi bi-check2-circle me-1\"></i>";
-        // line 26
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "completed", [], "any", true, true, false, 26)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "completed", [], "any", false, false, false, 26), "Завершённые")) : ("Завершённые")), "html", null, true);
+        // line 27
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "completed", [], "any", true, true, false, 27)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "completed", [], "any", false, false, false, 27), "Завершённые")) : ("Завершённые")), "html", null, true);
         yield "
                 <span class=\"badge bg-secondary ms-2\">";
-        // line 27
-        yield (string) $this->escaper->escape(($context["completedCount"] ?? null), "html", null, true);
+        // line 28
+        yield (string) $this->escaper->escape(Twig\Extension\CoreExtension::length($this->env->getCharset(), ($context["completedOrders"] ?? null)), "html", null, true);
         yield "</span>
             </button>
         </li>
@@ -114,18 +117,228 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
         <!-- Активные заказы -->
         <div class=\"tab-pane fade show active\" id=\"active-orders\" role=\"tabpanel\">
             ";
-        // line 35
-        yield (string) ((array_key_exists("activeOrdersHtml", $context)) ? (Twig\Extension\CoreExtension::default(($context["activeOrdersHtml"] ?? null), "")) : (""));
-        yield "
-        </div>
+        // line 36
+        if (Twig\Extension\CoreExtension::testEmpty(($context["activeOrders"] ?? null))) {
+            // line 37
+            yield "                <div class=\"text-center py-5\"><i class=\"bi bi-inbox fs-1 text-muted mb-3 d-block\"></i>
+                    <h5 class=\"text-muted\">";
+            // line 38
+            yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "noOrders", [], "any", true, true, false, 38)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "noOrders", [], "any", false, false, false, 38), "Заказов нет")) : ("Заказов нет")), "html", null, true);
+            yield "</h5></div>
+            ";
+        } else {
+            // line 40
+            yield "                ";
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable(($context["activeOrders"] ?? null));
+            foreach ($context['_seq'] as $context["_key"] => $context["order"]) {
+                // line 41
+                yield "                    ";
+                $context["status"] = ((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "status", [], "any", true, true, false, 41)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "status", [], "any", false, false, false, 41), "new")) : ("new"));
+                // line 42
+                yield "                    ";
+                $context["statusBadge"] = $this->env->getFilter('status_badge')->getCallable()(($context["status"] ?? null), ($context["ordersText"] ?? null));
+                // line 43
+                yield "                    ";
+                $context["itemsCount"] = Twig\Extension\CoreExtension::length($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["order"], "items", [], "any", false, false, false, 43));
+                // line 44
+                yield "                    ";
+                $context["total"] = $this->extensions['Twig\Extension\CoreExtension']->formatNumber(((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "total", [], "any", true, true, false, 44)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "total", [], "any", false, false, false, 44), 0)) : (0)), 0, ".", " ");
+                // line 45
+                yield "                    ";
+                $context["dateStr"] = ((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "created_at", [], "any", true, true, false, 45)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "created_at", [], "any", false, false, false, 45), ((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", true, true, false, 45)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", false, false, false, 45), "")) : ("")))) : (((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", true, true, false, 45)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", false, false, false, 45), "")) : (""))));
+                // line 46
+                yield "                    ";
+                $context["createdAt"] = (((($tmp = ($context["dateStr"] ?? null)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) ? ($this->extensions['Twig\Extension\CoreExtension']->formatDate(($context["dateStr"] ?? null), "d.m.Y H:i")) : ("—"));
+                // line 47
+                yield "                    <div class=\"card mb-3 shadow-sm order-card\" style=\"cursor: pointer;\">
+                        <div class=\"card-body\">
+                            <div class=\"row align-items-center\">
+                                <div class=\"col-md-1\">
+                                    <button class=\"btn btn-link text-decoration-none fw-bold btn-view-order\" data-id=\"";
+                // line 51
+                yield (string) $this->escaper->escape(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "id", [], "any", false, false, false, 51), "html", null, true);
+                yield "\">#";
+                yield (string) $this->escaper->escape(Twig\Extension\CoreExtension::slice($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["order"], "id", [], "any", false, false, false, 51),  -8), "html", null, true);
+                yield "</button>
+                                </div>
+                                <div class=\"col-md-3\">
+                                    <div class=\"fw-medium\">";
+                // line 54
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "fio", [], "any", true, true, false, 54)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "fio", [], "any", false, false, false, 54), "—")) : ("—")), "html", null, true);
+                yield "</div>
+                                    <small class=\"text-muted\">";
+                // line 55
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "phone", [], "any", true, true, false, 55)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "phone", [], "any", false, false, false, 55), "—")) : ("—")), "html", null, true);
+                yield "</small>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 58
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "products", [], "any", true, true, false, 58)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "products", [], "any", false, false, false, 58), "Товаров")) : ("Товаров")), "html", null, true);
+                yield "</small>
+                                    <strong>";
+                // line 59
+                yield (string) $this->escaper->escape(($context["itemsCount"] ?? null), "html", null, true);
+                yield "</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 62
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "amount", [], "any", true, true, false, 62)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "amount", [], "any", false, false, false, 62), "Сумма")) : ("Сумма")), "html", null, true);
+                yield "</small>
+                                    <strong class=\"text-success\">";
+                // line 63
+                yield (string) $this->escaper->escape(($context["total"] ?? null), "html", null, true);
+                yield " ₽</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 66
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", true, true, false, 66)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", false, false, false, 66), "Статус")) : ("Статус")), "html", null, true);
+                yield "</small>
+                                    <div>";
+                // line 67
+                yield (string) $this->escaper->escape(($context["statusBadge"] ?? null), "html", null, true);
+                yield "</div>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 70
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", true, true, false, 70)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", false, false, false, 70), "Дата")) : ("Дата")), "html", null, true);
+                yield "</small>
+                                    <small>";
+                // line 71
+                yield (string) $this->escaper->escape(($context["createdAt"] ?? null), "html", null, true);
+                yield "</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['order'], $context['_parent']);
+            $context = array_intersect_key($context, $_parent);
+            $context += $_parent;
+            // line 77
+            yield "            ";
+        }
+        // line 78
+        yield "        </div>
 
         <!-- Завершённые заказы -->
         <div class=\"tab-pane fade\" id=\"completed-orders\" role=\"tabpanel\">
             ";
-        // line 40
-        yield (string) ((array_key_exists("completedOrdersHtml", $context)) ? (Twig\Extension\CoreExtension::default(($context["completedOrdersHtml"] ?? null), "")) : (""));
-        yield "
-        </div>
+        // line 82
+        if (Twig\Extension\CoreExtension::testEmpty(($context["completedOrders"] ?? null))) {
+            // line 83
+            yield "                <div class=\"text-center py-5\"><i class=\"bi bi-inbox fs-1 text-muted mb-3 d-block\"></i>
+                    <h5 class=\"text-muted\">";
+            // line 84
+            yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "noOrders", [], "any", true, true, false, 84)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "noOrders", [], "any", false, false, false, 84), "Заказов нет")) : ("Заказов нет")), "html", null, true);
+            yield "</h5></div>
+            ";
+        } else {
+            // line 86
+            yield "                ";
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable(($context["completedOrders"] ?? null));
+            foreach ($context['_seq'] as $context["_key"] => $context["order"]) {
+                // line 87
+                yield "                    ";
+                $context["status"] = ((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "status", [], "any", true, true, false, 87)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "status", [], "any", false, false, false, 87), "new")) : ("new"));
+                // line 88
+                yield "                    ";
+                $context["statusBadge"] = $this->env->getFilter('status_badge')->getCallable()(($context["status"] ?? null), ($context["ordersText"] ?? null));
+                // line 89
+                yield "                    ";
+                $context["itemsCount"] = Twig\Extension\CoreExtension::length($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["order"], "items", [], "any", false, false, false, 89));
+                // line 90
+                yield "                    ";
+                $context["total"] = $this->extensions['Twig\Extension\CoreExtension']->formatNumber(((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "total", [], "any", true, true, false, 90)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "total", [], "any", false, false, false, 90), 0)) : (0)), 0, ".", " ");
+                // line 91
+                yield "                    ";
+                $context["dateStr"] = ((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "created_at", [], "any", true, true, false, 91)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "created_at", [], "any", false, false, false, 91), ((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", true, true, false, 91)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", false, false, false, 91), "")) : ("")))) : (((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", true, true, false, 91)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "date", [], "any", false, false, false, 91), "")) : (""))));
+                // line 92
+                yield "                    ";
+                $context["createdAt"] = (((($tmp = ($context["dateStr"] ?? null)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) ? ($this->extensions['Twig\Extension\CoreExtension']->formatDate(($context["dateStr"] ?? null), "d.m.Y H:i")) : ("—"));
+                // line 93
+                yield "                    <div class=\"card mb-3 shadow-sm order-card\" style=\"cursor: pointer;\">
+                        <div class=\"card-body\">
+                            <div class=\"row align-items-center\">
+                                <div class=\"col-md-1\">
+                                    <button class=\"btn btn-link text-decoration-none fw-bold btn-view-order\" data-id=\"";
+                // line 97
+                yield (string) $this->escaper->escape(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "id", [], "any", false, false, false, 97), "html", null, true);
+                yield "\">#";
+                yield (string) $this->escaper->escape(Twig\Extension\CoreExtension::slice($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["order"], "id", [], "any", false, false, false, 97),  -8), "html", null, true);
+                yield "</button>
+                                </div>
+                                <div class=\"col-md-3\">
+                                    <div class=\"fw-medium\">";
+                // line 100
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "fio", [], "any", true, true, false, 100)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "fio", [], "any", false, false, false, 100), "—")) : ("—")), "html", null, true);
+                yield "</div>
+                                    <small class=\"text-muted\">";
+                // line 101
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["order"], "phone", [], "any", true, true, false, 101)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["order"], "phone", [], "any", false, false, false, 101), "—")) : ("—")), "html", null, true);
+                yield "</small>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 104
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "products", [], "any", true, true, false, 104)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "products", [], "any", false, false, false, 104), "Товаров")) : ("Товаров")), "html", null, true);
+                yield "</small>
+                                    <strong>";
+                // line 105
+                yield (string) $this->escaper->escape(($context["itemsCount"] ?? null), "html", null, true);
+                yield "</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 108
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "amount", [], "any", true, true, false, 108)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "amount", [], "any", false, false, false, 108), "Сумма")) : ("Сумма")), "html", null, true);
+                yield "</small>
+                                    <strong class=\"text-success\">";
+                // line 109
+                yield (string) $this->escaper->escape(($context["total"] ?? null), "html", null, true);
+                yield " ₽</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 112
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", true, true, false, 112)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", false, false, false, 112), "Статус")) : ("Статус")), "html", null, true);
+                yield "</small>
+                                    <div>";
+                // line 113
+                yield (string) $this->escaper->escape(($context["statusBadge"] ?? null), "html", null, true);
+                yield "</div>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">";
+                // line 116
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", true, true, false, 116)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", false, false, false, 116), "Дата")) : ("Дата")), "html", null, true);
+                yield "</small>
+                                    <small>";
+                // line 117
+                yield (string) $this->escaper->escape(($context["createdAt"] ?? null), "html", null, true);
+                yield "</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['order'], $context['_parent']);
+            $context = array_intersect_key($context, $_parent);
+            $context += $_parent;
+            // line 123
+            yield "            ";
+        }
+        // line 124
+        yield "        </div>
     </div>
 </div>
 
@@ -146,25 +359,25 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
                             <div class=\"card-body\">
                                 <h6 class=\"text-muted mb-3\">
                                     <i class=\"bi bi-person me-1\"></i>";
-        // line 61
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "customer", [], "any", true, true, false, 61)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "customer", [], "any", false, false, false, 61), "Клиент")) : ("Клиент")), "html", null, true);
+        // line 144
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "customer", [], "any", true, true, false, 144)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "customer", [], "any", false, false, false, 144), "Клиент")) : ("Клиент")), "html", null, true);
         yield "
                                 </h6>
                                 <p class=\"mb-2\"><strong>";
-        // line 63
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "fio", [], "any", true, true, false, 63)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "fio", [], "any", false, false, false, 63), "ФИО:")) : ("ФИО:")), "html", null, true);
+        // line 146
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "fio", [], "any", true, true, false, 146)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "fio", [], "any", false, false, false, 146), "ФИО:")) : ("ФИО:")), "html", null, true);
         yield "</strong> <span id=\"orderModalFio\"></span></p>
                                 <p class=\"mb-2\"><strong>";
-        // line 64
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "email", [], "any", true, true, false, 64)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "email", [], "any", false, false, false, 64), "Email:")) : ("Email:")), "html", null, true);
+        // line 147
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "email", [], "any", true, true, false, 147)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "email", [], "any", false, false, false, 147), "Email:")) : ("Email:")), "html", null, true);
         yield "</strong> <span id=\"orderModalEmail\"></span></p>
                                 <p class=\"mb-2\"><strong>";
-        // line 65
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "phone", [], "any", true, true, false, 65)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "phone", [], "any", false, false, false, 65), "Телефон:")) : ("Телефон:")), "html", null, true);
+        // line 148
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "phone", [], "any", true, true, false, 148)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "phone", [], "any", false, false, false, 148), "Телефон:")) : ("Телефон:")), "html", null, true);
         yield "</strong> <span id=\"orderModalPhone\"></span></p>
                                 <p class=\"mb-0\"><strong>";
-        // line 66
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "address", [], "any", true, true, false, 66)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "address", [], "any", false, false, false, 66), "Адрес:")) : ("Адрес:")), "html", null, true);
+        // line 149
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "address", [], "any", true, true, false, 149)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "address", [], "any", false, false, false, 149), "Адрес:")) : ("Адрес:")), "html", null, true);
         yield "</strong> <span id=\"orderModalAddress\"></span></p>
                             </div>
                         </div>
@@ -174,21 +387,21 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
                             <div class=\"card-body\">
                                 <h6 class=\"text-muted mb-3\">
                                     <i class=\"bi bi-info-circle me-1\"></i>";
-        // line 74
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "details", [], "any", true, true, false, 74)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "details", [], "any", false, false, false, 74), "Детали")) : ("Детали")), "html", null, true);
+        // line 157
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "details", [], "any", true, true, false, 157)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "details", [], "any", false, false, false, 157), "Детали")) : ("Детали")), "html", null, true);
         yield "
                                 </h6>
                                 <p class=\"mb-2\"><strong>";
-        // line 76
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", true, true, false, 76)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", false, false, false, 76), "Дата:")) : ("Дата:")), "html", null, true);
+        // line 159
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", true, true, false, 159)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "date", [], "any", false, false, false, 159), "Дата:")) : ("Дата:")), "html", null, true);
         yield "</strong> <span id=\"orderModalDate\"></span></p>
                                 <p class=\"mb-2\"><strong>";
-        // line 77
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", true, true, false, 77)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", false, false, false, 77), "Статус:")) : ("Статус:")), "html", null, true);
+        // line 160
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", true, true, false, 160)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "status", [], "any", false, false, false, 160), "Статус:")) : ("Статус:")), "html", null, true);
         yield "</strong> <span id=\"orderModalStatus\"></span></p>
                                 <p class=\"mb-0\"><strong>";
-        // line 78
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "payment", [], "any", true, true, false, 78)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "payment", [], "any", false, false, false, 78), "Оплата:")) : ("Оплата:")), "html", null, true);
+        // line 161
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "payment", [], "any", true, true, false, 161)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "payment", [], "any", false, false, false, 161), "Оплата:")) : ("Оплата:")), "html", null, true);
         yield "</strong> <span id=\"orderModalPayment\"></span></p>
                             </div>
                         </div>
@@ -197,8 +410,8 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
 
                 <h6 class=\"text-muted mb-3\">
                     <i class=\"bi bi-box-seam me-1\"></i>";
-        // line 85
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "items", [], "any", true, true, false, 85)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "items", [], "any", false, false, false, 85), "Товары")) : ("Товары")), "html", null, true);
+        // line 168
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "items", [], "any", true, true, false, 168)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "items", [], "any", false, false, false, 168), "Товары")) : ("Товары")), "html", null, true);
         yield "
                 </h6>
                 <div class=\"card border-0 shadow-sm\">
@@ -207,20 +420,20 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
                             <thead class=\"table-light\">
                                 <tr>
                                     <th style=\"width: 50%\">";
-        // line 92
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "item", [], "any", true, true, false, 92)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "item", [], "any", false, false, false, 92), "Товар")) : ("Товар")), "html", null, true);
+        // line 175
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "item", [], "any", true, true, false, 175)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "item", [], "any", false, false, false, 175), "Товар")) : ("Товар")), "html", null, true);
         yield "</th>
                                     <th>";
-        // line 93
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "price", [], "any", true, true, false, 93)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "price", [], "any", false, false, false, 93), "Цена")) : ("Цена")), "html", null, true);
+        // line 176
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "price", [], "any", true, true, false, 176)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "price", [], "any", false, false, false, 176), "Цена")) : ("Цена")), "html", null, true);
         yield "</th>
                                     <th>";
-        // line 94
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "quantity", [], "any", true, true, false, 94)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "quantity", [], "any", false, false, false, 94), "Кол-во")) : ("Кол-во")), "html", null, true);
+        // line 177
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "quantity", [], "any", true, true, false, 177)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "quantity", [], "any", false, false, false, 177), "Кол-во")) : ("Кол-во")), "html", null, true);
         yield "</th>
                                     <th class=\"text-end\">";
-        // line 95
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "sum", [], "any", true, true, false, 95)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "sum", [], "any", false, false, false, 95), "Сумма")) : ("Сумма")), "html", null, true);
+        // line 178
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "sum", [], "any", true, true, false, 178)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "sum", [], "any", false, false, false, 178), "Сумма")) : ("Сумма")), "html", null, true);
         yield "</th>
                                 </tr>
                             </thead>
@@ -229,8 +442,8 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
                             <tfoot class=\"table-light\">
                                 <tr>
                                     <th colspan=\"3\" class=\"text-end\">";
-        // line 102
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "total", [], "any", true, true, false, 102)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "total", [], "any", false, false, false, 102), "Итого:")) : ("Итого:")), "html", null, true);
+        // line 185
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "total", [], "any", true, true, false, 185)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "total", [], "any", false, false, false, 185), "Итого:")) : ("Итого:")), "html", null, true);
         yield "</th>
                                     <th class=\"text-end text-success\" id=\"orderModalTotal\"></th>
                                 </tr>
@@ -242,20 +455,20 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
             <div class=\"modal-footer\">
                 <button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">
                     <i class=\"bi bi-x-lg me-1\"></i>";
-        // line 112
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "close", [], "any", true, true, false, 112)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "close", [], "any", false, false, false, 112), "Закрыть")) : ("Закрыть")), "html", null, true);
+        // line 195
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "close", [], "any", true, true, false, 195)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "close", [], "any", false, false, false, 195), "Закрыть")) : ("Закрыть")), "html", null, true);
         yield "
                 </button>
                 <button type=\"button\" class=\"btn btn-success\" id=\"btnCompleteOrder\">
                     <i class=\"bi bi-check-lg me-1\"></i>";
-        // line 115
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "complete", [], "any", true, true, false, 115)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "complete", [], "any", false, false, false, 115), "Завершить")) : ("Завершить")), "html", null, true);
+        // line 198
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "complete", [], "any", true, true, false, 198)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "complete", [], "any", false, false, false, 198), "Завершить")) : ("Завершить")), "html", null, true);
         yield "
                 </button>
                 <button type=\"button\" class=\"btn btn-outline-danger\" id=\"btnCancelOrder\">
                     <i class=\"bi bi-x-lg me-1\"></i>";
-        // line 118
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "cancel", [], "any", true, true, false, 118)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "cancel", [], "any", false, false, false, 118), "Отменить")) : ("Отменить")), "html", null, true);
+        // line 201
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "cancel", [], "any", true, true, false, 201)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "cancel", [], "any", false, false, false, 201), "Отменить")) : ("Отменить")), "html", null, true);
         yield "
                 </button>
             </div>
@@ -266,20 +479,20 @@ class __TwigTemplate_b1e735422b363203e3888ea1a32c04f2 extends Template
         return; yield;
     }
 
-    // line 126
+    // line 209
     /**
      * @return iterable<null|scalar|\Stringable>
      */
     public function block_scripts(array $context, array $blocks = []): iterable
     {
         $macros = $this->macros;
-        // line 127
+        // line 210
         yield "<script>
 document.addEventListener(\"DOMContentLoaded\", function() {
     let currentOrderId = null;
     let currentOrderStatus = null;
     const orders = ";
-        // line 131
+        // line 214
         yield (string) ($context["ordersJson"] ?? null);
         yield ";
 
@@ -316,28 +529,28 @@ document.addEventListener(\"DOMContentLoaded\", function() {
             document.getElementById(\"orderModalAddress\").textContent = order.address || \"—\";
             document.getElementById(\"orderModalDate\").textContent = formatDate(getOrderDate(order));
             document.getElementById(\"orderModalPayment\").textContent = order.payment === \"cash\" ? \"";
-        // line 165
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCash", [], "any", true, true, false, 165)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCash", [], "any", false, false, false, 165), "Наличными")) : ("Наличными")), "html", null, true);
+        // line 248
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCash", [], "any", true, true, false, 248)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCash", [], "any", false, false, false, 248), "Наличными")) : ("Наличными")), "html", null, true);
         yield "\" : \"";
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCard", [], "any", true, true, false, 165)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCard", [], "any", false, false, false, 165), "Картой")) : ("Картой")), "html", null, true);
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCard", [], "any", true, true, false, 248)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "paymentCard", [], "any", false, false, false, 248), "Картой")) : ("Картой")), "html", null, true);
         yield "\";
 
             const statusMap = {
                 \"new\": {text: \"";
-        // line 168
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusNew", [], "any", true, true, false, 168)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusNew", [], "any", false, false, false, 168), "Новый")) : ("Новый")), "html", null, true);
+        // line 251
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusNew", [], "any", true, true, false, 251)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusNew", [], "any", false, false, false, 251), "Новый")) : ("Новый")), "html", null, true);
         yield "\", class: \"bg-primary\"},
                 \"processing\": {text: \"";
-        // line 169
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusProcessing", [], "any", true, true, false, 169)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusProcessing", [], "any", false, false, false, 169), "В обработке")) : ("В обработке")), "html", null, true);
+        // line 252
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusProcessing", [], "any", true, true, false, 252)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusProcessing", [], "any", false, false, false, 252), "В обработке")) : ("В обработке")), "html", null, true);
         yield "\", class: \"bg-warning text-dark\"},
                 \"completed\": {text: \"";
-        // line 170
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCompleted", [], "any", true, true, false, 170)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCompleted", [], "any", false, false, false, 170), "Выполнен")) : ("Выполнен")), "html", null, true);
+        // line 253
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCompleted", [], "any", true, true, false, 253)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCompleted", [], "any", false, false, false, 253), "Выполнен")) : ("Выполнен")), "html", null, true);
         yield "\", class: \"bg-success\"},
                 \"cancelled\": {text: \"";
-        // line 171
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCancelled", [], "any", true, true, false, 171)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCancelled", [], "any", false, false, false, 171), "Отменён")) : ("Отменён")), "html", null, true);
+        // line 254
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCancelled", [], "any", true, true, false, 254)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["ordersText"] ?? null), "statusCancelled", [], "any", false, false, false, 254), "Отменён")) : ("Отменён")), "html", null, true);
         yield "\", class: \"bg-danger\"}
             };
             const status = statusMap[order.status] || {text: order.status, class: \"bg-secondary\"};
@@ -456,7 +669,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
      */
     public function getDebugInfo(): array
     {
-        return array (  340 => 171,  336 => 170,  332 => 169,  328 => 168,  320 => 165,  283 => 131,  277 => 127,  270 => 126,  258 => 118,  252 => 115,  246 => 112,  233 => 102,  223 => 95,  219 => 94,  215 => 93,  211 => 92,  201 => 85,  191 => 78,  187 => 77,  183 => 76,  178 => 74,  167 => 66,  163 => 65,  159 => 64,  155 => 63,  150 => 61,  126 => 40,  118 => 35,  107 => 27,  103 => 26,  95 => 21,  91 => 20,  80 => 12,  75 => 10,  70 => 7,  68 => 6,  66 => 5,  64 => 4,  57 => 3,  46 => 1,);
+        return array (  553 => 254,  549 => 253,  545 => 252,  541 => 251,  533 => 248,  496 => 214,  490 => 210,  483 => 209,  471 => 201,  465 => 198,  459 => 195,  446 => 185,  436 => 178,  432 => 177,  428 => 176,  424 => 175,  414 => 168,  404 => 161,  400 => 160,  396 => 159,  391 => 157,  380 => 149,  376 => 148,  372 => 147,  368 => 146,  363 => 144,  341 => 124,  338 => 123,  325 => 117,  321 => 116,  315 => 113,  311 => 112,  305 => 109,  301 => 108,  295 => 105,  291 => 104,  285 => 101,  281 => 100,  273 => 97,  267 => 93,  264 => 92,  261 => 91,  258 => 90,  255 => 89,  252 => 88,  249 => 87,  244 => 86,  239 => 84,  236 => 83,  234 => 82,  228 => 78,  225 => 77,  212 => 71,  208 => 70,  202 => 67,  198 => 66,  192 => 63,  188 => 62,  182 => 59,  178 => 58,  172 => 55,  168 => 54,  160 => 51,  154 => 47,  151 => 46,  148 => 45,  145 => 44,  142 => 43,  139 => 42,  136 => 41,  131 => 40,  126 => 38,  123 => 37,  121 => 36,  110 => 28,  106 => 27,  98 => 22,  94 => 21,  83 => 13,  78 => 11,  73 => 8,  71 => 7,  69 => 6,  66 => 5,  64 => 4,  57 => 3,  46 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -465,8 +678,9 @@ document.addEventListener(\"DOMContentLoaded\", function() {
 
 {% block content %}
 {% set ordersText = texts.orders|default({}) %}
-{% set activeCount = activeOrdersHtml|default(\x27\x27) is not empty ? activeOrders|default([])|length : 0 %}
-{% set completedCount = completedOrdersHtml|default(\x27\x27) is not empty ? completedOrders|default([])|length : 0 %}
+
+{% set activeOrders = orders|filter(o => o.status|default(\x27new\x27) in [\x27new\x27, \x27processing\x27]) %}
+{% set completedOrders = orders|filter(o => o.status|default(\x27\x27) in [\x27completed\x27, \x27cancelled\x27]) %}
 
 <div class=\"container py-4\">
     <div class=\"d-flex justify-content-between align-items-center mb-4\">
@@ -481,13 +695,13 @@ document.addEventListener(\"DOMContentLoaded\", function() {
         <li class=\"nav-item\" role=\"presentation\">
             <button class=\"nav-link active\" id=\"active-tab\" data-bs-toggle=\"tab\" data-bs-target=\"#active-orders\" type=\"button\" role=\"tab\">
                 <i class=\"bi bi-clock-history me-1\"></i>{{ ordersText.active|default(\x27Активные\x27) }}
-                <span class=\"badge bg-danger ms-2\">{{ activeCount }}</span>
+                <span class=\"badge bg-danger ms-2\">{{ activeOrders|length }}</span>
             </button>
         </li>
         <li class=\"nav-item\" role=\"presentation\">
             <button class=\"nav-link\" id=\"completed-tab\" data-bs-toggle=\"tab\" data-bs-target=\"#completed-orders\" type=\"button\" role=\"tab\">
                 <i class=\"bi bi-check2-circle me-1\"></i>{{ ordersText.completed|default(\x27Завершённые\x27) }}
-                <span class=\"badge bg-secondary ms-2\">{{ completedCount }}</span>
+                <span class=\"badge bg-secondary ms-2\">{{ completedOrders|length }}</span>
             </button>
         </li>
     </ul>
@@ -495,12 +709,94 @@ document.addEventListener(\"DOMContentLoaded\", function() {
     <div class=\"tab-content\" id=\"ordersTabsContent\">
         <!-- Активные заказы -->
         <div class=\"tab-pane fade show active\" id=\"active-orders\" role=\"tabpanel\">
-            {{ activeOrdersHtml|default(\x27\x27)|raw }}
+            {% if activeOrders is empty %}
+                <div class=\"text-center py-5\"><i class=\"bi bi-inbox fs-1 text-muted mb-3 d-block\"></i>
+                    <h5 class=\"text-muted\">{{ ordersText.noOrders|default(\x27Заказов нет\x27) }}</h5></div>
+            {% else %}
+                {% for order in activeOrders %}
+                    {% set status = order.status|default(\x27new\x27) %}
+                    {% set statusBadge = status|status_badge(ordersText) %}
+                    {% set itemsCount = order.items|length %}
+                    {% set total = order.total|default(0)|number_format(0, \x27.\x27, \x27 \x27) %}
+                    {% set dateStr = order.created_at|default(order.date|default(\x27\x27)) %}
+                    {% set createdAt = dateStr ? dateStr|date(\x27d.m.Y H:i\x27) : \x27—\x27 %}
+                    <div class=\"card mb-3 shadow-sm order-card\" style=\"cursor: pointer;\">
+                        <div class=\"card-body\">
+                            <div class=\"row align-items-center\">
+                                <div class=\"col-md-1\">
+                                    <button class=\"btn btn-link text-decoration-none fw-bold btn-view-order\" data-id=\"{{ order.id }}\">#{{ order.id|slice(-8) }}</button>
+                                </div>
+                                <div class=\"col-md-3\">
+                                    <div class=\"fw-medium\">{{ order.fio|default(\x27—\x27) }}</div>
+                                    <small class=\"text-muted\">{{ order.phone|default(\x27—\x27) }}</small>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.products|default(\x27Товаров\x27) }}</small>
+                                    <strong>{{ itemsCount }}</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.amount|default(\x27Сумма\x27) }}</small>
+                                    <strong class=\"text-success\">{{ total }} ₽</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.status|default(\x27Статус\x27) }}</small>
+                                    <div>{{ statusBadge }}</div>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.date|default(\x27Дата\x27) }}</small>
+                                    <small>{{ createdAt }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
 
         <!-- Завершённые заказы -->
         <div class=\"tab-pane fade\" id=\"completed-orders\" role=\"tabpanel\">
-            {{ completedOrdersHtml|default(\x27\x27)|raw }}
+            {% if completedOrders is empty %}
+                <div class=\"text-center py-5\"><i class=\"bi bi-inbox fs-1 text-muted mb-3 d-block\"></i>
+                    <h5 class=\"text-muted\">{{ ordersText.noOrders|default(\x27Заказов нет\x27) }}</h5></div>
+            {% else %}
+                {% for order in completedOrders %}
+                    {% set status = order.status|default(\x27new\x27) %}
+                    {% set statusBadge = status|status_badge(ordersText) %}
+                    {% set itemsCount = order.items|length %}
+                    {% set total = order.total|default(0)|number_format(0, \x27.\x27, \x27 \x27) %}
+                    {% set dateStr = order.created_at|default(order.date|default(\x27\x27)) %}
+                    {% set createdAt = dateStr ? dateStr|date(\x27d.m.Y H:i\x27) : \x27—\x27 %}
+                    <div class=\"card mb-3 shadow-sm order-card\" style=\"cursor: pointer;\">
+                        <div class=\"card-body\">
+                            <div class=\"row align-items-center\">
+                                <div class=\"col-md-1\">
+                                    <button class=\"btn btn-link text-decoration-none fw-bold btn-view-order\" data-id=\"{{ order.id }}\">#{{ order.id|slice(-8) }}</button>
+                                </div>
+                                <div class=\"col-md-3\">
+                                    <div class=\"fw-medium\">{{ order.fio|default(\x27—\x27) }}</div>
+                                    <small class=\"text-muted\">{{ order.phone|default(\x27—\x27) }}</small>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.products|default(\x27Товаров\x27) }}</small>
+                                    <strong>{{ itemsCount }}</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.amount|default(\x27Сумма\x27) }}</small>
+                                    <strong class=\"text-success\">{{ total }} ₽</strong>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.status|default(\x27Статус\x27) }}</small>
+                                    <div>{{ statusBadge }}</div>
+                                </div>
+                                <div class=\"col-md-2\">
+                                    <small class=\"text-muted d-block\">{{ ordersText.date|default(\x27Дата\x27) }}</small>
+                                    <small>{{ createdAt }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

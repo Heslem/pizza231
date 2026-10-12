@@ -48,22 +48,22 @@ class __TwigTemplate_09971f96ceac8954e0590cdaaf6b3328 extends Template
     protected function doDisplay(array $context, array $blocks = []): iterable
     {
         $macros = $this->macros;
-        // line 3
-        $context["usersText"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "users", [], "any", true, true, false, 3)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "users", [], "any", false, false, false, 3), [])) : ([]));
-        // line 1
         $this->parent = $this->load("base.html.twig", 1);
         yield from $this->parent->unwrap()->yield($context, array_merge($this->blocks, $blocks));
     }
 
-    // line 5
+    // line 3
     /**
      * @return iterable<null|scalar|\Stringable>
      */
     public function block_content(array $context, array $blocks = []): iterable
     {
         $macros = $this->macros;
-        // line 6
-        yield "<div class=\"container py-4\">
+        // line 4
+        $context["usersText"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "users", [], "any", true, true, false, 4)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "users", [], "any", false, false, false, 4), [])) : ([]));
+        // line 5
+        yield "
+<div class=\"container py-4\">
     <div class=\"d-flex justify-content-between align-items-center mb-4\">
         <h1 class=\"mb-0\">";
         // line 8
@@ -102,9 +102,51 @@ class __TwigTemplate_09971f96ceac8954e0590cdaaf6b3328 extends Template
                     <tbody>
                         ";
         // line 25
-        yield (string) ($context["usersHtml"] ?? null);
-        yield "
-                    </tbody>
+        if (Twig\Extension\CoreExtension::testEmpty(($context["users"] ?? null))) {
+            // line 26
+            yield "                            <tr><td colspan=\"4\" class=\"text-center py-4 text-muted\">
+                                <i class=\"bi bi-people fs-1 d-block mb-2\"></i>";
+            // line 27
+            yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["usersText"] ?? null), "noUsers", [], "any", true, true, false, 27)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["usersText"] ?? null), "noUsers", [], "any", false, false, false, 27), "Пользователей пока нет")) : ("Пользователей пока нет")), "html", null, true);
+            yield "
+                            </td></tr>
+                        ";
+        } else {
+            // line 30
+            yield "                            ";
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable(($context["users"] ?? null));
+            foreach ($context['_seq'] as $context["_key"] => $context["user"]) {
+                // line 31
+                yield "                                <tr>
+                                    <td>";
+                // line 32
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["user"], "id", [], "any", true, true, false, 32)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["user"], "id", [], "any", false, false, false, 32), "—")) : ("—")), "html", null, true);
+                yield "</td>
+                                    <td>";
+                // line 33
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["user"], "name", [], "any", true, true, false, 33)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["user"], "name", [], "any", false, false, false, 33), "—")) : ("—")), "html", null, true);
+                yield "</td>
+                                    <td>";
+                // line 34
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["user"], "email", [], "any", true, true, false, 34)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["user"], "email", [], "any", false, false, false, 34), "—")) : ("—")), "html", null, true);
+                yield "</td>
+                                    <td>";
+                // line 35
+                yield (string) (((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["user"], "created_at", [], "any", false, false, false, 35)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) ? ($this->escaper->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, $context["user"], "created_at", [], "any", false, false, false, 35), "d.m.Y H:i"), "html", null, true)) : ("—"));
+                yield "</td>
+                                </tr>
+                            ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['user'], $context['_parent']);
+            $context = array_intersect_key($context, $_parent);
+            $context += $_parent;
+            // line 38
+            yield "                        ";
+        }
+        // line 39
+        yield "                    </tbody>
                 </table>
             </div>
         </div>
@@ -143,16 +185,16 @@ class __TwigTemplate_09971f96ceac8954e0590cdaaf6b3328 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  105 => 25,  98 => 21,  94 => 20,  90 => 19,  86 => 18,  74 => 9,  70 => 8,  66 => 6,  59 => 5,  54 => 1,  52 => 3,  45 => 1,);
+        return array (  149 => 39,  146 => 38,  136 => 35,  132 => 34,  128 => 33,  124 => 32,  121 => 31,  116 => 30,  110 => 27,  107 => 26,  105 => 25,  98 => 21,  94 => 20,  90 => 19,  86 => 18,  74 => 9,  70 => 8,  65 => 5,  63 => 4,  56 => 3,  45 => 1,);
     }
 
     public function getSourceContext(): Source
     {
         return new Source("{% extends \x27base.html.twig\x27 %}
 
+{% block content %}
 {% set usersText = texts.users|default({}) %}
 
-{% block content %}
 <div class=\"container py-4\">
     <div class=\"d-flex justify-content-between align-items-center mb-4\">
         <h1 class=\"mb-0\">{{ usersText.title|default(\x27Пользователи\x27) }}</h1>
@@ -172,7 +214,20 @@ class __TwigTemplate_09971f96ceac8954e0590cdaaf6b3328 extends Template
                         </tr>
                     </thead>
                     <tbody>
-                        {{ usersHtml|raw }}
+                        {% if users is empty %}
+                            <tr><td colspan=\"4\" class=\"text-center py-4 text-muted\">
+                                <i class=\"bi bi-people fs-1 d-block mb-2\"></i>{{ usersText.noUsers|default(\x27Пользователей пока нет\x27) }}
+                            </td></tr>
+                        {% else %}
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id|default(\x27—\x27) }}</td>
+                                    <td>{{ user.name|default(\x27—\x27) }}</td>
+                                    <td>{{ user.email|default(\x27—\x27) }}</td>
+                                    <td>{{ user.created_at ? user.created_at|date(\x27d.m.Y H:i\x27) : \x27—\x27 }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

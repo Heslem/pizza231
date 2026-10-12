@@ -161,9 +161,85 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
                     <tbody id=\"productsTableBody\">
                         ";
         // line 52
-        yield (string) ((array_key_exists("productsHtml", $context)) ? (Twig\Extension\CoreExtension::default(($context["productsHtml"] ?? null), "")) : (""));
-        yield "
-                    </tbody>
+        if (Twig\Extension\CoreExtension::testEmpty(($context["products"] ?? null))) {
+            // line 53
+            yield "                            <tr><td colspan=\"6\" class=\"text-center py-4 text-muted\">
+                                <i class=\"bi bi-box fs-1 d-block mb-2\"></i>";
+            // line 54
+            yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "noProducts", [], "any", true, true, false, 54)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "noProducts", [], "any", false, false, false, 54), "Товаров пока нет")) : ("Товаров пока нет")), "html", null, true);
+            yield "
+                            </td></tr>
+                        ";
+        } else {
+            // line 57
+            yield "                            ";
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable(($context["products"] ?? null));
+            foreach ($context['_seq'] as $context["_key"] => $context["p"]) {
+                // line 58
+                yield "                                <tr data-id=\"";
+                yield (string) $this->escaper->escape(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "id", [], "any", false, false, false, 58), "html", null, true);
+                yield "\">
+                                    <td>";
+                // line 59
+                yield (string) $this->escaper->escape(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "id", [], "any", false, false, false, 59), "html", null, true);
+                yield "</td>
+                                    <td>
+                                        <img src=\"";
+                // line 61
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["p"], "image", [], "any", true, true, false, 61)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "image", [], "any", false, false, false, 61), "/assets/img/no-image.jpg")) : ("/assets/img/no-image.jpg")), "html", null, true);
+                yield "\"
+                                             alt=\"";
+                // line 62
+                yield (string) $this->escaper->escape(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "name", [], "any", false, false, false, 62), "html", null, true);
+                yield "\"
+                                             class=\"img-thumbnail\"
+                                             style=\"width: 50px; height: 50px; object-fit: cover;\">
+                                    </td>
+                                    <td>";
+                // line 66
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["p"], "name", [], "any", true, true, false, 66)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "name", [], "any", false, false, false, 66), "—")) : ("—")), "html", null, true);
+                yield "</td>
+                                    <td>";
+                // line 67
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["p"], "category", [], "any", true, true, false, 67)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "category", [], "any", false, false, false, 67), "Без категории")) : ("Без категории")), "html", null, true);
+                yield "</td>
+                                    <td>";
+                // line 68
+                yield (string) $this->escaper->escape($this->extensions['Twig\Extension\CoreExtension']->formatNumber(((CoreExtension::getAttribute($this->env, $this->source, $context["p"], "price", [], "any", true, true, false, 68)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "price", [], "any", false, false, false, 68), 0)) : (0)), 0, ".", " "), "html", null, true);
+                yield " ₽</td>
+                                    <td>
+                                        <button class=\"btn btn-sm btn-primary me-1 btn-edit\" data-id=\"";
+                // line 70
+                yield (string) $this->escaper->escape(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "id", [], "any", false, false, false, 70), "html", null, true);
+                yield "\">
+                                            <i class=\"bi bi-pencil\"></i> ";
+                // line 71
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "edit", [], "any", true, true, false, 71)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "edit", [], "any", false, false, false, 71), "Редактировать")) : ("Редактировать")), "html", null, true);
+                yield "
+                                        </button>
+                                        <button class=\"btn btn-sm btn-danger btn-delete\" data-id=\"";
+                // line 73
+                yield (string) $this->escaper->escape(CoreExtension::getAttribute($this->env, $this->source, $context["p"], "id", [], "any", false, false, false, 73), "html", null, true);
+                yield "\">
+                                            <i class=\"bi bi-trash\"></i> ";
+                // line 74
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", true, true, false, 74)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", false, false, false, 74), "Удалить")) : ("Удалить")), "html", null, true);
+                yield "
+                                        </button>
+                                    </td>
+                                </tr>
+                            ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['p'], $context['_parent']);
+            $context = array_intersect_key($context, $_parent);
+            $context += $_parent;
+            // line 79
+            yield "                        ";
+        }
+        // line 80
+        yield "                    </tbody>
                 </table>
             </div>
         </div>
@@ -177,8 +253,8 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
             <div class=\"modal-header\">
                 <h5 class=\"modal-title\" id=\"productModalLabel\">
                     ";
-        // line 66
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", true, true, false, 66)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", false, false, false, 66), "Добавить товар")) : ("Добавить товар")), "html", null, true);
+        // line 93
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", true, true, false, 93)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", false, false, false, 93), "Добавить товар")) : ("Добавить товар")), "html", null, true);
         yield "
                 </h5>
                 <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>
@@ -190,8 +266,8 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
                     <div class=\"mb-3\">
                         <label for=\"productName\" class=\"form-label\">
                             ";
-        // line 76
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "name", [], "any", true, true, false, 76)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "name", [], "any", false, false, false, 76), "Название")) : ("Название")), "html", null, true);
+        // line 103
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "name", [], "any", true, true, false, 103)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "name", [], "any", false, false, false, 103), "Название")) : ("Название")), "html", null, true);
         yield " *
                         </label>
                         <input type=\"text\" class=\"form-control\" id=\"productName\" name=\"name\" required>
@@ -200,8 +276,8 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
                     <div class=\"mb-3\">
                         <label for=\"productDescription\" class=\"form-label\">
                             ";
-        // line 83
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "description", [], "any", true, true, false, 83)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "description", [], "any", false, false, false, 83), "Описание")) : ("Описание")), "html", null, true);
+        // line 110
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "description", [], "any", true, true, false, 110)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "description", [], "any", false, false, false, 110), "Описание")) : ("Описание")), "html", null, true);
         yield "
                         </label>
                         <textarea class=\"form-control\" id=\"productDescription\" name=\"description\" rows=\"4\"></textarea>
@@ -211,8 +287,8 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
                         <div class=\"col-md-6 mb-3\">
                             <label for=\"productPrice\" class=\"form-label\">
                                 ";
-        // line 91
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "price", [], "any", true, true, false, 91)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "price", [], "any", false, false, false, 91), "Цена")) : ("Цена")), "html", null, true);
+        // line 118
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "price", [], "any", true, true, false, 118)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "price", [], "any", false, false, false, 118), "Цена")) : ("Цена")), "html", null, true);
         yield " *
                             </label>
                             <input type=\"number\" class=\"form-control\" id=\"productPrice\" name=\"price\"
@@ -222,8 +298,8 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
                         <div class=\"col-md-6 mb-3\">
                             <label for=\"productCategory\" class=\"form-label\">
                                 ";
-        // line 99
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "category", [], "any", true, true, false, 99)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "category", [], "any", false, false, false, 99), "Категория")) : ("Категория")), "html", null, true);
+        // line 126
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "category", [], "any", true, true, false, 126)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "category", [], "any", false, false, false, 126), "Категория")) : ("Категория")), "html", null, true);
         yield " *
                             </label>
                             <div class=\"input-group\">
@@ -231,11 +307,11 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
                                        list=\"categoryList\" required>
                                 <datalist id=\"categoryList\">
                                     ";
-        // line 105
+        // line 132
         $context['_parent'] = $context;
         $context['_seq'] = CoreExtension::ensureTraversable(($context["categories"] ?? null));
         foreach ($context['_seq'] as $context["_key"] => $context["category"]) {
-            // line 106
+            // line 133
             yield "                                        <option value=\"";
             yield (string) $this->escaper->escape($context["category"], "html", null, true);
             yield "\">
@@ -245,7 +321,7 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
         unset($context['_seq'], $context['_key'], $context['category'], $context['_parent']);
         $context = array_intersect_key($context, $_parent);
         $context += $_parent;
-        // line 108
+        // line 135
         yield "                                </datalist>
                             </div>
                         </div>
@@ -254,19 +330,19 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
                     <div class=\"mb-3\">
                         <label for=\"productImage\" class=\"form-label\">
                             ";
-        // line 115
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "image", [], "any", true, true, false, 115)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "image", [], "any", false, false, false, 115), "Изображение")) : ("Изображение")), "html", null, true);
+        // line 142
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "image", [], "any", true, true, false, 142)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "image", [], "any", false, false, false, 142), "Изображение")) : ("Изображение")), "html", null, true);
         yield "
                         </label>
                         <input type=\"text\" class=\"form-control\" id=\"productImage\" name=\"image\"
                                placeholder=\"";
-        // line 118
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", true, true, false, 118)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", false, false, false, 118), "URL или путь к изображению")) : ("URL или путь к изображению")), "html", null, true);
+        // line 145
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", true, true, false, 145)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", false, false, false, 145), "URL или путь к изображению")) : ("URL или путь к изображению")), "html", null, true);
         yield "\"
                                value=\"/assets/img/no-image.jpg\">
                         <small class=\"text-muted\">";
-        // line 120
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", true, true, false, 120)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", false, false, false, 120), "Например: /assets/img/photo.jpg или https://example.com/img.jpg")) : ("Например: /assets/img/photo.jpg или https://example.com/img.jpg")), "html", null, true);
+        // line 147
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", true, true, false, 147)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "imageHint", [], "any", false, false, false, 147), "Например: /assets/img/photo.jpg или https://example.com/img.jpg")) : ("Например: /assets/img/photo.jpg или https://example.com/img.jpg")), "html", null, true);
         yield "</small>
                     </div>
                 </form>
@@ -274,14 +350,14 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
             <div class=\"modal-footer\">
                 <button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">
                     ";
-        // line 126
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", true, true, false, 126)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", false, false, false, 126), "Отмена")) : ("Отмена")), "html", null, true);
+        // line 153
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", true, true, false, 153)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", false, false, false, 153), "Отмена")) : ("Отмена")), "html", null, true);
         yield "
                 </button>
                 <button type=\"button\" class=\"btn btn-primary\" id=\"saveProductBtn\">
                     ";
-        // line 129
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "save", [], "any", true, true, false, 129)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "save", [], "any", false, false, false, 129), "Сохранить")) : ("Сохранить")), "html", null, true);
+        // line 156
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "save", [], "any", true, true, false, 156)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "save", [], "any", false, false, false, 156), "Сохранить")) : ("Сохранить")), "html", null, true);
         yield "
                 </button>
             </div>
@@ -296,29 +372,29 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
             <div class=\"modal-header\">
                 <h5 class=\"modal-title\" id=\"deleteModalLabel\">
                     ";
-        // line 142
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "deleteConfirm", [], "any", true, true, false, 142)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "deleteConfirm", [], "any", false, false, false, 142), "Подтверждение удаления")) : ("Подтверждение удаления")), "html", null, true);
+        // line 169
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "deleteConfirm", [], "any", true, true, false, 169)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "deleteConfirm", [], "any", false, false, false, 169), "Подтверждение удаления")) : ("Подтверждение удаления")), "html", null, true);
         yield "
                 </h5>
                 <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>
             </div>
             <div class=\"modal-body\">
                 ";
-        // line 147
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "confirmDelete", [], "any", true, true, false, 147)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "confirmDelete", [], "any", false, false, false, 147), "Вы уверены, что хотите удалить этот товар?")) : ("Вы уверены, что хотите удалить этот товар?")), "html", null, true);
+        // line 174
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "confirmDelete", [], "any", true, true, false, 174)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "confirmDelete", [], "any", false, false, false, 174), "Вы уверены, что хотите удалить этот товар?")) : ("Вы уверены, что хотите удалить этот товар?")), "html", null, true);
         yield "
             </div>
             <div class=\"modal-footer\">
                 <button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">
                     ";
-        // line 151
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", true, true, false, 151)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", false, false, false, 151), "Отмена")) : ("Отмена")), "html", null, true);
+        // line 178
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", true, true, false, 178)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "cancel", [], "any", false, false, false, 178), "Отмена")) : ("Отмена")), "html", null, true);
         yield "
                 </button>
                 <button type=\"button\" class=\"btn btn-danger\" id=\"confirmDeleteBtn\">
                     ";
-        // line 154
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", true, true, false, 154)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", false, false, false, 154), "Удалить")) : ("Удалить")), "html", null, true);
+        // line 181
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", true, true, false, 181)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", false, false, false, 181), "Удалить")) : ("Удалить")), "html", null, true);
         yield "
                 </button>
             </div>
@@ -329,21 +405,21 @@ class __TwigTemplate_7a57ed31d5594b9661ca7762f1fdd979 extends Template
         return; yield;
     }
 
-    // line 162
+    // line 189
     /**
      * @return iterable<null|scalar|\Stringable>
      */
     public function block_scripts(array $context, array $blocks = []): iterable
     {
         $macros = $this->macros;
-        // line 163
+        // line 190
         yield "<script>
 const productsData = ";
-        // line 164
+        // line 191
         yield (string) ($context["productsJson"] ?? null);
         yield ";
 let categoriesData = ";
-        // line 165
+        // line 192
         yield (string) ($context["categoriesJson"] ?? null);
         yield ";
 
@@ -384,8 +460,8 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
                     <td colspan=\"6\" class=\"text-center py-4 text-muted\">
                         <i class=\"bi bi-box fs-1 d-block mb-2\"></i>
                         ";
-        // line 203
-        yield (string) $this->escaper->escape($this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "noProducts", [], "any", true, true, false, 203)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "noProducts", [], "any", false, false, false, 203), "Товаров пока нет")) : ("Товаров пока нет")), "js"), "html", null, true);
+        // line 230
+        yield (string) $this->escaper->escape($this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "noProducts", [], "any", true, true, false, 230)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "noProducts", [], "any", false, false, false, 230), "Товаров пока нет")) : ("Товаров пока нет")), "js"), "html", null, true);
         yield "
                     </td>
                 </tr>`;
@@ -405,14 +481,14 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
                 <td>
                     <button class=\"btn btn-sm btn-primary me-1 btn-edit\" data-id=\"\${p.id}\">
                         <i class=\"bi bi-pencil\"></i> ";
-        // line 221
-        yield (string) $this->escaper->escape($this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "edit", [], "any", true, true, false, 221)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "edit", [], "any", false, false, false, 221), "Редактировать")) : ("Редактировать")), "js"), "html", null, true);
+        // line 248
+        yield (string) $this->escaper->escape($this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "edit", [], "any", true, true, false, 248)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "edit", [], "any", false, false, false, 248), "Редактировать")) : ("Редактировать")), "js"), "html", null, true);
         yield "
                     </button>
                     <button class=\"btn btn-sm btn-danger btn-delete\" data-id=\"\${p.id}\">
                         <i class=\"bi bi-trash\"></i> ";
-        // line 224
-        yield (string) $this->escaper->escape($this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", true, true, false, 224)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", false, false, false, 224), "Удалить")) : ("Удалить")), "js"), "html", null, true);
+        // line 251
+        yield (string) $this->escaper->escape($this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", true, true, false, 251)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "delete", [], "any", false, false, false, 251), "Удалить")) : ("Удалить")), "js"), "html", null, true);
         yield "
                     </button>
                 </td>
@@ -457,8 +533,8 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
 
         document.querySelector(\x27#productModal .modal-title\x27).textContent =
             \x27";
-        // line 267
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "editProduct", [], "any", true, true, false, 267)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "editProduct", [], "any", false, false, false, 267), "Редактировать товар")) : ("Редактировать товар")), "html", null, true);
+        // line 294
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "editProduct", [], "any", true, true, false, 294)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "editProduct", [], "any", false, false, false, 294), "Редактировать товар")) : ("Редактировать товар")), "html", null, true);
         yield "\x27;
 
         productModal.show();
@@ -471,8 +547,8 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
 
         document.querySelector(\x27#productModal .modal-title\x27).textContent =
             \x27";
-        // line 278
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", true, true, false, 278)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", false, false, false, 278), "Добавить товар")) : ("Добавить товар")), "html", null, true);
+        // line 305
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", true, true, false, 305)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "addProduct", [], "any", false, false, false, 305), "Добавить товар")) : ("Добавить товар")), "html", null, true);
         yield "\x27;
     });
 
@@ -496,16 +572,16 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
 
         if (!data.name || !data.price || !data.category) {
             alert(\x27";
-        // line 300
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "required", [], "any", true, true, false, 300)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "required", [], "any", false, false, false, 300), "Заполните все обязательные поля")) : ("Заполните все обязательные поля")), "html", null, true);
+        // line 327
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "required", [], "any", true, true, false, 327)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "required", [], "any", false, false, false, 327), "Заполните все обязательные поля")) : ("Заполните все обязательные поля")), "html", null, true);
         yield "\x27);
             return;
         }
 
         if (data.price <= 0) {
             alert(\x27";
-        // line 305
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "minPrice", [], "any", true, true, false, 305)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "minPrice", [], "any", false, false, false, 305), "Цена должна быть больше 0")) : ("Цена должна быть больше 0")), "html", null, true);
+        // line 332
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "minPrice", [], "any", true, true, false, 332)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "minPrice", [], "any", false, false, false, 332), "Цена должна быть больше 0")) : ("Цена должна быть больше 0")), "html", null, true);
         yield "\x27);
             return;
         }
@@ -528,15 +604,15 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
                 setTimeout(() => loadProducts(), 100);
             } else {
                 alert(result.error || \x27";
-        // line 326
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 326)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 326), "Ошибка")) : ("Ошибка")), "html", null, true);
+        // line 353
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 353)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 353), "Ошибка")) : ("Ошибка")), "html", null, true);
         yield "\x27);
             }
         } catch (error) {
             console.error(\x27Error:\x27, error);
             alert(\x27";
-        // line 330
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 330)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 330), "Ошибка")) : ("Ошибка")), "html", null, true);
+        // line 357
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 357)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 357), "Ошибка")) : ("Ошибка")), "html", null, true);
         yield "\x27);
         }
     });
@@ -558,15 +634,15 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
                 loadProducts();
             } else {
                 alert(result.error || \x27";
-        // line 350
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 350)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 350), "Ошибка")) : ("Ошибка")), "html", null, true);
+        // line 377
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 377)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 377), "Ошибка")) : ("Ошибка")), "html", null, true);
         yield "\x27);
             }
         } catch (error) {
             console.error(\x27Error:\x27, error);
             alert(\x27";
-        // line 354
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 354)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 354), "Ошибка")) : ("Ошибка")), "html", null, true);
+        // line 381
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", true, true, false, 381)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["catalogText"] ?? null), "error", [], "any", false, false, false, 381), "Ошибка")) : ("Ошибка")), "html", null, true);
         yield "\x27);
         }
 
@@ -638,7 +714,7 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
      */
     public function getDebugInfo(): array
     {
-        return array (  569 => 354,  562 => 350,  539 => 330,  532 => 326,  508 => 305,  500 => 300,  475 => 278,  461 => 267,  415 => 224,  409 => 221,  388 => 203,  347 => 165,  343 => 164,  340 => 163,  333 => 162,  321 => 154,  315 => 151,  308 => 147,  300 => 142,  284 => 129,  278 => 126,  269 => 120,  264 => 118,  258 => 115,  249 => 108,  239 => 106,  235 => 105,  226 => 99,  215 => 91,  204 => 83,  194 => 76,  181 => 66,  164 => 52,  157 => 48,  153 => 47,  149 => 46,  145 => 45,  141 => 44,  137 => 43,  124 => 32,  112 => 30,  108 => 29,  104 => 28,  97 => 24,  85 => 15,  79 => 12,  73 => 9,  68 => 6,  66 => 5,  64 => 4,  57 => 3,  46 => 1,);
+        return array (  645 => 381,  638 => 377,  615 => 357,  608 => 353,  584 => 332,  576 => 327,  551 => 305,  537 => 294,  491 => 251,  485 => 248,  464 => 230,  423 => 192,  419 => 191,  416 => 190,  409 => 189,  397 => 181,  391 => 178,  384 => 174,  376 => 169,  360 => 156,  354 => 153,  345 => 147,  340 => 145,  334 => 142,  325 => 135,  315 => 133,  311 => 132,  302 => 126,  291 => 118,  280 => 110,  270 => 103,  257 => 93,  242 => 80,  239 => 79,  227 => 74,  223 => 73,  218 => 71,  214 => 70,  209 => 68,  205 => 67,  201 => 66,  194 => 62,  190 => 61,  185 => 59,  180 => 58,  175 => 57,  169 => 54,  166 => 53,  164 => 52,  157 => 48,  153 => 47,  149 => 46,  145 => 45,  141 => 44,  137 => 43,  124 => 32,  112 => 30,  108 => 29,  104 => 28,  97 => 24,  85 => 15,  79 => 12,  73 => 9,  68 => 6,  66 => 5,  64 => 4,  57 => 3,  46 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -694,7 +770,34 @@ document.addEventListener(\x27DOMContentLoaded\x27, function() {
                         </tr>
                     </thead>
                     <tbody id=\"productsTableBody\">
-                        {{ productsHtml|default(\x27\x27)|raw }}
+                        {% if products is empty %}
+                            <tr><td colspan=\"6\" class=\"text-center py-4 text-muted\">
+                                <i class=\"bi bi-box fs-1 d-block mb-2\"></i>{{ catalogText.noProducts|default(\x27Товаров пока нет\x27) }}
+                            </td></tr>
+                        {% else %}
+                            {% for p in products %}
+                                <tr data-id=\"{{ p.id }}\">
+                                    <td>{{ p.id }}</td>
+                                    <td>
+                                        <img src=\"{{ p.image|default(\x27/assets/img/no-image.jpg\x27) }}\"
+                                             alt=\"{{ p.name }}\"
+                                             class=\"img-thumbnail\"
+                                             style=\"width: 50px; height: 50px; object-fit: cover;\">
+                                    </td>
+                                    <td>{{ p.name|default(\x27—\x27) }}</td>
+                                    <td>{{ p.category|default(\x27Без категории\x27) }}</td>
+                                    <td>{{ p.price|default(0)|number_format(0, \x27.\x27, \x27 \x27) }} ₽</td>
+                                    <td>
+                                        <button class=\"btn btn-sm btn-primary me-1 btn-edit\" data-id=\"{{ p.id }}\">
+                                            <i class=\"bi bi-pencil\"></i> {{ catalogText.edit|default(\x27Редактировать\x27) }}
+                                        </button>
+                                        <button class=\"btn btn-sm btn-danger btn-delete\" data-id=\"{{ p.id }}\">
+                                            <i class=\"bi bi-trash\"></i> {{ catalogText.delete|default(\x27Удалить\x27) }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

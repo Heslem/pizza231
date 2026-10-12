@@ -350,49 +350,14 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
     </div>
 </div>
 
-<!-- Полноэкранный Toast -->
-<div id=\"fullscreenToast\" class=\"fullscreen-toast\" aria-hidden=\"true\">
-    <button class=\"toast-close\" id=\"closeFullscreenToast\" aria-label=\"Закрыть\">
-        <i class=\"bi bi-x-lg\"></i>
-    </button>
-
-    <video class=\"toast-video\" id=\"toastVideo\" autoplay muted playsinline loop>
-        <source src=\"/assets/img/cart_video.mp4\" type=\"video/mp4\">
-        Ваш браузер не поддерживает видео.
-    </video>
-
-    <div class=\"toast-message\" id=\"fullscreenToastMessage\">
-        ";
-        // line 181
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "addedWithEmoji", [], "any", true, true, false, 181)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "addedWithEmoji", [], "any", false, false, false, 181), "🎉 Товар добавлен в корзину!")) : ("🎉 Товар добавлен в корзину!")), "html", null, true);
-        yield "
-    </div>
-</div>
-
-<!-- Стандартный Toast -->
-<div class=\"toast-container position-fixed bottom-0 end-0 p-3\">
-    <div id=\"cartToast\" class=\"toast align-items-center text-bg-success border-0\" role=\"alert\">
-        <div class=\"d-flex\">
-            <div class=\"toast-body\">
-                <i class=\"bi bi-check-circle-fill me-2\"></i>
-                <span id=\"toastMessage\">";
-        // line 191
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "added", [], "any", true, true, false, 191)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "added", [], "any", false, false, false, 191), "Товар добавлен в корзину!")) : ("Товар добавлен в корзину!")), "html", null, true);
-        yield "</span>
-            </div>
-            <button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\"></button>
-        </div>
-    </div>
-</div>
-
 <!-- Модальное окно товара -->
 <div class=\"modal fade\" id=\"productModal\" tabindex=\"-1\" aria-hidden=\"true\">
     <div class=\"modal-dialog modal-dialog-centered modal-lg\">
         <div class=\"modal-content\">
             <div class=\"modal-header\">
                 <h5 class=\"modal-title\">";
-        // line 203
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", true, true, false, 203)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", false, false, false, 203), "Информация о товаре")) : ("Информация о товаре")), "html", null, true);
+        // line 174
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", true, true, false, 174)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", false, false, false, 174), "Информация о товаре")) : ("Информация о товаре")), "html", null, true);
         yield "</h5>
                 <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Закрыть\"></button>
             </div>
@@ -406,29 +371,16 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
         return; yield;
     }
 
-    // line 214
+    // line 185
     /**
      * @return iterable<null|scalar|\Stringable>
      */
     public function block_scripts(array $context, array $blocks = []): iterable
     {
         $macros = $this->macros;
-        // line 215
+        // line 186
         yield "<script>
 document.addEventListener(\"DOMContentLoaded\", function() {
-    const toastEl = document.getElementById(\"cartToast\");
-    if (toastEl && typeof bootstrap !== \"undefined\") {
-        window.cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
-    }
-
-    // Закрытие полноэкранного toast
-    document.getElementById(\x27closeFullscreenToast\x27)?.addEventListener(\x27click\x27, function() {
-        const toast = document.getElementById(\x27fullscreenToast\x27);
-        toast.classList.remove(\x27show\x27);
-        toast.setAttribute(\x27aria-hidden\x27, \x27true\x27);
-        document.body.classList.remove(\x27toast-open\x27);
-    });
-
     // Обработчики для кнопок \"Подробнее\"
     document.querySelectorAll(\x27.btn-product-details\x27).forEach(btn => {
         btn.addEventListener(\x27click\x27, function() {
@@ -470,8 +422,8 @@ async function loadProductModal(productId) {
 
         if (data.notFound) {
             modalBody.innerHTML = \x27<div class=\"alert alert-warning\">";
-        // line 270
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", true, true, false, 270)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", false, false, false, 270), "Товар не найден")) : ("Товар не найден")), "html", null, true);
+        // line 228
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", true, true, false, 228)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", false, false, false, 228), "Товар не найден")) : ("Товар не найден")), "html", null, true);
         yield "</div>\x27;
             return;
         }
@@ -504,8 +456,8 @@ async function loadProductModal(productId) {
                 </div>
                 <div class=\"col-md-7\">
                     <h5 class=\"text-uppercase fw-bold ls-1 mb-2 text-muted\" style=\"font-size: 0.8rem;\">";
-        // line 301
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 301), "label", [], "any", true, true, false, 301)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 301), "label", [], "any", false, false, false, 301), "Наше меню")) : ("Наше меню")), "html", null, true);
+        // line 259
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 259), "label", [], "any", true, true, false, 259)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 259), "label", [], "any", false, false, false, 259), "Наше меню")) : ("Наше меню")), "html", null, true);
         yield "</h5>
                     <h3 class=\"card-title fw-bold mb-3\">\${product.name}</h3>
                     <p class=\"card-text text-muted\" style=\"line-height: 1.6;\">\${product.description}</p>
@@ -513,8 +465,8 @@ async function loadProductModal(productId) {
                     <div class=\"d-flex align-items-center mb-3\">
                         <span class=\"h3 fw-bold me-3\">\${priceFormatted} ₽</span>
                         <span class=\"badge bg-success px-3 py-2 rounded-pill\">";
-        // line 307
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 307), "inStock", [], "any", true, true, false, 307)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 307), "inStock", [], "any", false, false, false, 307), "В наличии")) : ("В наличии")), "html", null, true);
+        // line 265
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 265), "inStock", [], "any", true, true, false, 265)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 265), "inStock", [], "any", false, false, false, 265), "В наличии")) : ("В наличии")), "html", null, true);
         yield "</span>
                     </div>
 
@@ -536,8 +488,8 @@ async function loadProductModal(productId) {
                                     <path d=\"M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z\"/>
                                 </svg>
                                 ";
-        // line 327
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 327), "addToCart", [], "any", true, true, false, 327)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 327), "addToCart", [], "any", false, false, false, 327), "В корзину")) : ("В корзину")), "html", null, true);
+        // line 285
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 285), "addToCart", [], "any", true, true, false, 285)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 285), "addToCart", [], "any", false, false, false, 285), "В корзину")) : ("В корзину")), "html", null, true);
         yield "
                             </button>
                         `}
@@ -550,8 +502,8 @@ async function loadProductModal(productId) {
 
     } catch (error) {
         modalBody.innerHTML = \x27<div class=\"alert alert-danger\">";
-        // line 338
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", true, true, false, 338)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", false, false, false, 338), "Ошибка загрузки товара")) : ("Ошибка загрузки товара")), "html", null, true);
+        // line 296
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", true, true, false, 296)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", false, false, false, 296), "Ошибка загрузки товара")) : ("Ошибка загрузки товара")), "html", null, true);
         yield "</div>\x27;
     }
 }
@@ -665,7 +617,7 @@ function initModalCartHandlers(productId) {
      */
     public function getDebugInfo(): array
     {
-        return array (  554 => 338,  540 => 327,  517 => 307,  508 => 301,  474 => 270,  417 => 215,  410 => 214,  395 => 203,  380 => 191,  367 => 181,  349 => 165,  345 => 163,  333 => 158,  329 => 157,  324 => 155,  320 => 154,  314 => 151,  310 => 150,  304 => 147,  299 => 145,  295 => 143,  291 => 142,  288 => 141,  284 => 139,  282 => 138,  278 => 136,  275 => 135,  269 => 133,  259 => 131,  256 => 130,  254 => 129,  249 => 127,  245 => 125,  240 => 122,  229 => 120,  224 => 119,  220 => 118,  215 => 115,  213 => 114,  201 => 105,  196 => 103,  192 => 102,  182 => 94,  176 => 92,  174 => 91,  167 => 87,  160 => 82,  158 => 81,  156 => 80,  154 => 79,  152 => 78,  150 => 77,  148 => 76,  146 => 75,  144 => 74,  137 => 73,  65 => 4,  58 => 3,  47 => 1,);
+        return array (  506 => 296,  492 => 285,  469 => 265,  460 => 259,  426 => 228,  382 => 186,  375 => 185,  360 => 174,  349 => 165,  345 => 163,  333 => 158,  329 => 157,  324 => 155,  320 => 154,  314 => 151,  310 => 150,  304 => 147,  299 => 145,  295 => 143,  291 => 142,  288 => 141,  284 => 139,  282 => 138,  278 => 136,  275 => 135,  269 => 133,  259 => 131,  256 => 130,  254 => 129,  249 => 127,  245 => 125,  240 => 122,  229 => 120,  224 => 119,  220 => 118,  215 => 115,  213 => 114,  201 => 105,  196 => 103,  192 => 102,  182 => 94,  176 => 92,  174 => 91,  167 => 87,  160 => 82,  158 => 81,  156 => 80,  154 => 79,  152 => 78,  150 => 77,  148 => 76,  146 => 75,  144 => 74,  137 => 73,  65 => 4,  58 => 3,  47 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -838,35 +790,6 @@ function initModalCartHandlers(productId) {
     </div>
 </div>
 
-<!-- Полноэкранный Toast -->
-<div id=\"fullscreenToast\" class=\"fullscreen-toast\" aria-hidden=\"true\">
-    <button class=\"toast-close\" id=\"closeFullscreenToast\" aria-label=\"Закрыть\">
-        <i class=\"bi bi-x-lg\"></i>
-    </button>
-
-    <video class=\"toast-video\" id=\"toastVideo\" autoplay muted playsinline loop>
-        <source src=\"/assets/img/cart_video.mp4\" type=\"video/mp4\">
-        Ваш браузер не поддерживает видео.
-    </video>
-
-    <div class=\"toast-message\" id=\"fullscreenToastMessage\">
-        {{ toastText.addedWithEmoji|default(\x27🎉 Товар добавлен в корзину!\x27) }}
-    </div>
-</div>
-
-<!-- Стандартный Toast -->
-<div class=\"toast-container position-fixed bottom-0 end-0 p-3\">
-    <div id=\"cartToast\" class=\"toast align-items-center text-bg-success border-0\" role=\"alert\">
-        <div class=\"d-flex\">
-            <div class=\"toast-body\">
-                <i class=\"bi bi-check-circle-fill me-2\"></i>
-                <span id=\"toastMessage\">{{ toastText.added|default(\x27Товар добавлен в корзину!\x27) }}</span>
-            </div>
-            <button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\"></button>
-        </div>
-    </div>
-</div>
-
 <!-- Модальное окно товара -->
 <div class=\"modal fade\" id=\"productModal\" tabindex=\"-1\" aria-hidden=\"true\">
     <div class=\"modal-dialog modal-dialog-centered modal-lg\">
@@ -886,19 +809,6 @@ function initModalCartHandlers(productId) {
 {% block scripts %}
 <script>
 document.addEventListener(\"DOMContentLoaded\", function() {
-    const toastEl = document.getElementById(\"cartToast\");
-    if (toastEl && typeof bootstrap !== \"undefined\") {
-        window.cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
-    }
-
-    // Закрытие полноэкранного toast
-    document.getElementById(\x27closeFullscreenToast\x27)?.addEventListener(\x27click\x27, function() {
-        const toast = document.getElementById(\x27fullscreenToast\x27);
-        toast.classList.remove(\x27show\x27);
-        toast.setAttribute(\x27aria-hidden\x27, \x27true\x27);
-        document.body.classList.remove(\x27toast-open\x27);
-    });
-
     // Обработчики для кнопок \"Подробнее\"
     document.querySelectorAll(\x27.btn-product-details\x27).forEach(btn => {
         btn.addEventListener(\x27click\x27, function() {

@@ -47,15 +47,15 @@ class __TwigTemplate_fcf120500d39410da2659df20dcff844 extends Template
     {
         $macros = $this->macros;
         // line 1
-        $context["navText"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "nav", [], "any", true, true, false, 1)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "nav", [], "any", false, false, false, 1), [])) : ([]));
+        $context["navText"] = ((array_key_exists("navText", $context)) ? (Twig\Extension\CoreExtension::default(($context["navText"] ?? null), [])) : ([]));
         // line 2
-        $context["footerText"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "footer", [], "any", true, true, false, 2)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "footer", [], "any", false, false, false, 2), [])) : ([]));
+        $context["footerText"] = ((array_key_exists("footerText", $context)) ? (Twig\Extension\CoreExtension::default(($context["footerText"] ?? null), [])) : ([]));
         // line 3
-        $context["cafeInfo"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "cafe", [], "any", true, true, false, 3)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "cafe", [], "any", false, false, false, 3), [])) : ([]));
+        $context["cafeInfo"] = ((array_key_exists("cafeInfo", $context)) ? (Twig\Extension\CoreExtension::default(($context["cafeInfo"] ?? null), [])) : ([]));
         // line 4
-        $context["pickupPoints"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "pickupPoints", [], "any", true, true, false, 4)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "pickupPoints", [], "any", false, false, false, 4), [])) : ([]));
+        $context["pickupPoints"] = ((array_key_exists("pickupPoints", $context)) ? (Twig\Extension\CoreExtension::default(($context["pickupPoints"] ?? null), [])) : ([]));
         // line 5
-        $context["checkoutText"] = ((CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "checkout", [], "any", true, true, false, 5)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "checkout", [], "any", false, false, false, 5), [])) : ([]));
+        $context["checkoutText"] = ((array_key_exists("checkoutText", $context)) ? (Twig\Extension\CoreExtension::default(($context["checkoutText"] ?? null), [])) : ([]));
         // line 6
         yield "<!DOCTYPE html>
 <html lang=\"ru\">
@@ -302,7 +302,13 @@ class __TwigTemplate_fcf120500d39410da2659df20dcff844 extends Template
         // line 199
         yield from $this->unwrap()->yieldBlock('scripts', $context, $blocks);
         // line 200
-        yield "    <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js\"></script>
+        yield "
+    ";
+        // line 201
+        yield from $this->load("_toasts.html.twig", 201)->unwrap()->yield($context);
+        // line 202
+        yield "
+    <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js\"></script>
     <script src=\"/assets/js/cart.js\"></script>
 </body>
 </html>
@@ -369,16 +375,16 @@ class __TwigTemplate_fcf120500d39410da2659df20dcff844 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  334 => 199,  324 => 63,  314 => 17,  305 => 200,  303 => 199,  243 => 142,  239 => 140,  237 => 138,  236 => 137,  235 => 131,  189 => 88,  183 => 85,  179 => 84,  171 => 79,  167 => 78,  160 => 74,  155 => 72,  145 => 64,  143 => 63,  128 => 51,  120 => 46,  114 => 43,  108 => 40,  94 => 29,  90 => 28,  78 => 18,  76 => 17,  67 => 11,  60 => 6,  58 => 5,  56 => 4,  54 => 3,  52 => 2,  50 => 1,);
+        return array (  340 => 199,  330 => 63,  320 => 17,  310 => 202,  308 => 201,  305 => 200,  303 => 199,  243 => 142,  239 => 140,  237 => 138,  236 => 137,  235 => 131,  189 => 88,  183 => 85,  179 => 84,  171 => 79,  167 => 78,  160 => 74,  155 => 72,  145 => 64,  143 => 63,  128 => 51,  120 => 46,  114 => 43,  108 => 40,  94 => 29,  90 => 28,  78 => 18,  76 => 17,  67 => 11,  60 => 6,  58 => 5,  56 => 4,  54 => 3,  52 => 2,  50 => 1,);
     }
 
     public function getSourceContext(): Source
     {
-        return new Source("{% set navText = texts.nav|default({}) %}
-{% set footerText = texts.footer|default({}) %}
-{% set cafeInfo = texts.cafe|default({}) %}
-{% set pickupPoints = texts.pickupPoints|default({}) %}
-{% set checkoutText = texts.checkout|default({}) %}
+        return new Source("{% set navText = navText|default({}) %}
+{% set footerText = footerText|default({}) %}
+{% set cafeInfo = cafeInfo|default({}) %}
+{% set pickupPoints = pickupPoints|default([]) %}
+{% set checkoutText = checkoutText|default({}) %}
 <!DOCTYPE html>
 <html lang=\"ru\">
 <head>
@@ -573,6 +579,9 @@ class __TwigTemplate_fcf120500d39410da2659df20dcff844 extends Template
     </script>
 
     {% block scripts %}{% endblock %}
+
+    {% include \x27_toasts.html.twig\x27 %}
+
     <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js\"></script>
     <script src=\"/assets/js/cart.js\"></script>
 </body>

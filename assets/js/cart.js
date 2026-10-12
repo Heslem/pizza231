@@ -336,10 +336,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Загрузить информацию о пользователе
     loadCurrentUser();
     
-    // Обработчики для страницы корзины
-    if (document.getElementById('cart-items')) {
-        initCartPage();
+    // Инициализация Toast
+    const toastEl = document.getElementById('cartToast');
+    if (toastEl && typeof bootstrap !== 'undefined') {
+        window.cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
     }
+    
+    // Закрытие полноэкранного toast
+    document.getElementById('closeFullscreenToast')?.addEventListener('click', function() {
+        const toast = document.getElementById('fullscreenToast');
+        toast.classList.remove('show');
+        toast.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('toast-open');
+    });
     
     // Обработчики для кнопок "В корзину"
     document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
