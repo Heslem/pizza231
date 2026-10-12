@@ -13,7 +13,7 @@ class ProductController
         
         if ($data && isset($data[$id])) {
             $productData = $data[$id];
-            return \App\Views\ProductTemplate::getCardTemplate($productData);
+            return \App\Views\ProductTemplate::renderProduct($productData);
         }
         
         return '<div class="alert alert-danger">Товар с ID ' . $id . ' не найден</div>';

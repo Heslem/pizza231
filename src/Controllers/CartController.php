@@ -22,7 +22,7 @@ class CartController
      */
     public function get(): string
     {
-        return CartTemplate::render();
+        return CartTemplate::getTemplate();
     }
 
     /**

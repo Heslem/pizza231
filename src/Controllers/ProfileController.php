@@ -52,7 +52,7 @@ class ProfileController
         // Получить историю заказов
         $orders = $this->userModel->getOrders($user['id']);
         
-        echo ProfileTemplate::render($profile, $orders);
+        echo ProfileTemplate::renderProfile($profile, $orders);
     }
     
     /**
@@ -81,7 +81,7 @@ class ProfileController
             // Получить обновлённый профиль
             $profile = $this->userModel->getFullProfile($user['id']);
             
-            return Response::success(['profile' => $profile]);
+            return Response::success(json_encode(['profile' => $profile]));
         }
         
         return Response::serverError('Ошибка сохранения профиля');
@@ -146,7 +146,7 @@ class ProfileController
             $avatarPath = '/storage/avatars/' . $newFilename;
             $this->userModel->updateProfile($user['id'], ['avatar' => $avatarPath]);
             
-            return Response::success(['avatar' => $avatarPath]);
+            return Response::success(json_encode(['avatar' => $avatarPath]));
         }
         
         return Response::serverError('Не удалось сохранить файл');

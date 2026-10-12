@@ -21,7 +21,7 @@ class CatalogController
         $filteredProducts = $this->filterProducts($allProducts, $search, $category);
         
         // 👇 Вызываем render() вместо getTemplate()
-        echo CatalogTemplate::render($filteredProducts, $search, $category, $categories);
+        echo CatalogTemplate::getTemplate($filteredProducts, $search, $category, $categories);
     }
     
     /**
