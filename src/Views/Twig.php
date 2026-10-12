@@ -3,6 +3,7 @@ namespace App\Views;
 
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
 
 class Twig
 {
@@ -13,9 +14,17 @@ class Twig
     private const BASE_TEXTS_PATH = __DIR__ . '/../../storage/templates/base.json';
 
     /**
+     * Получить Environment (для тестов и partial-рендеринга).
+     */
+    public static function getEnvironment(): Environment
+    {
+        return self::initEnvironment();
+    }
+
+    /**
      * Получить экземпляр Environment (синглтон).
      */
-    private static function getEnvironment(): Environment
+    private static function initEnvironment(): Environment
     {
         if (self::$env !== null) {
             return self::$env;
@@ -32,6 +41,18 @@ class Twig
             'debug' => true,
             'auto_reload' => true,
         ]);
+
+        // Кастомные фильтры
+        self::$env->addFilter(new TwigFilter('status_badge', function(string $status, array $texts = []): string {
+            $map = [
+                'new'        => ['text' => $texts['statusNew'] ?? 'Новый',        'class' => 'bg-primary'],
+                'processing' => ['text' => $texts['statusProcessing'] ?? 'В обработке', 'class' => 'bg-warning text-dark'],
+                'completed'  => ['text' => $texts['statusCompleted'] ?? 'Выполнен', 'class' => 'bg-success'],
+                'cancelled'  => ['text' => $texts['statusCancelled'] ?? 'Отменён',   'class' => 'bg-danger'],
+            ];
+            $cfg = $map[$status] ?? ['text' => $status, 'class' => 'bg-secondary'];
+            return '<span class="badge ' . $cfg['class'] . '">' . htmlspecialchars($cfg['text']) . '</span>';
+        }));
 
         return self::$env;
     }
@@ -89,6 +110,6 @@ class Twig
     public static function renderPage(string $template, array $data, string $textsPath): string
     {
         $data['texts'] = self::loadTexts($textsPath);
-        return self::getEnvironment()->render($template . '.html.twig', $data);
+        return self::initEnvironment()->render($template . '.html.twig', $data);
     }
 }

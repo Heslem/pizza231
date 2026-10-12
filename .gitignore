@@ -7,3 +7,4 @@ storage/orders_backup_*.json
 storage/payment.json
 KODA.md
 .phpunit.result.cache
+storage/cache/

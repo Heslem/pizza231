@@ -49,7 +49,34 @@
                         </tr>
                     </thead>
                     <tbody id="productsTableBody">
-                        {{ productsHtml|default('')|raw }}
+                        {% if products is empty %}
+                            <tr><td colspan="6" class="text-center py-4 text-muted">
+                                <i class="bi bi-box fs-1 d-block mb-2"></i>{{ catalogText.noProducts|default('Товаров пока нет') }}
+                            </td></tr>
+                        {% else %}
+                            {% for p in products %}
+                                <tr data-id="{{ p.id }}">
+                                    <td>{{ p.id }}</td>
+                                    <td>
+                                        <img src="{{ p.image|default('/assets/img/no-image.jpg') }}"
+                                             alt="{{ p.name }}"
+                                             class="img-thumbnail"
+                                             style="width: 50px; height: 50px; object-fit: cover;">
+                                    </td>
+                                    <td>{{ p.name|default('—') }}</td>
+                                    <td>{{ p.category|default('Без категории') }}</td>
+                                    <td>{{ p.price|default(0)|number_format(0, '.', ' ') }} ₽</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary me-1 btn-edit" data-id="{{ p.id }}">
+                                            <i class="bi bi-pencil"></i> {{ catalogText.edit|default('Редактировать') }}
+                                        </button>
+                                        <button class="btn btn-sm btn-danger btn-delete" data-id="{{ p.id }}">
+                                            <i class="bi bi-trash"></i> {{ catalogText.delete|default('Удалить') }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

@@ -1,0 +1,73 @@
+{#-
+    Partial полей формы оформления заказа (без тега <form>).
+    Параметры:
+      idPrefix      — префикс для input id ('checkout-' или '')
+      radioSuffix   — суффикс для radio id ('' или 'Modal')
+      deliveryCls   — CSS-класс блока доставки
+      pickupCls     — CSS-класс блока самовывоза
+      pickupId      — id select точки самовывоза
+      checkoutText  — массив переводов
+      pickupPoints  — точки самовывоза
+-#}
+{% set idPrefix = idPrefix|default('') %}
+{% set radioSuffix = radioSuffix|default('') %}
+{% set deliveryCls = deliveryCls|default('delivery-fields') %}
+{% set pickupCls = pickupCls|default('pickup-fields') %}
+{% set pickupId = pickupId|default('pickup-point') %}
+{% set checkoutText = checkoutText|default({}) %}
+{% set pickupPoints = pickupPoints|default([]) %}
+
+<div class="mb-3">
+    <label for="{{ idPrefix }}fio" class="form-label">{{ checkoutText.fio|default('ФИО') }} <span class="text-danger">*</span></label>
+    <input type="text" class="form-control" id="{{ idPrefix }}fio" name="fio" required placeholder="{{ checkoutText.fioPlaceholder|default('Иванов Иван Иванович') }}">
+</div>
+<div class="mb-3">
+    <label for="{{ idPrefix }}email" class="form-label">{{ checkoutText.email|default('Email') }} <span class="text-danger">*</span></label>
+    <input type="email" class="form-control" id="{{ idPrefix }}email" name="email" required placeholder="{{ checkoutText.emailPlaceholder|default('example@mail.ru') }}">
+</div>
+<div class="mb-3">
+    <label for="{{ idPrefix }}phone" class="form-label">{{ checkoutText.phone|default('Телефон') }} <span class="text-danger">*</span></label>
+    <input type="tel" class="form-control" id="{{ idPrefix }}phone" name="phone" required placeholder="{{ checkoutText.phonePlaceholder|default('+7 (999) 123-45-67') }}">
+</div>
+
+<!-- Переключатель Самовывоз/Доставка -->
+<div class="mb-3">
+    <label class="form-label">{{ checkoutText.deliveryType|default('Способ получения') }} <span class="text-danger">*</span></label>
+    <div class="btn-group w-100" role="group">
+        <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypeDelivery{{ radioSuffix }}" value="delivery" checked>
+        <label class="btn btn-outline-dark" for="deliveryTypeDelivery{{ radioSuffix }}">
+            <i class="bi bi-truck me-1"></i>{{ checkoutText.delivery|default('Доставка') }}
+        </label>
+        <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypePickup{{ radioSuffix }}" value="pickup">
+        <label class="btn btn-outline-dark" for="deliveryTypePickup{{ radioSuffix }}">
+            <i class="bi bi-shop me-1"></i>{{ checkoutText.pickup|default('Самовывоз') }}
+        </label>
+    </div>
+</div>
+
+<!-- Адрес доставки -->
+<div class="mb-3 {{ deliveryCls }}">
+    <label for="{{ idPrefix }}address" class="form-label">{{ checkoutText.deliveryAddress|default('Адрес доставки') }} <span class="text-danger">*</span></label>
+    <input type="text" class="form-control" id="{{ idPrefix }}address" name="address" placeholder="{{ checkoutText.deliveryAddressPlaceholder|default('г. Кемерово, ул. Примерная, д. 1, кв. 1') }}">
+</div>
+
+<!-- Выбор точки самовывоза -->
+<div class="mb-3 {{ pickupCls }} d-none">
+    <label for="{{ pickupId }}" class="form-label">{{ checkoutText.pickupAddress|default('Выберите точку самовывоза') }} <span class="text-danger">*</span></label>
+    <select class="form-select" id="{{ pickupId }}" name="pickupPoint">
+        <option value="">{{ checkoutText.pickupAddress|default('Выберите точку самовывоза') }}</option>
+        {% for point in pickupPoints %}
+        <option value="{{ point.address }}">{{ point.name }} - {{ point.address }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="mb-3">
+    <label for="{{ idPrefix }}payment" class="form-label">{{ checkoutText.payment|default('Способ оплаты') }} <span class="text-danger">*</span></label>
+    <select class="form-select" id="{{ idPrefix }}payment" name="payment" required>
+        <option value="">{{ checkoutText.paymentSelect|default('Выберите способ оплаты') }}</option>
+        <option value="cash">{{ checkoutText.paymentCash|default('Наличными при получении') }}</option>
+        <option value="card">{{ checkoutText.paymentCard|default('Банковской картой') }}</option>
+        <option value="online">{{ checkoutText.paymentOnline|default('Онлайн-оплата') }}</option>
+    </select>
+</div>

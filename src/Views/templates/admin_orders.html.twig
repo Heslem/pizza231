@@ -2,8 +2,9 @@
 
 {% block content %}
 {% set ordersText = texts.orders|default({}) %}
-{% set activeCount = activeOrders|default([])|length %}
-{% set completedCount = completedOrders|default([])|length %}
+
+{% set activeOrders = orders|filter(o => o.status|default('new') in ['new', 'processing']) %}
+{% set completedOrders = orders|filter(o => o.status|default('') in ['completed', 'cancelled']) %}
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -18,13 +19,13 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-orders" type="button" role="tab">
                 <i class="bi bi-clock-history me-1"></i>{{ ordersText.active|default('Активные') }}
-                <span class="badge bg-danger ms-2">{{ activeCount }}</span>
+                <span class="badge bg-danger ms-2">{{ activeOrders|length }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed-orders" type="button" role="tab">
                 <i class="bi bi-check2-circle me-1"></i>{{ ordersText.completed|default('Завершённые') }}
-                <span class="badge bg-secondary ms-2">{{ completedCount }}</span>
+                <span class="badge bg-secondary ms-2">{{ completedOrders|length }}</span>
             </button>
         </li>
     </ul>
@@ -32,12 +33,94 @@
     <div class="tab-content" id="ordersTabsContent">
         <!-- Активные заказы -->
         <div class="tab-pane fade show active" id="active-orders" role="tabpanel">
-            {{ activeOrdersHtml|default('')|raw }}
+            {% if activeOrders is empty %}
+                <div class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="text-muted">{{ ordersText.noOrders|default('Заказов нет') }}</h5></div>
+            {% else %}
+                {% for order in activeOrders %}
+                    {% set status = order.status|default('new') %}
+                    {% set statusBadge = status|status_badge(ordersText) %}
+                    {% set itemsCount = order.items|length %}
+                    {% set total = order.total|default(0)|number_format(0, '.', ' ') %}
+                    {% set dateStr = order.created_at|default(order.date|default('')) %}
+                    {% set createdAt = dateStr ? dateStr|date('d.m.Y H:i') : '—' %}
+                    <div class="card mb-3 shadow-sm order-card" style="cursor: pointer;">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1">
+                                    <button class="btn btn-link text-decoration-none fw-bold btn-view-order" data-id="{{ order.id }}">#{{ order.id|slice(-8) }}</button>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="fw-medium">{{ order.fio|default('—') }}</div>
+                                    <small class="text-muted">{{ order.phone|default('—') }}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.products|default('Товаров') }}</small>
+                                    <strong>{{ itemsCount }}</strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.amount|default('Сумма') }}</small>
+                                    <strong class="text-success">{{ total }} ₽</strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.status|default('Статус') }}</small>
+                                    <div>{{ statusBadge }}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.date|default('Дата') }}</small>
+                                    <small>{{ createdAt }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
 
         <!-- Завершённые заказы -->
         <div class="tab-pane fade" id="completed-orders" role="tabpanel">
-            {{ completedOrdersHtml|default('')|raw }}
+            {% if completedOrders is empty %}
+                <div class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="text-muted">{{ ordersText.noOrders|default('Заказов нет') }}</h5></div>
+            {% else %}
+                {% for order in completedOrders %}
+                    {% set status = order.status|default('new') %}
+                    {% set statusBadge = status|status_badge(ordersText) %}
+                    {% set itemsCount = order.items|length %}
+                    {% set total = order.total|default(0)|number_format(0, '.', ' ') %}
+                    {% set dateStr = order.created_at|default(order.date|default('')) %}
+                    {% set createdAt = dateStr ? dateStr|date('d.m.Y H:i') : '—' %}
+                    <div class="card mb-3 shadow-sm order-card" style="cursor: pointer;">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1">
+                                    <button class="btn btn-link text-decoration-none fw-bold btn-view-order" data-id="{{ order.id }}">#{{ order.id|slice(-8) }}</button>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="fw-medium">{{ order.fio|default('—') }}</div>
+                                    <small class="text-muted">{{ order.phone|default('—') }}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.products|default('Товаров') }}</small>
+                                    <strong>{{ itemsCount }}</strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.amount|default('Сумма') }}</small>
+                                    <strong class="text-success">{{ total }} ₽</strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.status|default('Статус') }}</small>
+                                    <div>{{ statusBadge }}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted d-block">{{ ordersText.date|default('Дата') }}</small>
+                                    <small>{{ createdAt }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

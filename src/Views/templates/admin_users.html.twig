@@ -1,8 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{% block content %}
 {% set usersText = texts.users|default({}) %}
 
-{% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">{{ usersText.title|default('Пользователи') }}</h1>
@@ -22,7 +22,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{ usersHtml|raw }}
+                        {% if users is empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">
+                                <i class="bi bi-people fs-1 d-block mb-2"></i>{{ usersText.noUsers|default('Пользователей пока нет') }}
+                            </td></tr>
+                        {% else %}
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id|default('—') }}</td>
+                                    <td>{{ user.name|default('—') }}</td>
+                                    <td>{{ user.email|default('—') }}</td>
+                                    <td>{{ user.created_at ? user.created_at|date('d.m.Y H:i') : '—' }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

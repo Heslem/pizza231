@@ -2,6 +2,7 @@
 {% set footerText = texts.footer|default({}) %}
 {% set cafeInfo = texts.cafe|default({}) %}
 {% set pickupPoints = texts.pickupPoints|default({}) %}
+{% set checkoutText = texts.checkout|default({}) %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -127,63 +128,18 @@
         </div>
         <div class="cart-slide-body">
             <form id="checkout-form-panel">
-                <div class="mb-3">
-                    <label for="checkout-fio" class="form-label">ФИО <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="checkout-fio" name="fio" required placeholder="Иванов Иван Иванович">
-                </div>
-                <div class="mb-3">
-                    <label for="checkout-email" class="form-label">Email <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control" id="checkout-email" name="email" required placeholder="example@mail.ru">
-                </div>
-                <div class="mb-3">
-                    <label for="checkout-phone" class="form-label">Телефон <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" id="checkout-phone" name="phone" required placeholder="+7 (999) 123-45-67">
-                </div>
-
-                <!-- Переключатель Самовывоз/Доставка -->
-                <div class="mb-3">
-                    <label class="form-label">Способ получения <span class="text-danger">*</span></label>
-                    <div class="btn-group w-100" role="group">
-                        <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypeDelivery" value="delivery" checked>
-                        <label class="btn btn-outline-dark" for="deliveryTypeDelivery">
-                            <i class="bi bi-truck me-1"></i>Доставка
-                        </label>
-                        <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypePickup" value="pickup">
-                        <label class="btn btn-outline-dark" for="deliveryTypePickup">
-                            <i class="bi bi-shop me-1"></i>Самовывоз
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Адрес доставки (показывается при доставке) -->
-                <div class="mb-3 delivery-fields">
-                    <label for="checkout-address" class="form-label">Адрес доставки <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="checkout-address" name="address" placeholder="г. Кемерово, ул. Примерная, д. 1, кв. 1">
-                </div>
-
-                <!-- Выбор точки самовывоза (скрыт по умолчанию) -->
-                <div class="mb-3 pickup-fields d-none">
-                    <label for="pickup-point" class="form-label">Точка самовывоза <span class="text-danger">*</span></label>
-                    <select class="form-select" id="pickup-point" name="pickupPoint">
-                        <option value="">Выберите точку самовывоза</option>
-                        {% for point in pickupPoints %}
-                        <option value="{{ point.address }}">{{ point.name }} - {{ point.address }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="checkout-payment" class="form-label">Способ оплаты <span class="text-danger">*</span></label>
-                    <select class="form-select" id="checkout-payment" name="payment" required>
-                        <option value="">Выберите способ оплаты</option>
-                        <option value="cash">Наличными при получении</option>
-                        <option value="card">Банковской картой</option>
-                        <option value="online">Онлайн-оплата</option>
-                    </select>
-                </div>
+                {% include '_checkout_form.html.twig' with {
+                    idPrefix: 'checkout-',
+                    radioSuffix: '',
+                    deliveryCls: 'delivery-fields',
+                    pickupCls: 'pickup-fields',
+                    pickupId: 'pickup-point',
+                    checkoutText: checkoutText,
+                    pickupPoints: pickupPoints
+                } only %}
                 <hr>
                 <div class="d-flex justify-content-between align-items-center">
-                    <span>К оплате:</span>
+                    <span>{{ checkoutText.totalToPay|default('Итого к оплате:') }}</span>
                     <span class="h5 mb-0 text-success" id="checkoutTotalAmount">0 ₽</span>
                 </div>
             </form>

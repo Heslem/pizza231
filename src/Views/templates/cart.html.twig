@@ -98,58 +98,15 @@
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-12">
-                            <label for="fio" class="form-label">{{ checkoutText.fio|default('ФИО') }} <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="fio" name="fio" required placeholder="{{ checkoutText.fioPlaceholder|default('Иванов Иван Иванович') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">{{ checkoutText.email|default('Email') }} <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="email" name="email" required placeholder="{{ checkoutText.emailPlaceholder|default('example@mail.ru') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="phone" class="form-label">{{ checkoutText.phone|default('Телефон') }} <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" id="phone" name="phone" required placeholder="{{ checkoutText.phonePlaceholder|default('+7 (999) 123-45-67') }}">
-                        </div>
-
-                        <!-- Переключатель Самовывоз/Доставка -->
-                        <div class="col-12">
-                            <label class="form-label">{{ checkoutText.deliveryType|default('Способ получения') }} <span class="text-danger">*</span></label>
-                            <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypeDeliveryModal" value="delivery" checked>
-                                <label class="btn btn-outline-dark" for="deliveryTypeDeliveryModal">
-                                    <i class="bi bi-truck me-1"></i>{{ checkoutText.delivery|default('Доставка') }}
-                                </label>
-                                <input type="radio" class="btn-check" name="deliveryType" id="deliveryTypePickupModal" value="pickup">
-                                <label class="btn btn-outline-dark" for="deliveryTypePickupModal">
-                                    <i class="bi bi-shop me-1"></i>{{ checkoutText.pickup|default('Самовывоз') }}
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Адрес доставки -->
-                        <div class="col-12 delivery-fields-modal">
-                            <label for="address" class="form-label">{{ checkoutText.deliveryAddress|default('Адрес доставки') }} <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="address" name="address" placeholder="{{ checkoutText.deliveryAddressPlaceholder|default('г. Кемерово, ул. Примерная, д. 1, кв. 1') }}">
-                        </div>
-
-                        <!-- Выбор точки самовывоза -->
-                        <div class="col-12 pickup-fields-modal d-none">
-                            <label for="pickup-point-modal" class="form-label">{{ checkoutText.pickupAddress|default('Выберите точку самовывоза') }} <span class="text-danger">*</span></label>
-                            <select class="form-select" id="pickup-point-modal" name="pickupPoint">
-                                <option value="">{{ checkoutText.pickupAddress|default('Выберите точку самовывоза') }}</option>
-                                {% for point in pickupPoints %}
-                                <option value="{{ point.address }}">{{ point.name }} - {{ point.address }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="col-12">
-                            <label for="payment" class="form-label">{{ checkoutText.payment|default('Способ оплаты') }} <span class="text-danger">*</span></label>
-                            <select class="form-select" id="payment" name="payment" required>
-                                <option value="">{{ checkoutText.paymentSelect|default('Выберите способ оплаты') }}</option>
-                                <option value="cash">{{ checkoutText.paymentCash|default('Наличными при получении') }}</option>
-                                <option value="card">{{ checkoutText.paymentCard|default('Банковской картой') }}</option>
-                                <option value="online">{{ checkoutText.paymentOnline|default('Онлайн-оплата') }}</option>
-                            </select>
+                            {% include '_checkout_form.html.twig' with {
+                                idPrefix: '',
+                                radioSuffix: 'Modal',
+                                deliveryCls: 'delivery-fields-modal',
+                                pickupCls: 'pickup-fields-modal',
+                                pickupId: 'pickup-point-modal',
+                                checkoutText: checkoutText,
+                                pickupPoints: pickupPoints
+                            } only %}
                         </div>
                     </div>
 

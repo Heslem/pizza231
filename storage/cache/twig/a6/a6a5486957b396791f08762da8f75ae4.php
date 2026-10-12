@@ -153,34 +153,32 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
         // line 79
         $context["category"] = ((array_key_exists("category", $context)) ? (Twig\Extension\CoreExtension::default(($context["category"] ?? null), "")) : (""));
         // line 80
-        $context["categoryTabs"] = ((array_key_exists("categoryTabs", $context)) ? (Twig\Extension\CoreExtension::default(($context["categoryTabs"] ?? null), "")) : (""));
+        $context["categories"] = ((array_key_exists("categories", $context)) ? (Twig\Extension\CoreExtension::default(($context["categories"] ?? null), [])) : ([]));
         // line 81
-        $context["searchInfo"] = ((array_key_exists("searchInfo", $context)) ? (Twig\Extension\CoreExtension::default(($context["searchInfo"] ?? null), "")) : (""));
+        $context["products"] = ((array_key_exists("products", $context)) ? (Twig\Extension\CoreExtension::default(($context["products"] ?? null), [])) : ([]));
         // line 82
-        $context["productsGrid"] = ((array_key_exists("productsGrid", $context)) ? (Twig\Extension\CoreExtension::default(($context["productsGrid"] ?? null), "")) : (""));
-        // line 83
         yield "
 <div class=\"container py-5\">
     <!-- Заголовок + Поиск -->
     <div class=\"row mb-4\">
         <div class=\"col-12 text-center\">
             <h1 class=\"display-5 fw-bold mb-4\">";
-        // line 88
+        // line 87
         yield (string) $this->escaper->escape(($context["titleText"] ?? null), "html", null, true);
         yield "</h1>
 
             <!-- Форма поиска -->
             <form method=\"GET\" action=\"/catalog\" class=\"col-md-6 col-lg-4 mx-auto\">
                 ";
-        // line 92
+        // line 91
         if ( !Twig\Extension\CoreExtension::testEmpty(($context["category"] ?? null))) {
-            // line 93
+            // line 92
             yield "                <input type=\"hidden\" name=\"category\" value=\"";
             yield (string) $this->escaper->escape(($context["category"] ?? null), "html", null, true);
             yield "\">
                 ";
         }
-        // line 95
+        // line 94
         yield "                <div class=\"input-group input-group-lg\">
                     <span class=\"input-group-text bg-white border-end-0\">
                         <i class=\"bi bi-search text-muted\"></i>
@@ -190,17 +188,17 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
                         name=\"search\"
                         class=\"form-control border-start-0 ps-0\"
                         placeholder=\"";
-        // line 103
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "placeholder", [], "any", true, true, false, 103)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "placeholder", [], "any", false, false, false, 103), "Поиск товаров...")) : ("Поиск товаров...")), "html", null, true);
+        // line 102
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "placeholder", [], "any", true, true, false, 102)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "placeholder", [], "any", false, false, false, 102), "Поиск товаров...")) : ("Поиск товаров...")), "html", null, true);
         yield "\"
                         value=\"";
-        // line 104
+        // line 103
         yield (string) $this->escaper->escape(($context["search"] ?? null), "html", null, true);
         yield "\"
                         aria-label=\"Поиск\">
                     <button class=\"btn btn-primary px-4\" type=\"submit\">";
-        // line 106
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "button", [], "any", true, true, false, 106)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "button", [], "any", false, false, false, 106), "Найти")) : ("Найти")), "html", null, true);
+        // line 105
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "button", [], "any", true, true, false, 105)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["searchText"] ?? null), "button", [], "any", false, false, false, 105), "Найти")) : ("Найти")), "html", null, true);
         yield "</button>
                 </div>
             </form>
@@ -211,36 +209,144 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
     <div class=\"row\">
         <!-- Боковое меню категорий -->
         ";
-        // line 115
-        if ( !Twig\Extension\CoreExtension::testEmpty(($context["categoryTabs"] ?? null))) {
-            // line 116
+        // line 114
+        if ( !Twig\Extension\CoreExtension::testEmpty(($context["categories"] ?? null))) {
+            // line 115
             yield "        <div class=\"col-lg-3 mb-4 mb-lg-0\">
-            ";
-            // line 117
-            yield (string) ($context["categoryTabs"] ?? null);
-            yield "
+            <div class=\"category-sidebar\">
+                <h5 class=\"category-title\">Категории</h5>
+                ";
+            // line 118
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable(($context["categories"] ?? null));
+            foreach ($context['_seq'] as $context["_key"] => $context["cat"]) {
+                // line 119
+                yield "                    <a href=\"/catalog?category=";
+                yield (string) $this->escaper->escape(Twig\Extension\CoreExtension::urlencode($context["cat"]), "html", null, true);
+                yield "\"
+                       class=\"category-link";
+                // line 120
+                yield (string) ((($context["cat"] == ($context["category"] ?? null))) ? (" active") : (""));
+                yield "\">";
+                yield (string) $this->escaper->escape($context["cat"], "html", null, true);
+                yield "</a>
+                ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['cat'], $context['_parent']);
+            $context = array_intersect_key($context, $_parent);
+            $context += $_parent;
+            // line 122
+            yield "            </div>
         </div>
         ";
         }
-        // line 120
+        // line 125
         yield "
         <!-- Товары -->
         <div class=\"";
-        // line 122
-        yield (string) (( !Twig\Extension\CoreExtension::testEmpty(($context["categoryTabs"] ?? null))) ? ("col-lg-9") : ("col-12"));
+        // line 127
+        yield (string) (( !Twig\Extension\CoreExtension::testEmpty(($context["categories"] ?? null))) ? ("col-lg-9") : ("col-12"));
         yield "\">
             <!-- Результаты поиска -->
             ";
-        // line 124
-        yield (string) ($context["searchInfo"] ?? null);
+        // line 129
+        if ( !Twig\Extension\CoreExtension::testEmpty(($context["search"] ?? null))) {
+            // line 130
+            yield "                ";
+            if ( !Twig\Extension\CoreExtension::testEmpty(($context["products"] ?? null))) {
+                // line 131
+                yield "                    <div class=\"alert alert-success\">Найдено по запросу «";
+                yield (string) $this->escaper->escape(($context["search"] ?? null), "html", null, true);
+                yield "» <strong>";
+                yield (string) $this->escaper->escape(Twig\Extension\CoreExtension::length($this->env->getCharset(), ($context["products"] ?? null)), "html", null, true);
+                yield "</strong> ";
+                yield (string) (((Twig\Extension\CoreExtension::length($this->env->getCharset(), ($context["products"] ?? null)) == 1)) ? ("товар") : ("товаров"));
+                yield "</div>
+                ";
+            } else {
+                // line 133
+                yield "                    <div class=\"alert alert-warning\">По запросу «";
+                yield (string) $this->escaper->escape(($context["search"] ?? null), "html", null, true);
+                yield "» ничего не найдено</div>
+                ";
+            }
+            // line 135
+            yield "            ";
+        }
+        // line 136
         yield "
-
-            <!-- Секции товаров -->
+            <!-- Сетка товаров -->
             ";
-        // line 127
-        yield (string) ($context["productsGrid"] ?? null);
-        yield "
-        </div>
+        // line 138
+        if (Twig\Extension\CoreExtension::testEmpty(($context["products"] ?? null))) {
+            // line 139
+            yield "                <div class=\"alert alert-info\">Товары отсутствуют</div>
+            ";
+        } else {
+            // line 141
+            yield "                <div class=\"row g-4\">
+                    ";
+            // line 142
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable(($context["products"] ?? null));
+            foreach ($context['_seq'] as $context["_key"] => $context["product"]) {
+                // line 143
+                yield "                    <div class=\"col-6 col-md-4 col-lg-3\">
+                        <div class=\"card h-100\">
+                            <img src=\"";
+                // line 145
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "image", [], "any", true, true, false, 145)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "image", [], "any", false, false, false, 145), "/assets/img/no-image.jpg")) : ("/assets/img/no-image.jpg")), "html", null, true);
+                yield "\"
+                                 class=\"card-img-top\"
+                                 alt=\"";
+                // line 147
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "name", [], "any", true, true, false, 147)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "name", [], "any", false, false, false, 147), "")) : ("")), "html", null, true);
+                yield "\"
+                                 onerror=\"this.src=\x27/assets/img/no-image.jpg\x27\">
+                            <div class=\"card-body\">
+                                <h5 class=\"card-title\">";
+                // line 150
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "name", [], "any", true, true, false, 150)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "name", [], "any", false, false, false, 150), "")) : ("")), "html", null, true);
+                yield "</h5>
+                                <p class=\"card-text\">";
+                // line 151
+                yield (string) $this->escaper->escape(Twig\Extension\CoreExtension::slice($this->env->getCharset(), ((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "description", [], "any", true, true, false, 151)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "description", [], "any", false, false, false, 151), "")) : ("")), 0, 100), "html", null, true);
+                yield "</p>
+                            </div>
+                            <div class=\"card-footer\">
+                                <span class=\"price\">";
+                // line 154
+                yield (string) $this->escaper->escape($this->extensions['Twig\Extension\CoreExtension']->formatNumber(((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "price", [], "any", true, true, false, 154)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "price", [], "any", false, false, false, 154), 0)) : (0)), 0, ".", " "), "html", null, true);
+                yield " ₽</span>
+                                <button class=\"btn btn-primary btn-sm btn-product-details\" data-id=\"";
+                // line 155
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "id", [], "any", true, true, false, 155)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "id", [], "any", false, false, false, 155), "")) : ("")), "html", null, true);
+                yield "\">Подробнее</button>
+                                <button class=\"btn btn-outline-primary btn-sm btn-add-to-cart\"
+                                        data-product=\x27";
+                // line 157
+                yield (string) $this->escaper->escape(json_encode(["id" => ((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "id", [], "any", true, true, false, 157)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "id", [], "any", false, false, false, 157), "")) : ("")), "name" => ((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "name", [], "any", true, true, false, 157)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "name", [], "any", false, false, false, 157), "")) : ("")), "price" => ((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "price", [], "any", true, true, false, 157)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "price", [], "any", false, false, false, 157), 0)) : (0)), "image" => ((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "image", [], "any", true, true, false, 157)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "image", [], "any", false, false, false, 157), "/assets/img/no-image.jpg")) : ("/assets/img/no-image.jpg"))]), "html_attr");
+                yield "\x27
+                                        data-id=\"";
+                // line 158
+                yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["product"], "id", [], "any", true, true, false, 158)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["product"], "id", [], "any", false, false, false, 158), "")) : ("")), "html", null, true);
+                yield "\">В корзину</button>
+                            </div>
+                        </div>
+                    </div>
+                    ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['product'], $context['_parent']);
+            $context = array_intersect_key($context, $_parent);
+            $context += $_parent;
+            // line 163
+            yield "                </div>
+            ";
+        }
+        // line 165
+        yield "        </div>
     </div>
 </div>
 
@@ -257,8 +363,8 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
 
     <div class=\"toast-message\" id=\"fullscreenToastMessage\">
         ";
-        // line 144
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "addedWithEmoji", [], "any", true, true, false, 144)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "addedWithEmoji", [], "any", false, false, false, 144), "🎉 Товар добавлен в корзину!")) : ("🎉 Товар добавлен в корзину!")), "html", null, true);
+        // line 181
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "addedWithEmoji", [], "any", true, true, false, 181)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "addedWithEmoji", [], "any", false, false, false, 181), "🎉 Товар добавлен в корзину!")) : ("🎉 Товар добавлен в корзину!")), "html", null, true);
         yield "
     </div>
 </div>
@@ -270,8 +376,8 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
             <div class=\"toast-body\">
                 <i class=\"bi bi-check-circle-fill me-2\"></i>
                 <span id=\"toastMessage\">";
-        // line 154
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "added", [], "any", true, true, false, 154)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "added", [], "any", false, false, false, 154), "Товар добавлен в корзину!")) : ("Товар добавлен в корзину!")), "html", null, true);
+        // line 191
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "added", [], "any", true, true, false, 191)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["toastText"] ?? null), "added", [], "any", false, false, false, 191), "Товар добавлен в корзину!")) : ("Товар добавлен в корзину!")), "html", null, true);
         yield "</span>
             </div>
             <button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\"></button>
@@ -285,8 +391,8 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
         <div class=\"modal-content\">
             <div class=\"modal-header\">
                 <h5 class=\"modal-title\">";
-        // line 166
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", true, true, false, 166)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", false, false, false, 166), "Информация о товаре")) : ("Информация о товаре")), "html", null, true);
+        // line 203
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", true, true, false, 203)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "title", [], "any", false, false, false, 203), "Информация о товаре")) : ("Информация о товаре")), "html", null, true);
         yield "</h5>
                 <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Закрыть\"></button>
             </div>
@@ -300,14 +406,14 @@ class __TwigTemplate_24343e27c5ac170ba6e42afcd40f7e01 extends Template
         return; yield;
     }
 
-    // line 177
+    // line 214
     /**
      * @return iterable<null|scalar|\Stringable>
      */
     public function block_scripts(array $context, array $blocks = []): iterable
     {
         $macros = $this->macros;
-        // line 178
+        // line 215
         yield "<script>
 document.addEventListener(\"DOMContentLoaded\", function() {
     const toastEl = document.getElementById(\"cartToast\");
@@ -364,8 +470,8 @@ async function loadProductModal(productId) {
 
         if (data.notFound) {
             modalBody.innerHTML = \x27<div class=\"alert alert-warning\">";
-        // line 233
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", true, true, false, 233)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", false, false, false, 233), "Товар не найден")) : ("Товар не найден")), "html", null, true);
+        // line 270
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", true, true, false, 270)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "notFound", [], "any", false, false, false, 270), "Товар не найден")) : ("Товар не найден")), "html", null, true);
         yield "</div>\x27;
             return;
         }
@@ -398,8 +504,8 @@ async function loadProductModal(productId) {
                 </div>
                 <div class=\"col-md-7\">
                     <h5 class=\"text-uppercase fw-bold ls-1 mb-2 text-muted\" style=\"font-size: 0.8rem;\">";
-        // line 264
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 264), "label", [], "any", true, true, false, 264)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 264), "label", [], "any", false, false, false, 264), "Наше меню")) : ("Наше меню")), "html", null, true);
+        // line 301
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 301), "label", [], "any", true, true, false, 301)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 301), "label", [], "any", false, false, false, 301), "Наше меню")) : ("Наше меню")), "html", null, true);
         yield "</h5>
                     <h3 class=\"card-title fw-bold mb-3\">\${product.name}</h3>
                     <p class=\"card-text text-muted\" style=\"line-height: 1.6;\">\${product.description}</p>
@@ -407,8 +513,8 @@ async function loadProductModal(productId) {
                     <div class=\"d-flex align-items-center mb-3\">
                         <span class=\"h3 fw-bold me-3\">\${priceFormatted} ₽</span>
                         <span class=\"badge bg-success px-3 py-2 rounded-pill\">";
-        // line 270
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 270), "inStock", [], "any", true, true, false, 270)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 270), "inStock", [], "any", false, false, false, 270), "В наличии")) : ("В наличии")), "html", null, true);
+        // line 307
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 307), "inStock", [], "any", true, true, false, 307)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 307), "inStock", [], "any", false, false, false, 307), "В наличии")) : ("В наличии")), "html", null, true);
         yield "</span>
                     </div>
 
@@ -430,8 +536,8 @@ async function loadProductModal(productId) {
                                     <path d=\"M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z\"/>
                                 </svg>
                                 ";
-        // line 290
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 290), "addToCart", [], "any", true, true, false, 290)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 290), "addToCart", [], "any", false, false, false, 290), "В корзину")) : ("В корзину")), "html", null, true);
+        // line 327
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, true, false, 327), "addToCart", [], "any", true, true, false, 327)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["texts"] ?? null), "product", [], "any", false, false, false, 327), "addToCart", [], "any", false, false, false, 327), "В корзину")) : ("В корзину")), "html", null, true);
         yield "
                             </button>
                         `}
@@ -444,8 +550,8 @@ async function loadProductModal(productId) {
 
     } catch (error) {
         modalBody.innerHTML = \x27<div class=\"alert alert-danger\">";
-        // line 301
-        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", true, true, false, 301)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", false, false, false, 301), "Ошибка загрузки товара")) : ("Ошибка загрузки товара")), "html", null, true);
+        // line 338
+        yield (string) $this->escaper->escape(((CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", true, true, false, 338)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, ($context["modalText"] ?? null), "error", [], "any", false, false, false, 338), "Ошибка загрузки товара")) : ("Ошибка загрузки товара")), "html", null, true);
         yield "</div>\x27;
     }
 }
@@ -559,7 +665,7 @@ function initModalCartHandlers(productId) {
      */
     public function getDebugInfo(): array
     {
-        return array (  448 => 301,  434 => 290,  411 => 270,  402 => 264,  368 => 233,  311 => 178,  304 => 177,  289 => 166,  274 => 154,  261 => 144,  241 => 127,  235 => 124,  230 => 122,  226 => 120,  220 => 117,  217 => 116,  215 => 115,  203 => 106,  198 => 104,  194 => 103,  184 => 95,  178 => 93,  176 => 92,  169 => 88,  162 => 83,  160 => 82,  158 => 81,  156 => 80,  154 => 79,  152 => 78,  150 => 77,  148 => 76,  146 => 75,  144 => 74,  137 => 73,  65 => 4,  58 => 3,  47 => 1,);
+        return array (  554 => 338,  540 => 327,  517 => 307,  508 => 301,  474 => 270,  417 => 215,  410 => 214,  395 => 203,  380 => 191,  367 => 181,  349 => 165,  345 => 163,  333 => 158,  329 => 157,  324 => 155,  320 => 154,  314 => 151,  310 => 150,  304 => 147,  299 => 145,  295 => 143,  291 => 142,  288 => 141,  284 => 139,  282 => 138,  278 => 136,  275 => 135,  269 => 133,  259 => 131,  256 => 130,  254 => 129,  249 => 127,  245 => 125,  240 => 122,  229 => 120,  224 => 119,  220 => 118,  215 => 115,  213 => 114,  201 => 105,  196 => 103,  192 => 102,  182 => 94,  176 => 92,  174 => 91,  167 => 87,  160 => 82,  158 => 81,  156 => 80,  154 => 79,  152 => 78,  150 => 77,  148 => 76,  146 => 75,  144 => 74,  137 => 73,  65 => 4,  58 => 3,  47 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -637,15 +743,14 @@ function initModalCartHandlers(productId) {
 {% endblock %}
 
 {% block content %}
-{% set searchText = texts.search|default([]) %}
-{% set toastText = texts.toast|default([]) %}
-{% set modalText = texts.modal|default([]) %}
+{% set searchText = texts.search|default({}) %}
+{% set toastText = texts.toast|default({}) %}
+{% set modalText = texts.modal|default({}) %}
 {% set titleText = texts.title|default(\x27Каталог товаров\x27) %}
 {% set search = search|default(\x27\x27) %}
 {% set category = category|default(\x27\x27) %}
-{% set categoryTabs = categoryTabs|default(\x27\x27) %}
-{% set searchInfo = searchInfo|default(\x27\x27) %}
-{% set productsGrid = productsGrid|default(\x27\x27) %}
+{% set categories = categories|default([]) %}
+{% set products = products|default([]) %}
 
 <div class=\"container py-5\">
     <!-- Заголовок + Поиск -->
@@ -678,19 +783,57 @@ function initModalCartHandlers(productId) {
     <!-- Основной контент: боковое меню + товары -->
     <div class=\"row\">
         <!-- Боковое меню категорий -->
-        {% if categoryTabs is not empty %}
+        {% if categories is not empty %}
         <div class=\"col-lg-3 mb-4 mb-lg-0\">
-            {{ categoryTabs|raw }}
+            <div class=\"category-sidebar\">
+                <h5 class=\"category-title\">Категории</h5>
+                {% for cat in categories %}
+                    <a href=\"/catalog?category={{ cat|url_encode }}\"
+                       class=\"category-link{{ cat == category ? \x27 active\x27 : \x27\x27 }}\">{{ cat }}</a>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
         <!-- Товары -->
-        <div class=\"{{ categoryTabs is not empty ? \x27col-lg-9\x27 : \x27col-12\x27 }}\">
+        <div class=\"{{ categories is not empty ? \x27col-lg-9\x27 : \x27col-12\x27 }}\">
             <!-- Результаты поиска -->
-            {{ searchInfo|raw }}
+            {% if search is not empty %}
+                {% if products is not empty %}
+                    <div class=\"alert alert-success\">Найдено по запросу «{{ search }}» <strong>{{ products|length }}</strong> {{ products|length == 1 ? \x27товар\x27 : \x27товаров\x27 }}</div>
+                {% else %}
+                    <div class=\"alert alert-warning\">По запросу «{{ search }}» ничего не найдено</div>
+                {% endif %}
+            {% endif %}
 
-            <!-- Секции товаров -->
-            {{ productsGrid|raw }}
+            <!-- Сетка товаров -->
+            {% if products is empty %}
+                <div class=\"alert alert-info\">Товары отсутствуют</div>
+            {% else %}
+                <div class=\"row g-4\">
+                    {% for product in products %}
+                    <div class=\"col-6 col-md-4 col-lg-3\">
+                        <div class=\"card h-100\">
+                            <img src=\"{{ product.image|default(\x27/assets/img/no-image.jpg\x27) }}\"
+                                 class=\"card-img-top\"
+                                 alt=\"{{ product.name|default(\x27\x27) }}\"
+                                 onerror=\"this.src=\x27/assets/img/no-image.jpg\x27\">
+                            <div class=\"card-body\">
+                                <h5 class=\"card-title\">{{ product.name|default(\x27\x27) }}</h5>
+                                <p class=\"card-text\">{{ product.description|default(\x27\x27)|slice(0, 100) }}</p>
+                            </div>
+                            <div class=\"card-footer\">
+                                <span class=\"price\">{{ product.price|default(0)|number_format(0, \x27.\x27, \x27 \x27) }} ₽</span>
+                                <button class=\"btn btn-primary btn-sm btn-product-details\" data-id=\"{{ product.id|default(\x27\x27) }}\">Подробнее</button>
+                                <button class=\"btn btn-outline-primary btn-sm btn-add-to-cart\"
+                                        data-product=\x27{{ {\"id\": product.id|default(\x27\x27), \"name\": product.name|default(\x27\x27), \"price\": product.price|default(0), \"image\": product.image|default(\x27/assets/img/no-image.jpg\x27)}|json_encode|e(\x27html_attr\x27) }}\x27
+                                        data-id=\"{{ product.id|default(\x27\x27) }}\">В корзину</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

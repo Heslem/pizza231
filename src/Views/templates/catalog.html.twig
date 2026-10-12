@@ -71,15 +71,14 @@
 {% endblock %}
 
 {% block content %}
-{% set searchText = texts.search|default([]) %}
-{% set toastText = texts.toast|default([]) %}
-{% set modalText = texts.modal|default([]) %}
+{% set searchText = texts.search|default({}) %}
+{% set toastText = texts.toast|default({}) %}
+{% set modalText = texts.modal|default({}) %}
 {% set titleText = texts.title|default('Каталог товаров') %}
 {% set search = search|default('') %}
 {% set category = category|default('') %}
-{% set categoryTabs = categoryTabs|default('') %}
-{% set searchInfo = searchInfo|default('') %}
-{% set productsGrid = productsGrid|default('') %}
+{% set categories = categories|default([]) %}
+{% set products = products|default([]) %}
 
 <div class="container py-5">
     <!-- Заголовок + Поиск -->
@@ -112,19 +111,57 @@
     <!-- Основной контент: боковое меню + товары -->
     <div class="row">
         <!-- Боковое меню категорий -->
-        {% if categoryTabs is not empty %}
+        {% if categories is not empty %}
         <div class="col-lg-3 mb-4 mb-lg-0">
-            {{ categoryTabs|raw }}
+            <div class="category-sidebar">
+                <h5 class="category-title">Категории</h5>
+                {% for cat in categories %}
+                    <a href="/catalog?category={{ cat|url_encode }}"
+                       class="category-link{{ cat == category ? ' active' : '' }}">{{ cat }}</a>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
         <!-- Товары -->
-        <div class="{{ categoryTabs is not empty ? 'col-lg-9' : 'col-12' }}">
+        <div class="{{ categories is not empty ? 'col-lg-9' : 'col-12' }}">
             <!-- Результаты поиска -->
-            {{ searchInfo|raw }}
+            {% if search is not empty %}
+                {% if products is not empty %}
+                    <div class="alert alert-success">Найдено по запросу «{{ search }}» <strong>{{ products|length }}</strong> {{ products|length == 1 ? 'товар' : 'товаров' }}</div>
+                {% else %}
+                    <div class="alert alert-warning">По запросу «{{ search }}» ничего не найдено</div>
+                {% endif %}
+            {% endif %}
 
-            <!-- Секции товаров -->
-            {{ productsGrid|raw }}
+            <!-- Сетка товаров -->
+            {% if products is empty %}
+                <div class="alert alert-info">Товары отсутствуют</div>
+            {% else %}
+                <div class="row g-4">
+                    {% for product in products %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card h-100">
+                            <img src="{{ product.image|default('/assets/img/no-image.jpg') }}"
+                                 class="card-img-top"
+                                 alt="{{ product.name|default('') }}"
+                                 onerror="this.src='/assets/img/no-image.jpg'">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name|default('') }}</h5>
+                                <p class="card-text">{{ product.description|default('')|slice(0, 100) }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <span class="price">{{ product.price|default(0)|number_format(0, '.', ' ') }} ₽</span>
+                                <button class="btn btn-primary btn-sm btn-product-details" data-id="{{ product.id|default('') }}">Подробнее</button>
+                                <button class="btn btn-outline-primary btn-sm btn-add-to-cart"
+                                        data-product='{{ {"id": product.id|default(''), "name": product.name|default(''), "price": product.price|default(0), "image": product.image|default('/assets/img/no-image.jpg')}|json_encode|e('html_attr') }}'
+                                        data-id="{{ product.id|default('') }}">В корзину</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
