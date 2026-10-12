@@ -1,142 +1,116 @@
 <?php
 namespace App\Models;
 
-use App\Config\Config;
-use App\Database\Database;
-use PDO;
+use App\Support\DatabaseAware;
+use App\Support\JsonStore;
 
+/**
+ * Модель заказов — единый слой данных (PDO + JSON fallback)
+ *
+ * Формат заказа единый для БД и JSON:
+ * id (string order_xxx), created_at, fio, email, phone, address,
+ * deliveryType, payment, items, total, status, user_id?, completed_at?
+ */
 class Order
 {
-    private const FILE_ORDERS = __DIR__ . '/../../storage/orders.json';
+    use DatabaseAware;
 
-    private ?PDO $db = null;
+    private JsonStore $store;
 
-    public function __construct()
+    public function __construct(?string $jsonFile = null)
     {
-        if (Config::isDatabaseAvailable()) {
-            $this->db = Database::getConnection();
-        }
+        $this->store = new JsonStore($jsonFile ?? __DIR__ . '/../../storage/orders.json');
+        $this->initDatabase();
     }
 
     /**
-     * Создать заказ
+     * Создать заказ, вернуть его ID
      */
-    public function create(array $orderData): ?int
+    public function create(array $orderData): ?string
     {
         if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("
-                    INSERT INTO orders (user_id, email, name, phone, address, total, status, items)
-                    VALUES (:user_id, :email, :name, :phone, :address, :total, :status, :items)
-                ");
-                $stmt->execute([
-                    ':user_id' => $orderData['user_id'] ?? null,
-                    ':email' => $orderData['email'],
-                    ':name' => $orderData['name'],
-                    ':phone' => $orderData['phone'] ?? '',
-                    ':address' => $orderData['address'] ?? '',
-                    ':total' => $orderData['total'],
-                    ':status' => $orderData['status'] ?? 'pending',
-                    ':items' => json_encode($orderData['items'] ?? [], JSON_UNESCAPED_UNICODE),
-                ]);
+            $id = $this->dbInsert("
+                INSERT INTO orders (user_id, email, name, phone, address, total, status, items)
+                VALUES (:user_id, :email, :name, :phone, :address, :total, :status, :items)
+            ", [
+                ':user_id' => $orderData['user_id'] ?? null,
+                ':email' => $orderData['email'] ?? '',
+                ':name' => $orderData['fio'] ?? $orderData['name'] ?? '',
+                ':phone' => $orderData['phone'] ?? '',
+                ':address' => $orderData['address'] ?? '',
+                ':total' => $orderData['total'] ?? 0,
+                ':status' => $this->mapStatusToDb($orderData['status'] ?? 'new'),
+                ':items' => json_encode($orderData['items'] ?? [], JSON_UNESCAPED_UNICODE),
+            ]);
 
-                return (int) $this->db->lastInsertId();
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
+            if ($id !== null) {
+                return (string)$id;
             }
         }
 
-        // JSON fallback
         return $this->createJson($orderData);
     }
 
     /**
      * Создание заказа в JSON
      */
-    private function createJson(array $orderData): ?int
+    private function createJson(array $orderData): ?string
     {
-        $orders = $this->loadFromJson();
+        $id = $orderData['id'] ?? uniqid('order_');
+        $orders = $this->store->read();
 
-        // Генерация ID
-        $maxId = 0;
-        foreach ($orders as $order) {
-            $orderId = isset($order['id']) ? (int)$order['id'] : 0;
-            if ($orderId > $maxId) {
-                $maxId = $orderId;
-            }
-        }
-
-        $newOrder = [
-            'id' => (int)$maxId + 1,
-            'user_id' => $orderData['user_id'] ?? null,
-            'email' => $orderData['email'],
-            'name' => $orderData['name'],
-            'phone' => $orderData['phone'] ?? '',
-            'address' => $orderData['address'] ?? '',
-            'total' => $orderData['total'],
-            'status' => $orderData['status'] ?? 'pending',
-            'items' => $orderData['items'] ?? [],
+        $newOrder = array_merge([
+            'id' => $id,
             'created_at' => date('Y-m-d H:i:s'),
-        ];
+            'fio' => '',
+            'email' => '',
+            'phone' => '',
+            'address' => '',
+            'deliveryType' => 'delivery',
+            'payment' => 'cash',
+            'items' => [],
+            'total' => 0,
+            'status' => 'new',
+        ], $orderData, ['id' => $id]);
 
         $orders[] = $newOrder;
 
-        if ($this->saveToJson($orders)) {
-            return $newOrder['id'];
-        }
-
-        return null;
+        return $this->store->write($orders) ? $id : null;
     }
 
     /**
-     * Получить все заказы
+     * Получить все заказы (новые сверху)
      */
     public function getAll(): array
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->query("SELECT * FROM orders ORDER BY created_at DESC");
-                $orders = $stmt->fetchAll();
+        $rows = $this->dbFetchAll("SELECT * FROM orders ORDER BY created_at DESC");
 
-                foreach ($orders as &$order) {
-                    if (isset($order['items'])) {
-                        $order['items'] = json_decode($order['items'], true) ?? [];
-                    }
-                }
-
-                return $orders;
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        if ($rows !== null) {
+            return array_map([$this, 'normalizeDbRow'], $rows);
         }
 
-        return $this->loadFromJson();
+        $orders = $this->store->read();
+
+        usort($orders, function ($a, $b) {
+            return strtotime($b['created_at'] ?? '') - strtotime($a['created_at'] ?? '');
+        });
+
+        return $orders;
     }
 
     /**
      * Получить заказ по ID
      */
-    public function findById(int $id): ?array
+    public function findById(string $id): ?array
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("SELECT * FROM orders WHERE id = :id");
-                $stmt->execute([':id' => $id]);
-                $order = $stmt->fetch();
+        $row = $this->dbFetchOne("SELECT * FROM orders WHERE id = :id", [':id' => $id]);
 
-                if ($order && isset($order['items'])) {
-                    $order['items'] = json_decode($order['items'], true) ?? [];
-                }
-
-                return $order ?: null;
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        if ($row !== null) {
+            return $this->normalizeDbRow($row);
         }
 
-        $orders = $this->loadFromJson();
-        foreach ($orders as $order) {
-            if ($order['id'] === $id) {
+        foreach ($this->store->read() as $order) {
+            if ((string)($order['id'] ?? '') === $id) {
                 return $order;
             }
         }
@@ -145,26 +119,59 @@ class Order
     }
 
     /**
+     * Получить заказы пользователя (по user_id или email)
+     */
+    public function getForUser(int $userId, string $email = ''): array
+    {
+        $rows = $this->dbFetchAll("
+            SELECT * FROM orders
+            WHERE user_id = :user_id OR LOWER(email) = LOWER(:email)
+            ORDER BY created_at DESC
+        ", [':user_id' => $userId, ':email' => $email]);
+
+        if ($rows !== null) {
+            return array_map([$this, 'normalizeDbRow'], $rows);
+        }
+
+        $userOrders = array_filter($this->store->read(), function ($order) use ($userId, $email) {
+            if (isset($order['user_id']) && (int)$order['user_id'] === $userId) {
+                return true;
+            }
+            return $email !== '' && !isset($order['user_id'])
+                && strtolower($order['email'] ?? '') === strtolower($email);
+        });
+
+        $userOrders = array_values($userOrders);
+
+        usort($userOrders, function ($a, $b) {
+            return strtotime($b['created_at'] ?? '') - strtotime($a['created_at'] ?? '');
+        });
+
+        return $userOrders;
+    }
+
+    /**
      * Обновить статус заказа
      */
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(string $id, string $status): bool
     {
         if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("UPDATE orders SET status = :status, updated_at = NOW() WHERE id = :id");
-                return $stmt->execute([':id' => $id, ':status' => $status]);
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
+            if ($this->dbRun("UPDATE orders SET status = :status, updated_at = NOW() WHERE id = :id", [
+                ':id' => $id,
+                ':status' => $this->mapStatusToDb($status),
+            ])) {
+                return true;
             }
         }
 
-        // JSON fallback
-        $orders = $this->loadFromJson();
+        $orders = $this->store->read();
         foreach ($orders as &$order) {
-            if ($order['id'] === $id) {
+            if ((string)($order['id'] ?? '') === $id) {
                 $order['status'] = $status;
-                $order['updated_at'] = date('Y-m-d H:i:s');
-                return $this->saveToJson($orders);
+                if ($status === 'completed') {
+                    $order['completed_at'] = date('Y-m-d H:i:s');
+                }
+                return $this->store->write($orders);
             }
         }
 
@@ -172,30 +179,25 @@ class Order
     }
 
     /**
-     * Загрузить заказы из JSON
+     * Привести строку БД к единому JSON-формату
      */
-    private function loadFromJson(): array
+    private function normalizeDbRow(array $order): array
     {
-        if (!file_exists(self::FILE_ORDERS)) {
-            return [];
+        if (isset($order['items']) && is_string($order['items'])) {
+            $order['items'] = json_decode($order['items'], true) ?? [];
         }
-
-        $data = file_get_contents(self::FILE_ORDERS);
-        $orders = json_decode($data, true);
-
-        return is_array($orders) ? $orders : [];
+        if (isset($order['name']) && !isset($order['fio'])) {
+            $order['fio'] = $order['name'];
+        }
+        return $order;
     }
 
     /**
-     * Сохранить заказы в JSON
+     * Маппинг статуса приложения в ENUM таблицы orders
      */
-    private function saveToJson(array $orders): bool
+    private function mapStatusToDb(string $status): string
     {
-        $dir = dirname(self::FILE_ORDERS);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-
-        return file_put_contents(self::FILE_ORDERS, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) !== false;
+        $allowed = ['pending', 'processing', 'completed', 'cancelled'];
+        return in_array($status, $allowed, true) ? $status : 'pending';
     }
 }

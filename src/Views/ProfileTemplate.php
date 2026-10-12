@@ -62,7 +62,7 @@ class ProfileTemplate extends BaseTemplate
         // Тексты для истории заказов
         $ordersTitle = $texts['orders']['title'] ?? 'История заказов';
         $noOrdersText = $texts['orders']['noOrders'] ?? 'У вас пока нет заказов';
-        $orderNumberText = $texts['orders']['orderNumber'] ?? 'Заказ';
+        $orderGNumberText = $texts['orders']['orderNumber'] ?? 'Заказ';
         $dateText = $texts['orders']['date'] ?? 'Дата';
         $statusText = $texts['orders']['status'] ?? 'Статус';
         $totalText = $texts['orders']['total'] ?? 'Сумма';

@@ -1,22 +1,24 @@
 <?php
 namespace App\Models;
 
-use App\Config\Config;
-use App\Database\Database;
-use PDO;
+use App\Support\DatabaseAware;
+use App\Support\JsonStore;
 
+/**
+ * Модель пользователей (PDO + JSON fallback)
+ */
 class User
 {
-    private const FILE_USERS = __DIR__ . '/../../storage/users.json';
-    private const FILE_ADMINS = __DIR__ . '/../../storage/admins.json';
-    
-    private ?PDO $db = null;
+    use DatabaseAware;
 
-    public function __construct()
+    private JsonStore $usersStore;
+    private JsonStore $adminsStore;
+
+    public function __construct(?string $usersFile = null, ?string $adminsFile = null)
     {
-        if (Config::isDatabaseAvailable()) {
-            $this->db = Database::getConnection();
-        }
+        $this->usersStore = new JsonStore($usersFile ?? __DIR__ . '/../../storage/users.json');
+        $this->adminsStore = new JsonStore($adminsFile ?? __DIR__ . '/../../storage/admins.json');
+        $this->initDatabase();
     }
 
     /**
@@ -24,63 +26,25 @@ class User
      */
     public function loadData(): array
     {
-        if ($this->db !== null) {
-            return $this->loadFromDatabase();
-        }
-        return $this->loadFromJson();
+        $rows = $this->dbFetchAll("SELECT * FROM users ORDER BY id");
+
+        return $rows ?? $this->loadFromJson();
     }
-        
-    /**
-     * Загрузка из БД
-     */
-    private function loadFromDatabase(): array
-    {
-        try {
-            $stmt = $this->db->query("SELECT * FROM users ORDER BY id");
-            return $stmt->fetchAll();
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return $this->loadFromJson();
-        }
-    }
-    
+
     /**
      * Загрузка из JSON (fallback)
      */
     private function loadFromJson(): array
     {
-        if (!file_exists(self::FILE_USERS)) {
-            return [];
-        }
-        
-        $data = file_get_contents(self::FILE_USERS);
-        $users = json_decode($data, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($users)) {
-            return [];
-        }
-        
-        return $users;
+        return $this->usersStore->read();
     }
 
     /**
-     * Загрузить всех администраторов
+     * Загрузить всех администраторов (legacy, всегда из JSON)
      */
     public function loadAdmins(): array
     {
-        // Админы всегда из JSON (или можно создать таблицу admins)
-        if (!file_exists(self::FILE_ADMINS)) {
-            return [];
-        }
-
-        $data = file_get_contents(self::FILE_ADMINS);
-        $admins = json_decode($data, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($admins)) {
-            return [];
-        }
-
-        return $admins;
+        return $this->adminsStore->read();
     }
 
     /**
@@ -88,12 +52,7 @@ class User
      */
     private function saveData(array $users): bool
     {
-        $dir = dirname(self::FILE_USERS);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-
-        return file_put_contents(self::FILE_USERS, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) !== false;
+        return $this->usersStore->write($users);
     }
 
     /**
@@ -102,8 +61,7 @@ class User
     public function findByEmail(string $email): ?array
     {
         // Проверяем среди админов (всегда из JSON)
-        $admins = $this->loadAdmins();
-        foreach ($admins as $admin) {
+        foreach ($this->loadAdmins() as $admin) {
             if (strtolower($admin['email']) === strtolower($email)) {
                 $admin['is_admin'] = true;
                 $admin['is_verified'] = true;
@@ -111,23 +69,16 @@ class User
             }
         }
 
-        // Ищем в БД
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("SELECT * FROM users WHERE LOWER(email) = LOWER(:email)");
-                $stmt->execute([':email' => $email]);
-                $user = $stmt->fetch();
-                if ($user) {
-                    return $user;
-                }
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        $row = $this->dbFetchOne(
+            "SELECT * FROM users WHERE LOWER(email) = LOWER(:email)",
+            [':email' => $email]
+        );
+
+        if ($row !== null) {
+            return $row;
         }
 
-        // Fallback на JSON
-        $users = $this->loadFromJson();
-        foreach ($users as $user) {
+        foreach ($this->loadFromJson() as $user) {
             if (strtolower($user['email']) === strtolower($email)) {
                 return $user;
             }
@@ -141,22 +92,13 @@ class User
      */
     public function findById(int $id): ?array
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
-                $stmt->execute([':id' => $id]);
-                $user = $stmt->fetch();
-                if ($user) {
-                    return $user;
-                }
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        $row = $this->dbFetchOne("SELECT * FROM users WHERE id = :id", [':id' => $id]);
+
+        if ($row !== null) {
+            return $row;
         }
 
-        // Fallback на JSON
-        $users = $this->loadFromJson();
-        foreach ($users as $user) {
+        foreach ($this->loadFromJson() as $user) {
             if ($user['id'] === $id) {
                 return $user;
             }
@@ -167,33 +109,36 @@ class User
 
     /**
      * Проверить, является ли пользователь админом
+     *
+     * userId = 0 — legacy-админы из admins.json: проверяются по email.
      */
-    public function isAdmin(int $userId): bool
+    public function isAdmin(int $userId, string $email = ''): bool
     {
         if ($userId === 0) {
-            return true;
+            if ($email === '') {
+                return false;
+            }
+            foreach ($this->loadAdmins() as $admin) {
+                if (strtolower($admin['email']) === strtolower($email)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         $user = $this->findById($userId);
-        if (!$user) return false;
+        if (!$user) {
+            return false;
+        }
 
         // Проверяем поле is_admin в БД
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("SELECT is_admin FROM users WHERE id = :id");
-                $stmt->execute([':id' => $userId]);
-                $result = $stmt->fetch();
-                if ($result && $result['is_admin']) {
-                    return true;
-                }
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        $row = $this->dbFetchOne("SELECT is_admin FROM users WHERE id = :id", [':id' => $userId]);
+        if ($row !== null && !empty($row['is_admin'])) {
+            return true;
         }
 
         // Fallback: проверяем по email среди админов
-        $admins = $this->loadAdmins();
-        foreach ($admins as $admin) {
+        foreach ($this->loadAdmins() as $admin) {
             if (strtolower($admin['email']) === strtolower($user['email'])) {
                 return true;
             }
@@ -211,24 +156,23 @@ class User
         $verificationExpires = date('Y-m-d H:i:s', time() + 3600);
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        // Пробуем создать в БД
         if ($this->db !== null) {
-            try {
-                // Проверяем, существует ли пользователь
-                $existing = $this->findByEmail($email);
-                if ($existing) {
-                    if ($existing['is_verified'] ?? false) {
-                        return null; // Уже подтверждён
-                    }
-                    // Обновляем код подтверждения
-                    return $this->updateUnverifiedUser($existing['id'], $email, $hashedPassword, $name, $verificationCode, $verificationExpires);
+            // Проверяем, существует ли пользователь
+            $existing = $this->findByEmail($email);
+            if ($existing) {
+                if ($existing['is_verified'] ?? false) {
+                    return null; // Уже подтверждён
                 }
-
-                $stmt = $this->db->prepare("
+                // Обновляем код подтверждения
+                $updated = $this->updateUnverifiedUser($existing['id'], $email, $hashedPassword, $name, $verificationCode, $verificationExpires);
+                if ($updated !== null) {
+                    return $updated;
+                }
+            } else {
+                $id = $this->dbInsert("
                     INSERT INTO users (email, password, name, verification_code, verification_expires)
                     VALUES (:email, :password, :name, :code, :expires)
-                ");
-                $stmt->execute([
+                ", [
                     ':email' => $email,
                     ':password' => $hashedPassword,
                     ':name' => $name,
@@ -236,15 +180,15 @@ class User
                     ':expires' => $verificationExpires,
                 ]);
 
-                return [
-                    'id' => (int) $this->db->lastInsertId(),
-                    'email' => $email,
-                    'name' => $name,
-                    'is_verified' => false,
-                    'verification_code' => $verificationCode
-                ];
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
+                if ($id !== null) {
+                    return [
+                        'id' => $id,
+                        'email' => $email,
+                        'name' => $name,
+                        'is_verified' => false,
+                        'verification_code' => $verificationCode
+                    ];
+                }
             }
         }
 
@@ -253,38 +197,33 @@ class User
     }
 
     /**
-     * Обновить неподтверждённого пользователя
+     * Обновить неподтверждённого пользователя (БД)
      */
     private function updateUnverifiedUser(int $id, string $email, string $password, string $name, string $code, string $expires): ?array
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("
-                    UPDATE users 
-                    SET password = :password, name = :name, verification_code = :code, verification_expires = :expires
-                    WHERE id = :id AND (is_verified = 0 OR is_verified IS NULL)
-                ");
-                $stmt->execute([
-                    ':id' => $id,
-                    ':password' => $password,
-                    ':name' => $name,
-                    ':code' => $code,
-                    ':expires' => $expires,
-                ]);
+        $ok = $this->dbRun("
+            UPDATE users
+            SET password = :password, name = :name, verification_code = :code, verification_expires = :expires
+            WHERE id = :id AND (is_verified = 0 OR is_verified IS NULL)
+        ", [
+            ':id' => $id,
+            ':password' => $password,
+            ':name' => $name,
+            ':code' => $code,
+            ':expires' => $expires,
+        ]);
 
-                return [
-                    'id' => $id,
-                    'email' => $email,
-                    'name' => $name,
-                    'is_verified' => false,
-                    'verification_code' => $code
-                ];
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        if (!$ok) {
+            return null;
         }
 
-        return null;
+        return [
+            'id' => $id,
+            'email' => $email,
+            'name' => $name,
+            'is_verified' => false,
+            'verification_code' => $code
+        ];
     }
 
     /**
@@ -358,43 +297,34 @@ class User
      */
     public function verifyEmail(string $email, string $code): bool
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("
-                    SELECT * FROM users WHERE LOWER(email) = LOWER(:email)
-                ");
-                $stmt->execute([':email' => $email]);
-                $user = $stmt->fetch();
+        $user = $this->dbFetchOne(
+            "SELECT * FROM users WHERE LOWER(email) = LOWER(:email)",
+            [':email' => $email]
+        );
 
-                if (!$user) {
-                    return false;
-                }
-
-                if ($user['is_verified']) {
-                    return true;
-                }
-
-                if ($user['verification_code'] !== $code) {
-                    return false;
-                }
-
-                $expires = strtotime($user['verification_expires']);
-                if ($expires < time()) {
-                    return false;
-                }
-
-                $updateStmt = $this->db->prepare("
-                    UPDATE users 
-                    SET is_verified = 1, verification_code = NULL, verification_expires = NULL, verified_at = NOW()
-                    WHERE id = :id
-                ");
-                return $updateStmt->execute([':id' => $user['id']]);
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
+        if ($user !== null) {
+            if (!empty($user['is_verified'])) {
+                return true;
             }
+            if ($user['verification_code'] !== $code) {
+                return false;
+            }
+            if (strtotime($user['verification_expires']) < time()) {
+                return false;
+            }
+
+            return $this->dbRun("
+                UPDATE users
+                SET is_verified = 1, verification_code = NULL, verification_expires = NULL, verified_at = NOW()
+                WHERE id = :id
+            ", [':id' => $user['id']]);
         }
 
-        // JSON fallback
+        // JSON fallback (только если БД недоступна)
+        if ($this->db !== null) {
+            return false;
+        }
+
         $users = $this->loadFromJson();
         foreach ($users as &$user) {
             if (strtolower($user['email']) === strtolower($email)) {
@@ -438,23 +368,27 @@ class User
         $verificationExpires = date('Y-m-d H:i:s', time() + 3600);
 
         if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("
-                    UPDATE users 
+            $rows = $this->dbFetchAll("
+                SELECT id, is_verified FROM users
+                WHERE LOWER(email) = LOWER(:email)
+            ", [':email' => $email]);
+
+            if ($rows !== null && !empty($rows)) {
+                if (!empty($rows[0]['is_verified'])) {
+                    return null;
+                }
+
+                $ok = $this->dbRun("
+                    UPDATE users
                     SET verification_code = :code, verification_expires = :expires
-                    WHERE LOWER(email) = LOWER(:email) AND (is_verified = 0 OR is_verified IS NULL)
-                ");
-                $stmt->execute([
+                    WHERE id = :id AND (is_verified = 0 OR is_verified IS NULL)
+                ", [
                     ':code' => $verificationCode,
                     ':expires' => $verificationExpires,
-                    ':email' => $email,
+                    ':id' => $rows[0]['id'],
                 ]);
 
-                if ($stmt->rowCount() > 0) {
-                    return $verificationCode;
-                }
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
+                return $ok ? $verificationCode : null;
             }
         }
 
@@ -470,6 +404,7 @@ class User
                 if ($this->saveData($users)) {
                     return $verificationCode;
                 }
+                return null;
             }
         }
 
@@ -481,9 +416,8 @@ class User
      */
     public function verifyPassword(string $email, string $password): ?array
     {
-        // Проверяем среди админов (JSON)
-        $admins = $this->loadAdmins();
-        foreach ($admins as $admin) {
+        // Проверяем среди админов (JSON, legacy plain-пароль)
+        foreach ($this->loadAdmins() as $admin) {
             if (strtolower($admin['email']) === strtolower($email)) {
                 if ($password === $admin['password']) {
                     return [
@@ -497,25 +431,22 @@ class User
             }
         }
 
-        // Ищем в БД
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("SELECT * FROM users WHERE LOWER(email) = LOWER(:email)");
-                $stmt->execute([':email' => $email]);
-                $user = $stmt->fetch();
+        $row = $this->dbFetchOne(
+            "SELECT * FROM users WHERE LOWER(email) = LOWER(:email)",
+            [':email' => $email]
+        );
 
-                if ($user && password_verify($password, $user['password'])) {
-                    unset($user['password']);
-                    return $user;
-                }
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
+        if ($row !== null) {
+            if (password_verify($password, $row['password'])) {
+                unset($row['password']);
+                return $row;
             }
+            return null;
         }
 
         // JSON fallback
         $user = $this->findByEmail($email);
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user && password_verify($password, $user['password'] ?? '')) {
             unset($user['password']);
             return $user;
         }
@@ -529,37 +460,28 @@ class User
     public function updateProfile(int $userId, array $data): bool
     {
         if ($this->db !== null) {
-            try {
-                $fields = [];
-                $params = [':id' => $userId];
+            $fields = [];
+            $params = [':id' => $userId];
 
-                if (isset($data['name'])) {
-                    $fields[] = 'name = :name';
-                    $params[':name'] = trim($data['name']);
+            foreach (['name', 'phone', 'address'] as $field) {
+                if (isset($data[$field])) {
+                    $fields[] = "$field = :$field";
+                    $params[":$field"] = trim($data[$field]);
                 }
-                if (isset($data['phone'])) {
-                    $fields[] = 'phone = :phone';
-                    $params[':phone'] = trim($data['phone']);
-                }
-                if (isset($data['address'])) {
-                    $fields[] = 'address = :address';
-                    $params[':address'] = trim($data['address']);
-                }
-                if (isset($data['avatar'])) {
-                    $fields[] = 'avatar = :avatar';
-                    $params[':avatar'] = $data['avatar'];
-                }
+            }
+            if (isset($data['avatar'])) {
+                $fields[] = 'avatar = :avatar';
+                $params[':avatar'] = $data['avatar'];
+            }
 
-                if (empty($fields)) {
-                    return false;
-                }
+            if (empty($fields)) {
+                return false;
+            }
 
-                $fields[] = 'updated_at = NOW()';
+            $fields[] = 'updated_at = NOW()';
 
-                $stmt = $this->db->prepare("UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id");
-                return $stmt->execute($params);
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
+            if ($this->dbRun("UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id", $params)) {
+                return true;
             }
         }
 
@@ -567,10 +489,14 @@ class User
         $users = $this->loadFromJson();
         foreach ($users as &$user) {
             if ($user['id'] === $userId) {
-                if (isset($data['name'])) $user['name'] = trim($data['name']);
-                if (isset($data['phone'])) $user['phone'] = trim($data['phone']);
-                if (isset($data['address'])) $user['address'] = trim($data['address']);
-                if (isset($data['avatar'])) $user['avatar'] = $data['avatar'];
+                foreach (['name', 'phone', 'address'] as $field) {
+                    if (isset($data[$field])) {
+                        $user[$field] = trim($data[$field]);
+                    }
+                }
+                if (isset($data['avatar'])) {
+                    $user['avatar'] = $data['avatar'];
+                }
                 $user['updated_at'] = date('Y-m-d H:i:s');
                 return $this->saveData($users);
             }
@@ -598,7 +524,7 @@ class User
     }
 
     /**
-     * Получить историю заказов пользователя
+     * Получить историю заказов пользователя (делегировано модели Order)
      */
     public function getOrders(int $userId): array
     {
@@ -607,56 +533,8 @@ class User
             return [];
         }
 
-        // Пробуем получить из БД
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("
-                    SELECT * FROM orders 
-                    WHERE user_id = :user_id OR LOWER(email) = LOWER(:email)
-                    ORDER BY created_at DESC
-                ");
-                $stmt->execute([':user_id' => $userId, ':email' => $user['email']]);
-                $orders = $stmt->fetchAll();
-
-                // Декодируем JSON-поле items
-                foreach ($orders as &$order) {
-                    if (isset($order['items'])) {
-                        $order['items'] = json_decode($order['items'], true) ?? [];
-                    }
-                }
-
-                return $orders;
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
-        }
-
-        // JSON fallback
-        $ordersFile = __DIR__ . '/../../storage/orders.json';
-        if (!file_exists($ordersFile)) {
-            return [];
-        }
-
-        $content = file_get_contents($ordersFile);
-        $allOrders = json_decode($content, true) ?: [];
-        
-        $userOrders = [];
-        foreach ($allOrders as $order) {
-            if (isset($order['user_id']) && $order['user_id'] === $userId) {
-                $userOrders[] = $order;
-                continue;
-            }
-            if (!isset($order['user_id']) && isset($order['email']) && 
-                strtolower($order['email']) === strtolower($user['email'])) {
-                $userOrders[] = $order;
-            }
-        }
-        
-        usort($userOrders, function($a, $b) {
-            return strtotime($b['created_at'] ?? '') - strtotime($a['created_at'] ?? '');
-        });
-        
-        return $userOrders;
+        $orderModel = new Order();
+        return $orderModel->getForUser($userId, $user['email'] ?? '');
     }
 
     /**

@@ -2,16 +2,16 @@
 namespace App\Controllers;
 
 use App\Models\Cart;
+use App\Models\Order;
 use App\Models\EmailSender;
 use App\Models\Payment;
 use App\Views\CartTemplate;
 use App\Support\Session;
 use App\Support\Response;
+use App\Support\Request;
 
 class CartController
 {
-    private const ORDERS_FILE = __DIR__ . '/../../storage/orders.json';
-
     public function __construct()
     {
         Session::ensure();
@@ -29,8 +29,10 @@ class CartController
      * API: Оформить заказ
      * @param array $data ['fio', 'email', 'phone', 'address', 'payment', 'items', 'total']
      */
-    public function order(?array $data): string
+    public function order(?array $data = null): string
     {
+        $data ??= Request::json();
+
         if (!$data) {
             return Response::error('Некорректные данные');
         }
@@ -57,9 +59,8 @@ class CartController
 
         $total = Cart::getTotal();
 
-        // Создаём заказ
+        // Данные заказа
         $order = [
-            'id' => uniqid('order_'),
             'created_at' => date('Y-m-d H:i:s'),
             'fio' => htmlspecialchars(trim($data['fio'])),
             'email' => htmlspecialchars(trim($data['email'])),
@@ -77,21 +78,22 @@ class CartController
             $order['user_id'] = (int)Session::get('user_id');
         }
 
-        // Читаем существующие заказы
-        $orders = $this->loadOrders();
-        $orders[] = $order;
+        // Сохраняем заказ через модель (PDO + JSON fallback)
+        $orderModel = new Order();
+        $orderId = $orderModel->create($order);
 
-        // Сохраняем
-        if (!$this->saveOrders($orders)) {
+        if ($orderId === null) {
             return Response::error('Ошибка сохранения заказа', 500);
         }
-        
+
+        $order['id'] = $orderId;
+
         // Отправляем email-уведомление
         try {
             $emailSent = EmailSender::sendOrderNotification($order, $order['email']);
             if (!$emailSent) {
                 // Логируем, но не прерываем выполнение
-                error_log('Не удалось отправить email-уведомление для заказа ' . $order['id']);
+                error_log('Не удалось отправить email-уведомление для заказа ' . $orderId);
             }
         } catch (\Exception $e) {
             error_log('Ошибка при отправке email: ' . $e->getMessage());
@@ -108,7 +110,7 @@ class CartController
 
         return Response::json([
             'success' => true,
-            'orderId' => $order['id'],
+            'orderId' => $orderId,
             'paymentUrl' => $paymentUrl
         ]);
     }
@@ -117,8 +119,10 @@ class CartController
      * API: Добавить товар в корзину
      * @param array $data ['id', 'name', 'price', 'image', 'quantity']
      */
-    public function add(?array $data): string
+    public function add(?array $data = null): string
     {
+        $data ??= Request::json();
+
         if (!$data || !isset($data['id'], $data['name'], $data['price'])) {
             return Response::error('Некорректные данные');
         }
@@ -142,8 +146,10 @@ class CartController
      * API: Обновить количество товара
      * @param array $data ['id', 'quantity']
      */
-    public function update(?array $data): string
+    public function update(?array $data = null): string
     {
+        $data ??= Request::json();
+
         if (!$data || !isset($data['id'], $data['quantity'])) {
             return Response::error('Некорректные данные');
         }
@@ -161,8 +167,10 @@ class CartController
      * API: Удалить товар из корзины
      * @param array $data ['id']
      */
-    public function remove(?array $data): string
+    public function remove(?array $data = null): string
     {
+        $data ??= Request::json();
+
         if (!$data || !isset($data['id'])) {
             return Response::error('Некорректные данные');
         }
@@ -194,64 +202,21 @@ class CartController
      * API: Изменить статус заказа (закрыть/открыть)
      * @param array $data ['id', 'status']
      */
-    public function updateStatus(?array $data): string
+    public function updateStatus(?array $data = null): string
     {
+        $data ??= Request::json();
+
         if (!$data || !isset($data['id'], $data['status'])) {
             return Response::error('Некорректные данные');
         }
-        
-        $orderId = $data['id'];
-        $newStatus = $data['status'];
-        
-        // Читаем заказы
-        $orders = $this->loadOrders();
-        
-        // Ищем и обновляем заказ
-        $found = false;
-        foreach ($orders as &$order) {
-            if ($order['id'] === $orderId) {
-                $order['status'] = $newStatus;
-                if ($newStatus === 'completed') {
-                    $order['completed_at'] = date('Y-m-d H:i:s');
-                }
-                $found = true;
-                break;
-            }
-        }
-        unset($order);
-        
-        if (!$found) {
+
+        $orderModel = new Order();
+        $result = $orderModel->updateStatus((string)$data['id'], (string)$data['status']);
+
+        if (!$result) {
             return Response::notFound('Заказ не найден');
         }
-        
-        // Сохраняем
-        if (!$this->saveOrders($orders)) {
-            return Response::error('Ошибка сохранения', 500);
-        }
-        
+
         return Response::json(['success' => true]);
-    }
-
-    /**
-     * Загрузить заказы из файла
-     */
-    private function loadOrders(): array
-    {
-        if (!file_exists(self::ORDERS_FILE)) {
-            return [];
-        }
-        $content = file_get_contents(self::ORDERS_FILE);
-        return json_decode($content, true) ?: [];
-    }
-
-    /**
-     * Сохранить заказы в файл
-     */
-    private function saveOrders(array $orders): bool
-    {
-        return file_put_contents(
-            self::ORDERS_FILE,
-            json_encode($orders, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
-        ) !== false;
     }
 }

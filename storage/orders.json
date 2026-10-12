@@ -854,5 +854,90 @@
             }
         ],
         "created_at": "2026-10-12 06:50:56"
+    },
+    {
+        "id": 30,
+        "user_id": null,
+        "email": "test@example.com",
+        "name": "Test User",
+        "phone": "+79000000000",
+        "address": "Test Address 1",
+        "total": 500,
+        "status": "pending",
+        "items": [
+            {
+                "id": 1,
+                "name": "Product 1",
+                "price": 250,
+                "quantity": 2
+            }
+        ],
+        "created_at": "2026-10-12 07:00:04"
+    },
+    {
+        "id": 31,
+        "user_id": null,
+        "email": "test@example.com",
+        "name": "Test User",
+        "phone": "",
+        "address": "",
+        "total": 100,
+        "status": "completed",
+        "items": [],
+        "created_at": "2026-10-12 07:00:04",
+        "updated_at": "2026-10-12 07:00:04"
+    },
+    {
+        "id": 32,
+        "user_id": null,
+        "email": "test_order@example.com",
+        "name": "Test User",
+        "phone": "+79000000000",
+        "address": "Test Address",
+        "total": 250,
+        "status": "pending",
+        "items": [
+            {
+                "id": 1,
+                "name": "Product",
+                "price": 250,
+                "quantity": 1
+            }
+        ],
+        "created_at": "2026-10-12 07:00:04"
+    },
+    {
+        "id": "order_6acc86c0daaa4",
+        "created_at": "2026-10-12 07:05:36",
+        "fio": "Test User",
+        "email": "test@example.com",
+        "phone": "+79000000000",
+        "address": "Test Address 1",
+        "deliveryType": "delivery",
+        "payment": "cash",
+        "items": [
+            {
+                "id": 1,
+                "name": "Product 1",
+                "price": 250,
+                "quantity": 2
+            }
+        ],
+        "total": 500,
+        "status": "new"
+    },
+    {
+        "id": "order_6acc86c104ae1",
+        "created_at": "2026-10-12 07:05:37",
+        "fio": "Test User",
+        "email": "test_status@example.com",
+        "phone": "",
+        "address": "",
+        "deliveryType": "delivery",
+        "payment": "cash",
+        "items": [],
+        "total": 100,
+        "status": "completed",
+        "completed_at": "2026-10-12 07:05:37"
     }
 ]

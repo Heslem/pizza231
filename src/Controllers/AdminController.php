@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Models\User;
 use App\Models\Product;
+use App\Models\Order;
 use App\Models\Logger;
 use App\Views\AdminTemplate;
 use App\Support\Session;
@@ -36,7 +37,7 @@ class AdminController
         }
         
         // Если нет в сессии - проверяем через модель
-        return $this->userModel->isAdmin(Session::get('user_id'));
+        return $this->userModel->isAdmin((int)Session::get('user_id'), (string)Session::get('user_email', ''));
     }
     
     /**
@@ -114,31 +115,12 @@ class AdminController
     }
     
     /**
-     * Получить все заказы
+     * Получить все заказы (через единую модель Order)
      */
     private function getOrders(): array
     {
-        $file = __DIR__ . '/../../storage/orders.json';
-        
-        if (!file_exists($file)) {
-            return [];
-        }
-        
-        $data = file_get_contents($file);
-        $orders = json_decode($data, true);
-        
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($orders)) {
-            return [];
-        }
-        
-        // Сортировка по дате (новые первые)
-        usort($orders, function($a, $b) {
-            $dateA = $a['created_at'] ?? $a['date'] ?? '';
-            $dateB = $b['created_at'] ?? $b['date'] ?? '';
-            return strtotime($dateB) - strtotime($dateA);
-        });
-        
-        return $orders;
+        $orderModel = new Order();
+        return $orderModel->getAll();
     }
     
     /**

@@ -15,6 +15,11 @@
             "App\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "start": "php -S localhost:8000",
         "test": "phpunit"

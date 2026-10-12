@@ -2,59 +2,36 @@
 namespace App\Models;
 
 use App\Config\Config;
-use App\Database\Database;
-use PDO;
+use App\Support\DatabaseAware;
+use App\Support\JsonStore;
 
+/**
+ * Модель товаров (PDO + JSON fallback)
+ */
 class Product
 {
-    private ?PDO $db = null;
+    use DatabaseAware;
 
-    public function __construct()
+    private JsonStore $store;
+
+    public function __construct(?string $jsonFile = null)
     {
-        // Пытаемся подключиться к БД
-        if (Config::isDatabaseAvailable()) {
-            $this->db = Database::getConnection();
-        }
+        $this->store = new JsonStore($jsonFile ?? Config::FILE_PRODUCTS);
+        $this->initDatabase();
     }
 
     /**
-     * Загрузить все товары (сначала БД, потом JSON fallback)
+     * Загрузить все товары, индексированные по ID
      */
     public function loadData(): ?array
     {
-        // Пробуем получить из БД
-        if ($this->db !== null) {
-            return $this->loadFromDatabase();
+        $rows = $this->dbFetchAll("SELECT * FROM products ORDER BY id");
+
+        if ($rows !== null && !empty($rows)) {
+            return $this->indexById($rows);
         }
 
-        // Fallback на JSON
         return $this->loadFromJson();
-    }
-
-    /**
-     * Загрузка из базы данных
-     */
-    private function loadFromDatabase(): ?array
-    {
-        try {
-            $stmt = $this->db->query("SELECT * FROM products ORDER BY id");
-            $products = $stmt->fetchAll();
-
-            if (empty($products)) {
-                return null;
-            }
-
-            $indexedData = [];
-            foreach ($products as $product) {
-                $indexedData[$product['id']] = $product;
-            }
-
-            return $indexedData;
-        } catch (\PDOException $e) {
-            // Логируем ошибку и возвращаемся к JSON
-            error_log("Database error: " . $e->getMessage());
-            return $this->loadFromJson();
-        }
     }
 
     /**
@@ -62,25 +39,23 @@ class Product
      */
     private function loadFromJson(): ?array
     {
-        if (!file_exists(Config::FILE_PRODUCTS)) {
-            return null;
-        }
+        $arr = $this->store->read();
 
-        $data = file_get_contents(Config::FILE_PRODUCTS);
-        $arr = json_decode($data, true);
+        return empty($arr) ? null : $this->indexById($arr);
+    }
 
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($arr)) {
-            return null;
-        }
-
-        $indexedData = [];
-        foreach ($arr as $item) {
+    /**
+     * Индексировать список товаров по полю id
+     */
+    private function indexById(array $items): array
+    {
+        $indexed = [];
+        foreach ($items as $item) {
             if (isset($item['id'])) {
-                $indexedData[$item['id']] = $item;
+                $indexed[$item['id']] = $item;
             }
         }
-
-        return $indexedData;
+        return $indexed;
     }
 
     /**
@@ -88,20 +63,13 @@ class Product
      */
     public function findById(int $id): ?array
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("SELECT * FROM products WHERE id = :id");
-                $stmt->execute([':id' => $id]);
-                $product = $stmt->fetch();
-                return $product ?: null;
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        $row = $this->dbFetchOne("SELECT * FROM products WHERE id = :id", [':id' => $id]);
+
+        if ($row !== null) {
+            return $row;
         }
 
-        // Fallback на JSON
-        $products = $this->loadFromJson();
-        return $products[$id] ?? null;
+        return $this->loadFromJson()[$id] ?? null;
     }
 
     /**
@@ -109,17 +77,15 @@ class Product
      */
     public function findByCategory(string $category): array
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("SELECT * FROM products WHERE category = :category ORDER BY id");
-                $stmt->execute([':category' => $category]);
-                return $stmt->fetchAll();
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        $rows = $this->dbFetchAll(
+            "SELECT * FROM products WHERE category = :category ORDER BY id",
+            [':category' => $category]
+        );
+
+        if ($rows !== null) {
+            return $rows;
         }
 
-        // Fallback на JSON
         $products = $this->loadFromJson() ?? [];
         return array_filter($products, fn($p) => ($p['category'] ?? '') === $category);
     }
@@ -129,18 +95,14 @@ class Product
      */
     public function getCategories(): array
     {
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->query("SELECT DISTINCT category FROM products ORDER BY category");
-                return array_column($stmt->fetchAll(), 'category');
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        $rows = $this->dbFetchAll("SELECT DISTINCT category FROM products ORDER BY category");
+
+        if ($rows !== null) {
+            return array_column($rows, 'category');
         }
 
-        // Fallback на JSON
         $products = $this->loadFromJson() ?? [];
-        return array_values(array_unique(array_column($products, 'category')));
+        return array_values(array_unique(array_filter(array_column($products, 'category'))));
     }
 
     /**
@@ -148,26 +110,19 @@ class Product
      */
     public function search(string $query): array
     {
-        $searchTerm = "%{$query}%";
+        $rows = $this->dbFetchAll("
+            SELECT * FROM products
+            WHERE name LIKE :query OR description LIKE :query OR category LIKE :query
+            ORDER BY id
+        ", [':query' => "%{$query}%"]);
 
-        if ($this->db !== null) {
-            try {
-                $stmt = $this->db->prepare("
-                    SELECT * FROM products 
-                    WHERE name LIKE :query OR description LIKE :query OR category LIKE :query
-                    ORDER BY id
-                ");
-                $stmt->execute([':query' => $searchTerm]);
-                return $stmt->fetchAll();
-            } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-            }
+        if ($rows !== null) {
+            return $rows;
         }
 
-        // Fallback на JSON
         $products = $this->loadFromJson() ?? [];
         $queryLower = mb_strtolower($query);
-        return array_filter($products, fn($p) => 
+        return array_filter($products, fn($p) =>
             mb_strpos(mb_strtolower($p['name'] ?? ''), $queryLower) !== false ||
             mb_strpos(mb_strtolower($p['description'] ?? ''), $queryLower) !== false ||
             mb_strpos(mb_strtolower($p['category'] ?? ''), $queryLower) !== false
@@ -175,20 +130,15 @@ class Product
     }
 
     /**
-     * Создать товар (только для БД)
+     * Создать товар, вернуть его ID
      */
     public function create(array $data): ?int
     {
-        if ($this->db === null) {
-            return null; // JSON mode не поддерживает создание
-        }
-
-        try {
-            $stmt = $this->db->prepare("
+        if ($this->db !== null) {
+            $id = $this->dbInsert("
                 INSERT INTO products (name, image, description, price, category)
                 VALUES (:name, :image, :description, :price, :category)
-            ");
-            $stmt->execute([
+            ", [
                 ':name' => $data['name'],
                 ':image' => $data['image'] ?? '/assets/img/no-image.jpg',
                 ':description' => $data['description'] ?? '',
@@ -196,58 +146,102 @@ class Product
                 ':category' => $data['category'] ?? 'Без категории',
             ]);
 
-            return (int) $this->db->lastInsertId();
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return null;
+            if ($id !== null) {
+                return $id;
+            }
         }
+
+        // JSON fallback
+        return $this->createJson($data);
     }
 
     /**
-     * Обновить товар (только для БД)
+     * Создание товара в JSON
+     */
+    private function createJson(array $data): ?int
+    {
+        $products = $this->store->read();
+
+        $maxId = 0;
+        foreach ($products as $product) {
+            $pid = (int)($product['id'] ?? 0);
+            if ($pid > $maxId) {
+                $maxId = $pid;
+            }
+        }
+
+        $newId = $maxId + 1;
+
+        $products[] = [
+            'id' => $newId,
+            'name' => $data['name'],
+            'image' => $data['image'] ?? '/assets/img/no-image.jpg',
+            'description' => $data['description'] ?? '',
+            'price' => $data['price'],
+            'category' => $data['category'] ?? 'Без категории',
+        ];
+
+        return $this->store->write($products) ? $newId : null;
+    }
+
+    /**
+     * Обновить товар
      */
     public function update(int $id, array $data): bool
     {
-        if ($this->db === null) {
-            return false;
-        }
-
-        try {
-            $stmt = $this->db->prepare("
-                UPDATE products 
-                SET name = :name, image = :image, description = :description, 
+        if ($this->db !== null) {
+            if ($this->dbRun("
+                UPDATE products
+                SET name = :name, image = :image, description = :description,
                     price = :price, category = :category
                 WHERE id = :id
-            ");
-            return $stmt->execute([
+            ", [
                 ':id' => $id,
                 ':name' => $data['name'],
                 ':image' => $data['image'] ?? '/assets/img/no-image.jpg',
                 ':description' => $data['description'] ?? '',
                 ':price' => $data['price'],
                 ':category' => $data['category'] ?? 'Без категории',
-            ]);
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return false;
+            ])) {
+                return true;
+            }
         }
+
+        // JSON fallback
+        $products = $this->store->read();
+        foreach ($products as &$product) {
+            if ((int)($product['id'] ?? 0) === $id) {
+                $product['name'] = $data['name'];
+                $product['image'] = $data['image'] ?? '/assets/img/no-image.jpg';
+                $product['description'] = $data['description'] ?? '';
+                $product['price'] = $data['price'];
+                $product['category'] = $data['category'] ?? 'Без категории';
+                return $this->store->write($products);
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Удалить товар (только для БД)
+     * Удалить товар
      */
     public function delete(int $id): bool
     {
-        if ($this->db === null) {
+        if ($this->db !== null) {
+            if ($this->dbRun("DELETE FROM products WHERE id = :id", [':id' => $id])) {
+                return true;
+            }
+        }
+
+        // JSON fallback
+        $products = $this->store->read();
+        $filtered = array_values(array_filter($products, fn($p) => (int)($p['id'] ?? 0) !== $id));
+
+        if (count($filtered) === count($products)) {
             return false;
         }
 
-        try {
-            $stmt = $this->db->prepare("DELETE FROM products WHERE id = :id");
-            return $stmt->execute([':id' => $id]);
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return false;
-        }
+        return $this->store->write($filtered);
     }
 }

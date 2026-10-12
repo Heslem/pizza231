@@ -1,195 +1,266 @@
 <?php
 namespace Tests\Models;
 
-use PHPUnit\Framework\TestCase;
+use Tests\BaseTestCase;
 use App\Models\User;
 
-class UserTest extends TestCase
+class UserTest extends BaseTestCase
 {
+    private ?string $usersFile = null;
+    private ?string $adminsFile = null;
     private User $user;
-    
+
     protected function setUp(): void
     {
-        $this->user = new User();
+        // Временные JSON — тесты не трогают реальные storage/users.json и admins.json
+        $this->usersFile = $this->createTempJsonFile([]);
+        $this->adminsFile = $this->createTempJsonFile([
+            ['email' => 'admin@example.com', 'password' => 'admin123', 'name' => 'Admin'],
+        ]);
+        $this->user = new User($this->usersFile, $this->adminsFile);
     }
-    
+
+    protected function tearDown(): void
+    {
+        if ($this->usersFile) {
+            $this->cleanupTempFile($this->usersFile);
+        }
+        if ($this->adminsFile) {
+            $this->cleanupTempFile($this->adminsFile);
+        }
+    }
+
     /**
      * Тест: loadData возвращает массив
      */
     public function testLoadDataReturnsArray(): void
     {
-        $result = $this->user->loadData();
-        
-        $this->assertIsArray($result);
+        $this->assertIsArray($this->user->loadData());
     }
-    
+
     /**
      * Тест: loadAdmins возвращает массив
      */
     public function testLoadAdminsReturnsArray(): void
     {
-        $result = $this->user->loadAdmins();
-        
-        $this->assertIsArray($result);
+        $admins = $this->user->loadAdmins();
+
+        $this->assertIsArray($admins);
+        $this->assertCount(1, $admins);
     }
-    
+
     /**
      * Тест: findByEmail возвращает null для несуществующего пользователя
      */
     public function testFindByEmailReturnsNullForNonExistent(): void
     {
-        $result = $this->user->findByEmail('nonexistent@example.com');
-        
-        $this->assertNull($result);
+        $this->assertNull($this->user->findByEmail('nonexistent@example.com'));
     }
-    
+
+    /**
+     * Тест: findByEmail находит legacy-админа
+     */
+    public function testFindByEmailFindsAdmin(): void
+    {
+        $admin = $this->user->findByEmail('admin@example.com');
+
+        $this->assertNotNull($admin);
+        $this->assertTrue($admin['is_admin']);
+        $this->assertTrue($admin['is_verified']);
+    }
+
     /**
      * Тест: findById возвращает null для несуществующего пользователя
      */
     public function testFindByIdReturnsNullForNonExistent(): void
     {
-        $result = $this->user->findById(999999);
-        
-        $this->assertNull($result);
+        $this->assertNull($this->user->findById(999999));
     }
-    
+
     /**
      * Тест: isAdmin возвращает false для несуществующего пользователя
      */
     public function testIsAdminReturnsFalseForNonExistent(): void
     {
-        $result = $this->user->isAdmin(999999);
-        
-        $this->assertFalse($result);
+        $this->assertFalse($this->user->isAdmin(999999));
     }
-    
+
     /**
-     * Тест: isAdmin возвращает true для userId = 0 (админ по умолчанию)
+     * Тест: isAdmin(0) без email возвращает false (верифицированный legacy-доступ)
      */
-    public function testIsAdminReturnsTrueForIdZero(): void
+    public function testIsAdminIdZeroWithoutEmailIsFalse(): void
     {
-        $result = $this->user->isAdmin(0);
-        
-        $this->assertTrue($result);
+        $this->assertFalse($this->user->isAdmin(0));
     }
-    
+
+    /**
+     * Тест: isAdmin(0) с email из admins.json возвращает true
+     */
+    public function testIsAdminIdZeroWithAdminEmailIsTrue(): void
+    {
+        $this->assertTrue($this->user->isAdmin(0, 'admin@example.com'));
+        $this->assertFalse($this->user->isAdmin(0, 'hacker@example.com'));
+    }
+
     /**
      * Тест: isVerified возвращает false для несуществующего email
      */
     public function testIsVerifiedReturnsFalseForNonExistent(): void
     {
-        $result = $this->user->isVerified('nonexistent@example.com');
-        
-        $this->assertFalse($result);
+        $this->assertFalse($this->user->isVerified('nonexistent@example.com'));
     }
-    
+
     /**
      * Тест: verifyPassword возвращает null для несуществующего пользователя
      */
     public function testVerifyPasswordReturnsNullForNonExistent(): void
     {
-        $result = $this->user->verifyPassword('nonexistent@example.com', 'password');
-        
-        $this->assertNull($result);
+        $this->assertNull($this->user->verifyPassword('nonexistent@example.com', 'password'));
     }
-    
+
+    /**
+     * Тест: verifyPassword аутентифицирует legacy-админа (plain-пароль)
+     */
+    public function testVerifyPasswordAuthenticatesAdmin(): void
+    {
+        $user = $this->user->verifyPassword('admin@example.com', 'admin123');
+
+        $this->assertNotNull($user);
+        $this->assertTrue($user['is_admin']);
+        $this->assertSame(0, $user['id']);
+    }
+
     /**
      * Тест: create возвращает массив с данными пользователя
      */
     public function testCreateReturnsUserArray(): void
     {
-        $email = 'test_' . time() . '@example.com';
-        $result = $this->user->create($email, 'password123', 'Test User');
-        
-        // Может вернуть null если есть БД и она требует уникальность, или массив с данными
-        $this->assertTrue($result === null || is_array($result));
-        
-        if (is_array($result)) {
-            $this->assertArrayHasKey('id', $result);
-            $this->assertArrayHasKey('email', $result);
-            $this->assertArrayHasKey('name', $result);
-            $this->assertArrayHasKey('is_verified', $result);
-            $this->assertArrayHasKey('verification_code', $result);
-            $this->assertFalse($result['is_verified']);
-        }
+        $result = $this->user->create('new@example.com', 'password123', 'Test User');
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('email', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayHasKey('is_verified', $result);
+        $this->assertArrayHasKey('verification_code', $result);
+        $this->assertFalse($result['is_verified']);
     }
-    
+
     /**
      * Тест: create возвращает null при попытке создать дубликат подтверждённого пользователя
      */
     public function testCreateReturnsNullForExistingVerifiedUser(): void
     {
-        // Сначала создаём пользователя
-        $email = 'duplicate_test_' . time() . '@example.com';
-        $this->user->create($email, 'password123', 'Test User');
-        
-        // Пробуем создать снова - должен вернуть null (пользователь уже существует)
+        $email = 'dup@example.com';
+        $created = $this->user->create($email, 'password123', 'Test User');
+        $this->user->verifyEmail($email, $created['verification_code']);
+
         $result = $this->user->create($email, 'password456', 'Test User 2');
-        
-        // Результат зависит от наличия БД
-        $this->assertTrue($result === null || is_array($result));
+
+        $this->assertNull($result);
     }
-    
+
+    /**
+     * Тест: verifyEmail подтверждает пользователя по коду
+     */
+    public function testVerifyEmailWithCorrectCode(): void
+    {
+        $created = $this->user->create('verify@example.com', 'password123', 'Verify User');
+
+        $this->assertNotNull($created);
+        $result = $this->user->verifyEmail('verify@example.com', $created['verification_code']);
+
+        $this->assertTrue($result);
+        $this->assertTrue($this->user->isVerified('verify@example.com'));
+    }
+
+    /**
+     * Тест: verifyEmail возвращает false для неверного кода
+     */
+    public function testVerifyEmailWithWrongCode(): void
+    {
+        $this->user->create('wrong@example.com', 'password123', 'Wrong User');
+
+        $this->assertFalse($this->user->verifyEmail('wrong@example.com', '999999'));
+    }
+
     /**
      * Тест: verifyEmail возвращает false для несуществующего email
      */
     public function testVerifyEmailReturnsFalseForNonExistent(): void
     {
-        $result = $this->user->verifyEmail('nonexistent@example.com', '000000');
-        
-        $this->assertFalse($result);
+        $this->assertFalse($this->user->verifyEmail('nonexistent@example.com', '000000'));
     }
-    
+
     /**
-     * Тест: regenerateVerificationCode возвращает null для подтверждённого email
+     * Тест: regenerateVerificationCode возвращает null для несуществующего email
      */
-    public function testRegenerateVerificationCodeReturnsNullForVerified(): void
+    public function testRegenerateVerificationCodeReturnsNullForNonExistent(): void
     {
-        $result = $this->user->regenerateVerificationCode('nonexistent@example.com');
-        
-        // Для несуществующего или подтверждённого email должен вернуть null
-        $this->assertNull($result);
+        $this->assertNull($this->user->regenerateVerificationCode('nonexistent@example.com'));
     }
-    
+
     /**
-     * Тест: updateProfile возвращает false для несуществующего пользователя (JSON mode)
+     * Тест: regenerateVerificationCode возвращает новый код для неподтверждённого
+     */
+    public function testRegenerateVerificationCodeReturnsCode(): void
+    {
+        $this->user->create('regen@example.com', 'password123', 'Regen User');
+
+        $code = $this->user->regenerateVerificationCode('regen@example.com');
+
+        $this->assertIsString($code);
+        $this->assertSame(6, strlen($code));
+    }
+
+    /**
+     * Тест: updateProfile изменяет данные пользователя
+     */
+    public function testUpdateProfileUpdatesUser(): void
+    {
+        $created = $this->user->create('profile@example.com', 'password123', 'Old Name');
+
+        $result = $this->user->updateProfile($created['id'], ['name' => 'New Name', 'phone' => '+79000000000']);
+
+        $this->assertTrue($result);
+
+        $profile = $this->user->getFullProfile($created['id']);
+        $this->assertSame('New Name', $profile['name']);
+        $this->assertSame('+79000000000', $profile['phone']);
+    }
+
+    /**
+     * Тест: updateProfile возвращает false для несуществующего пользователя
      */
     public function testUpdateProfileReturnsFalseForNonExistent(): void
     {
-        $result = $this->user->updateProfile(999999, ['name' => 'New Name']);
-        
-        // Без БД должен вернуть false
-        $this->assertFalse($result);
+        $this->assertFalse($this->user->updateProfile(999999, ['name' => 'New Name']));
     }
-    
+
     /**
      * Тест: getFullProfile возвращает null для несуществующего пользователя
      */
     public function testGetFullProfileReturnsNullForNonExistent(): void
     {
-        $result = $this->user->getFullProfile(999999);
-        
-        $this->assertNull($result);
+        $this->assertNull($this->user->getFullProfile(999999));
     }
-    
+
     /**
      * Тест: getOrders возвращает пустой массив для несуществующего пользователя
      */
     public function testGetOrdersReturnsEmptyArrayForNonExistent(): void
     {
         $result = $this->user->getOrders(999999);
-        
+
         $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
-    
+
     /**
      * Тест: getAll возвращает массив
      */
     public function testGetAllReturnsArray(): void
     {
-        $result = $this->user->getAll();
-        
-        $this->assertIsArray($result);
+        $this->assertIsArray($this->user->getAll());
     }
 }

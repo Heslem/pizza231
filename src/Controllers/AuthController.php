@@ -8,72 +8,247 @@ use App\Support\Session;
 use App\Support\Response;
 use App\Support\Request;
 
+/**
+ * Контроллер авторизации.
+ *
+ * Вся логика сосредоточена в методах doRegister/doLogin/doVerify/doResend,
+ * которые возвращают массив ['error' => ...] или ['user' => ..., ...].
+ * Web- и API-эндпоинты — тонкие обёртки над ними.
+ */
 class AuthController
 {
     private User $userModel;
-    
+
     public function __construct()
     {
         $this->userModel = new User();
         Session::ensure();
     }
-    
+
+    // =====================================================
+    // Общая логика
+    // =====================================================
+
+    /**
+     * Зарегистрировать пользователя и войти в аккаунт
+     *
+     * @return array ['error' => string] либо ['user' => array, 'needs_verification' => true]
+     */
+    private function doRegister(string $email, string $password, string $name, string $passwordConfirm = ''): array
+    {
+        if (empty($email) || empty($password) || empty($name)) {
+            return ['error' => 'Заполните все поля'];
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['error' => 'Введите корректный email'];
+        }
+
+        if (strlen($password) < 6) {
+            return ['error' => 'Пароль должен быть не менее 6 символов'];
+        }
+
+        // Проверка подтверждения пароля — только если поле передано (web-форма)
+        if ($passwordConfirm !== '' && $password !== $passwordConfirm) {
+            return ['error' => 'Пароли не совпадают'];
+        }
+
+        $result = $this->userModel->create($email, $password, $name);
+
+        if (!$result) {
+            return ['error' => 'Пользователь с таким email уже существует и подтверждён'];
+        }
+
+        // Отправляем код подтверждения
+        EmailSender::sendVerificationCode(
+            $result['email'],
+            $result['verification_code'],
+            $result['name']
+        );
+
+        // Сразу входим в аккаунт (email ещё не подтверждён)
+        $this->putUserInSession([
+            'id' => $result['id'],
+            'name' => $result['name'],
+            'email' => $result['email'],
+            'is_admin' => false,
+            'is_verified' => false,
+        ]);
+        Session::set('pending_verification_email', $email);
+        Session::writeClose();
+
+        return [
+            'user' => [
+                'id' => $result['id'],
+                'name' => $result['name'],
+                'email' => $result['email'],
+                'is_verified' => false,
+            ],
+            'needs_verification' => true,
+        ];
+    }
+
+    /**
+     * Войти по email/паролю
+     *
+     * @return array ['error' => string] либо ['user' => array, 'needs_verification'?: bool]
+     */
+    private function doLogin(string $email, string $password): array
+    {
+        if (empty($email) || empty($password)) {
+            return ['error' => 'Заполните все поля'];
+        }
+
+        $user = $this->userModel->verifyPassword($email, $password);
+
+        if (!$user) {
+            return ['error' => 'Неверный email или пароль'];
+        }
+
+        $isVerified = $this->userModel->isVerified($user['email'] ?? $email);
+
+        $this->putUserInSession([
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'is_admin' => $user['is_admin'] ?? false,
+            'is_verified' => $isVerified,
+        ]);
+
+        $result = [
+            'user' => [
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'is_admin' => $user['is_admin'] ?? false,
+                'is_verified' => $isVerified,
+            ],
+        ];
+
+        if (!$isVerified) {
+            Session::set('pending_verification_email', $email);
+            $result['needs_verification'] = true;
+        }
+
+        Session::writeClose();
+
+        return $result;
+    }
+
+    /**
+     * Подтвердить email по коду из сессии
+     *
+     * @return array ['error' => string] либо ['user' => array]
+     */
+    private function doVerify(string $code): array
+    {
+        $email = Session::get('pending_verification_email', '');
+
+        if (empty($email)) {
+            return ['error' => 'Сессия истекла. Зарегистрируйтесь снова.'];
+        }
+
+        if (empty($code)) {
+            return ['error' => 'Введите код подтверждения'];
+        }
+
+        if (strlen($code) !== 6 || !ctype_digit($code)) {
+            return ['error' => 'Код должен состоять из 6 цифр'];
+        }
+
+        if (!$this->userModel->verifyEmail($email, $code)) {
+            return ['error' => 'Неверный или истёкший код подтверждения'];
+        }
+
+        Session::set('is_verified', true);
+        Session::forget('pending_verification_email');
+
+        return [
+            'user' => [
+                'email' => $email,
+                'is_verified' => true,
+            ],
+        ];
+    }
+
+    /**
+     * Повторно отправить код подтверждения
+     *
+     * @return array ['error' => string] либо ['message' => string]
+     */
+    private function doResend(): array
+    {
+        $email = Session::get('pending_verification_email', '');
+
+        if (empty($email)) {
+            return ['error' => 'Сессия истекла. Зарегистрируйтесь снова.'];
+        }
+
+        $code = $this->userModel->regenerateVerificationCode($email);
+
+        if ($code === null) {
+            return ['error' => 'Email уже подтверждён'];
+        }
+
+        $user = $this->userModel->findByEmail($email);
+
+        if ($user && EmailSender::sendVerificationCode($email, $code, $user['name'])) {
+            return ['message' => 'Код отправлен повторно'];
+        }
+
+        return ['error' => 'Ошибка отправки письма', 'status' => 500];
+    }
+
+    /**
+     * Записать данные пользователя в сессию
+     */
+    private function putUserInSession(array $user): void
+    {
+        Session::set('user_id', $user['id']);
+        Session::set('user_name', $user['name']);
+        Session::set('user_email', $user['email']);
+        Session::set('is_admin', $user['is_admin'] ?? false);
+        Session::set('is_verified', $user['is_verified'] ?? false);
+    }
+
+    /**
+     * Ответ с ошибкой: для web — текст ошибки, для API — Response::error
+     */
+    private static function errorResponse(array $result): string
+    {
+        return Response::error($result['error'], $result['status'] ?? 400);
+    }
+
+    // =====================================================
+    // Web-страницы
+    // =====================================================
+
     /**
      * Страница регистрации
      */
     public function register(): void
     {
         $error = '';
-        $success = '';
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = trim($_POST['email'] ?? '');
-            $password = $_POST['password'] ?? '';
-            $passwordConfirm = $_POST['password_confirm'] ?? '';
-            $name = trim($_POST['name'] ?? '');
-            
-            // Валидация
-            if (empty($email) || empty($password) || empty($name)) {
-                $error = 'Заполните все поля';
-            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $error = 'Введите корректный email';
-            } elseif (strlen($password) < 6) {
-                $error = 'Пароль должен быть не менее 6 символов';
-            } elseif ($password !== $passwordConfirm) {
-                $error = 'Пароли не совпадают';
-            } else {
-                $result = $this->userModel->create($email, $password, $name);
-                
-                if ($result) {
-                    // Отправляем код подтверждения
-                    EmailSender::sendVerificationCode(
-                        $result['email'],
-                        $result['verification_code'],
-                        $result['name']
-                    );
-                    
-                    // Сразу входим в аккаунт
-                    Session::set('user_id', $result['id']);
-                    Session::set('user_name', $result['name']);
-                    Session::set('user_email', $result['email']);
-                    Session::set('is_admin', false);
-                    Session::set('is_verified', false); // Ещё не подтверждён
-                    Session::set('pending_verification_email', $email);
-                    
-                    Session::writeClose();
-                    
-                    // Перенаправляем на страницу подтверждения
-                    header('Location: /verify');
-                    exit;
-                } else {
-                    $error = 'Пользователь с таким email уже существует и подтверждён';
-                }
+
+        if (Request::isPost()) {
+            $result = $this->doRegister(
+                trim(Request::post('email', '')),
+                Request::post('password', ''),
+                trim(Request::post('name', '')),
+                Request::post('password_confirm', '')
+            );
+
+            if (!isset($result['error'])) {
+                header('Location: /verify');
+                exit;
             }
+
+            $error = $result['error'];
         }
-        
-        echo AuthTemplate::renderRegister($error, $success);
+
+        echo AuthTemplate::renderRegister($error, '');
     }
-    
+
     /**
      * Страница подтверждения email
      */
@@ -82,114 +257,57 @@ class AuthController
         $error = '';
         $success = '';
         $email = Session::get('pending_verification_email', '');
-        
+
         // Если нет email в сессии, редирект на регистрацию
         if (empty($email)) {
             header('Location: /register');
             exit;
         }
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $code = trim($_POST['code'] ?? '');
-            
-            if (empty($code)) {
-                $error = 'Введите код подтверждения';
-            } elseif (strlen($code) !== 6 || !ctype_digit($code)) {
-                $error = 'Код должен состоять из 6 цифр';
+
+        if (Request::isPost()) {
+            $result = $this->doVerify(trim(Request::post('code', '')));
+
+            if (isset($result['error'])) {
+                $error = $result['error'];
             } else {
-                // Проверяем код
-                if ($this->userModel->verifyEmail($email, $code)) {
-                    $success = 'Email подтверждён!';
-                    Session::set('is_verified', true);
-                    Session::forget('pending_verification_email');
-                    
-                    // Редирект на главную через 2 секунды
-                    header('Refresh: 2; URL=/');
-                } else {
-                    $error = 'Неверный или истёкший код подтверждения';
-                }
+                $success = 'Email подтверждён!';
+                // Редирект на главную через 2 секунды
+                header('Refresh: 2; URL=/');
             }
         }
-        
+
         echo AuthTemplate::renderVerify($email, $error, $success);
     }
-    
-    /**
-     * Повторная отправка кода подтверждения
-     */
-    public function resendCode(): string
-    {
-        $email = Session::get('pending_verification_email', '');
-        
-        if (empty($email)) {
-            return Response::error('Сессия истекла. Зарегистрируйтесь снова.');
-        }
-        
-        $code = $this->userModel->regenerateVerificationCode($email);
-        
-        if ($code === null) {
-            return Response::error('Email уже подтверждён');
-        }
-        
-        $user = $this->userModel->findByEmail($email);
-        
-        if ($user && EmailSender::sendVerificationCode($email, $code, $user['name'])) {
-            return Response::json(['success' => true, 'message' => 'Код отправлен повторно']);
-        }
-        
-        return Response::serverError('Ошибка отправки письма');
-    }
-    
+
     /**
      * Страница входа
      */
     public function login(): void
     {
         $error = '';
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = trim($_POST['email'] ?? '');
-            $password = $_POST['password'] ?? '';
-            
-            if (empty($email) || empty($password)) {
-                $error = 'Заполните все поля';
-            } else {
-                $user = $this->userModel->verifyPassword($email, $password);
-                
-                if ($user) {
-                    // Проверяем, подтверждён ли email
-                    $isVerified = $this->userModel->isVerified($email);
-                    
-                    // Установка сессии
-                    Session::set('user_id', $user['id']);
-                    Session::set('user_name', $user['name']);
-                    Session::set('user_email', $user['email']);
-                    Session::set('is_admin', $user['is_admin'] ?? false);
-                    Session::set('is_verified', $isVerified);
-                    
-                    // Если email не подтверждён - перенаправляем на подтверждение
-                    if (!$isVerified) {
-                        Session::set('pending_verification_email', $email);
-                        Session::writeClose();
-                        header('Location: /verify');
-                        exit;
-                    }
-                    
-                    // Записать сессию
-                    Session::writeClose();
-                    
-                    // Перенаправление
-                    header('Location: /');
-                    exit;
+
+        if (Request::isPost()) {
+            $result = $this->doLogin(
+                trim(Request::post('email', '')),
+                Request::post('password', '')
+            );
+
+            if (!isset($result['error'])) {
+                // Если email не подтверждён - перенаправляем на подтверждение
+                if ($result['needs_verification'] ?? false) {
+                    header('Location: /verify');
                 } else {
-                    $error = 'Неверный email или пароль';
+                    header('Location: /');
                 }
+                exit;
             }
+
+            $error = $result['error'];
         }
-        
+
         echo AuthTemplate::renderLogin($error);
     }
-    
+
     /**
      * Выход
      */
@@ -199,212 +317,113 @@ class AuthController
         header('Location: /');
         exit;
     }
-    
+
     /**
-     * Получить текущего пользователя
+     * Получить текущего пользователя из сессии
      */
     public static function getCurrentUser(): ?array
     {
         Session::ensure();
-        
+
         if (Session::has('user_id')) {
-            $isAdmin = Session::get('is_admin', false);
-            $isVerified = Session::get('is_verified', false);
-            
             return [
                 'id' => Session::get('user_id'),
                 'name' => Session::get('user_name'),
                 'email' => Session::get('user_email'),
-                'is_admin' => $isAdmin,
-                'is_verified' => $isVerified
+                'is_admin' => Session::get('is_admin', false),
+                'is_verified' => Session::get('is_verified', false)
             ];
         }
-        
+
         return null;
     }
-    
+
+    // =====================================================
+    // API
+    // =====================================================
+
     /**
      * API: регистрация
      */
     public function apiRegister(): string
     {
         $input = Request::json() ?? [];
-        $email = trim($input['email'] ?? '');
-        $password = $input['password'] ?? '';
-        $name = trim($input['name'] ?? '');
-        
-        if (empty($email) || empty($password) || empty($name)) {
-            return Response::error('Заполните все поля');
+
+        $result = $this->doRegister(
+            trim($input['email'] ?? ''),
+            $input['password'] ?? '',
+            trim($input['name'] ?? '')
+        );
+
+        if (isset($result['error'])) {
+            return self::errorResponse($result);
         }
-        
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return Response::error('Введите корректный email');
-        }
-        
-        if (strlen($password) < 6) {
-            return Response::error('Пароль должен быть не менее 6 символов');
-        }
-        
-        $result = $this->userModel->create($email, $password, $name);
-        
-        if ($result) {
-            // Отправляем код подтверждения
-            EmailSender::sendVerificationCode(
-                $result['email'],
-                $result['verification_code'],
-                $result['name']
-            );
-            
-            // Сразу входим в аккаунт
-            Session::set('user_id', $result['id']);
-            Session::set('user_name', $result['name']);
-            Session::set('user_email', $result['email']);
-            Session::set('is_admin', false);
-            Session::set('is_verified', false);
-            Session::set('pending_verification_email', $email);
-            
-            Session::writeClose();
-            
-            return Response::json([
-                'success' => true, 
-                'message' => 'На ваш email отправлен код подтверждения',
-                'user' => [
-                    'id' => $result['id'],
-                    'name' => $result['name'],
-                    'email' => $result['email'],
-                    'is_verified' => false
-                ],
-                'needs_verification' => true
-            ]);
-        }
-        
-        return Response::error('Пользователь с таким email уже существует и подтверждён');
+
+        return Response::json([
+            'success' => true,
+            'message' => 'На ваш email отправлен код подтверждения',
+            'user' => $result['user'],
+            'needs_verification' => true
+        ]);
     }
-    
+
     /**
      * API: вход
      */
     public function apiLogin(): string
     {
         $input = Request::json() ?? [];
-        $email = trim($input['email'] ?? '');
-        $password = $input['password'] ?? '';
-        
-        if (empty($email) || empty($password)) {
-            return Response::error('Заполните все поля');
+
+        $result = $this->doLogin(
+            trim($input['email'] ?? ''),
+            $input['password'] ?? ''
+        );
+
+        if (isset($result['error'])) {
+            return Response::unauthorized($result['error']);
         }
-        
-        $user = $this->userModel->verifyPassword($email, $password);
-        
-        if ($user) {
-            // Проверяем, подтверждён ли email
-            $isVerified = $this->userModel->isVerified($email);
-            
-            Session::set('user_id', $user['id']);
-            Session::set('user_name', $user['name']);
-            Session::set('user_email', $user['email']);
-            Session::set('is_admin', $user['is_admin'] ?? false);
-            Session::set('is_verified', $isVerified);
-            
-            // Если email не подтверждён - возвращаем информацию об этом
-            if (!$isVerified) {
-                Session::set('pending_verification_email', $email);
-                Session::writeClose();
-                
-                return Response::json([
-                    'success' => true,
-                    'user' => [
-                        'id' => $user['id'],
-                        'name' => $user['name'],
-                        'email' => $user['email'],
-                        'is_admin' => $user['is_admin'] ?? false,
-                        'is_verified' => false
-                    ],
-                    'needs_verification' => true
-                ]);
-            }
-            
-            Session::writeClose();
-            
-            return Response::json([
-                'success' => true, 
-                'user' => [
-                    'id' => $user['id'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'is_admin' => $user['is_admin'] ?? false,
-                    'is_verified' => true
-                ]
-            ]);
-        }
-        
-        return Response::unauthorized('Неверный email или пароль');
+
+        return Response::json(array_filter([
+            'success' => true,
+            'user' => $result['user'],
+            'needs_verification' => $result['needs_verification'] ?? null,
+        ], fn($v) => $v !== null));
     }
-    
+
     /**
      * API: подтверждение email
      */
     public function apiVerify(): string
     {
         $input = Request::json() ?? [];
-        $code = trim($input['code'] ?? '');
-        $email = Session::get('pending_verification_email', '');
-        
-        if (empty($email)) {
-            return Response::error('Сессия истекла. Зарегистрируйтесь снова.');
+
+        $result = $this->doVerify(trim($input['code'] ?? ''));
+
+        if (isset($result['error'])) {
+            return self::errorResponse($result);
         }
-        
-        if (empty($code)) {
-            return Response::error('Введите код подтверждения');
-        }
-        
-        if (strlen($code) !== 6 || !ctype_digit($code)) {
-            return Response::error('Код должен состоять из 6 цифр');
-        }
-        
-        if ($this->userModel->verifyEmail($email, $code)) {
-            Session::set('is_verified', true);
-            Session::forget('pending_verification_email');
-            
-            return Response::json([
-                'success' => true, 
-                'message' => 'Email подтверждён!',
-                'user' => [
-                    'email' => $email,
-                    'is_verified' => true
-                ]
-            ]);
-        }
-        
-        return Response::error('Неверный или истёкший код подтверждения');
+
+        return Response::json([
+            'success' => true,
+            'message' => 'Email подтверждён!',
+            'user' => $result['user']
+        ]);
     }
-    
+
     /**
      * API: повторная отправка кода
      */
     public function apiResend(): string
     {
-        $email = Session::get('pending_verification_email', '');
-        
-        if (empty($email)) {
-            return Response::error('Сессия истекла. Зарегистрируйтесь снова.');
+        $result = $this->doResend();
+
+        if (isset($result['error'])) {
+            return self::errorResponse($result);
         }
-        
-        $code = $this->userModel->regenerateVerificationCode($email);
-        
-        if ($code === null) {
-            return Response::error('Email уже подтверждён');
-        }
-        
-        $user = $this->userModel->findByEmail($email);
-        
-        if ($user && EmailSender::sendVerificationCode($email, $code, $user['name'])) {
-            return Response::json(['success' => true, 'message' => 'Код отправлен повторно']);
-        }
-        
-        return Response::serverError('Ошибка отправки письма');
+
+        return Response::json(['success' => true, 'message' => $result['message']]);
     }
-    
+
     /**
      * API: выход
      */
@@ -413,30 +432,25 @@ class AuthController
         Session::destroy();
         return Response::json(['success' => true]);
     }
-    
+
     /**
-     * API: получить текущего пользователя
+     * API: получить текущего пользователя (с актуализацией is_admin/is_verified)
      */
     public function apiGetCurrent(): string
     {
-        Session::ensure();
-        
         $user = self::getCurrentUser();
-        
-        // Если есть user, но нет is_admin - проверить через модель
+
         if ($user) {
-            $isAdmin = $this->userModel->isAdmin($user['id']);
-            $user['is_admin'] = $isAdmin;
-            
-            // Обновить сессию
-            Session::set('is_admin', $isAdmin);
-            
-            // Проверить актуальный статус верификации
+            $isAdmin = $this->userModel->isAdmin((int)$user['id'], (string)$user['email']);
             $isVerified = $this->userModel->isVerified($user['email']);
+
+            $user['is_admin'] = $isAdmin;
             $user['is_verified'] = $isVerified;
+
+            Session::set('is_admin', $isAdmin);
             Session::set('is_verified', $isVerified);
         }
-        
+
         return Response::json(['user' => $user]);
     }
 }

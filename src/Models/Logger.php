@@ -20,18 +20,26 @@ class Logger
     }
     
     /**
-     * Записать сообщение об ошибке
+     * Записать сообщение в лог с указанным уровнем
      */
-    public static function error(string $message, array $context = []): void
+    public static function log(string $level, string $message, array $context = []): void
     {
         self::init();
         
         $timestamp = date('Y-m-d H:i:s');
         $contextStr = !empty($context) ? ' | Context: ' . json_encode($context, JSON_UNESCAPED_UNICODE) : '';
-        $logMessage = "[{$timestamp}] ERROR: {$message}{$contextStr}\n";
+        $logMessage = "[{$timestamp}] {$level}: {$message}{$contextStr}\n";
         
         $filePath = self::$logDir . '/' . self::$logFile;
         file_put_contents($filePath, $logMessage, FILE_APPEND | LOCK_EX);
+    }
+    
+    /**
+     * Записать сообщение об ошибке
+     */
+    public static function error(string $message, array $context = []): void
+    {
+        self::log('ERROR', $message, $context);
     }
     
     /**
@@ -39,14 +47,7 @@ class Logger
      */
     public static function info(string $message, array $context = []): void
     {
-        self::init();
-        
-        $timestamp = date('Y-m-d H:i:s');
-        $contextStr = !empty($context) ? ' | Context: ' . json_encode($context, JSON_UNESCAPED_UNICODE) : '';
-        $logMessage = "[{$timestamp}] INFO: {$message}{$contextStr}\n";
-        
-        $filePath = self::$logDir . '/' . self::$logFile;
-        file_put_contents($filePath, $logMessage, FILE_APPEND | LOCK_EX);
+        self::log('INFO', $message, $context);
     }
     
     /**
