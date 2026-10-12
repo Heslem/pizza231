@@ -1,8 +1,6 @@
 <?php
 namespace App\Views;
 
-require_once __DIR__ . '/BaseTemplate.php';
-
 class CatalogTemplate extends BaseTemplate
 {
     /**

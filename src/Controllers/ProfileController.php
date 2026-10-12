@@ -1,11 +1,11 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../Views/ProfileTemplate.php';
-
 use App\Models\User;
 use App\Views\ProfileTemplate;
+use App\Support\Session;
+use App\Support\Response;
+use App\Support\Request;
 
 class ProfileController
 {
@@ -14,10 +14,7 @@ class ProfileController
     public function __construct()
     {
         $this->userModel = new User();
-        
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        Session::ensure();
     }
     
     /**
@@ -25,15 +22,15 @@ class ProfileController
      */
     private function requireAuth(): array
     {
-        if (!isset($_SESSION['user_id'])) {
+        if (!Session::has('user_id')) {
             header('Location: /login');
             exit;
         }
         
         return [
-            'id' => $_SESSION['user_id'],
-            'name' => $_SESSION['user_name'],
-            'email' => $_SESSION['user_email']
+            'id' => Session::get('user_id'),
+            'name' => Session::get('user_name'),
+            'email' => Session::get('user_email')
         ];
     }
     
@@ -63,16 +60,13 @@ class ProfileController
      */
     public function apiUpdate(): string
     {
-        header('Content-Type: application/json');
-        
         $user = $this->requireAuth();
         
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = Request::json() ?? [];
         
         // Валидация имени
         if (isset($input['name']) && empty(trim($input['name']))) {
-            http_response_code(400);
-            return json_encode(['error' => 'Имя не может быть пустым'], JSON_UNESCAPED_UNICODE);
+            return Response::error('Имя не может быть пустым');
         }
         
         // Обновляем профиль
@@ -81,20 +75,16 @@ class ProfileController
         if ($result) {
             // Обновить сессию если изменилось имя
             if (isset($input['name'])) {
-                $_SESSION['user_name'] = trim($input['name']);
+                Session::set('user_name', trim($input['name']));
             }
             
             // Получить обновлённый профиль
             $profile = $this->userModel->getFullProfile($user['id']);
             
-            return json_encode([
-                'success' => true,
-                'profile' => $profile
-            ], JSON_UNESCAPED_UNICODE);
+            return Response::success(['profile' => $profile]);
         }
         
-        http_response_code(500);
-        return json_encode(['error' => 'Ошибка сохранения профиля'], JSON_UNESCAPED_UNICODE);
+        return Response::serverError('Ошибка сохранения профиля');
     }
     
     /**
@@ -102,21 +92,17 @@ class ProfileController
      */
     public function apiUploadAvatar(): string
     {
-        header('Content-Type: application/json');
-        
         $user = $this->requireAuth();
         
         if (!isset($_FILES['avatar'])) {
-            http_response_code(400);
-            return json_encode(['error' => 'Файл не загружен'], JSON_UNESCAPED_UNICODE);
+            return Response::error('Файл не загружен');
         }
         
         $file = $_FILES['avatar'];
         
         // Проверка на ошибки
         if ($file['error'] !== UPLOAD_ERR_OK) {
-            http_response_code(400);
-            return json_encode(['error' => 'Ошибка загрузки файла'], JSON_UNESCAPED_UNICODE);
+            return Response::error('Ошибка загрузки файла');
         }
         
         // Проверка типа файла
@@ -126,14 +112,12 @@ class ProfileController
         finfo_close($finfo);
         
         if (!in_array($mimeType, $allowedTypes)) {
-            http_response_code(400);
-            return json_encode(['error' => 'Разрешены только изображения (JPEG, PNG, GIF, WebP)'], JSON_UNESCAPED_UNICODE);
+            return Response::error('Разрешены только изображения (JPEG, PNG, GIF, WebP)');
         }
         
         // Проверка размера (макс. 2MB)
         if ($file['size'] > 2 * 1024 * 1024) {
-            http_response_code(400);
-            return json_encode(['error' => 'Максимальный размер файла - 2MB'], JSON_UNESCAPED_UNICODE);
+            return Response::error('Максимальный размер файла - 2MB');
         }
         
         // Создать папку для аватарок
@@ -162,14 +146,10 @@ class ProfileController
             $avatarPath = '/storage/avatars/' . $newFilename;
             $this->userModel->updateProfile($user['id'], ['avatar' => $avatarPath]);
             
-            return json_encode([
-                'success' => true,
-                'avatar' => $avatarPath
-            ], JSON_UNESCAPED_UNICODE);
+            return Response::success(['avatar' => $avatarPath]);
         }
         
-        http_response_code(500);
-        return json_encode(['error' => 'Не удалось сохранить файл'], JSON_UNESCAPED_UNICODE);
+        return Response::serverError('Не удалось сохранить файл');
     }
     
     /**
@@ -177,16 +157,10 @@ class ProfileController
      */
     public function apiGet(): string
     {
-        header('Content-Type: application/json');
-        
         $user = $this->requireAuth();
         
         $profile = $this->userModel->getFullProfile($user['id']);
         
-        if ($profile) {
-            return json_encode(['profile' => $profile], JSON_UNESCAPED_UNICODE);
-        }
-        
-        return json_encode(['profile' => null], JSON_UNESCAPED_UNICODE);
+        return Response::json(['profile' => $profile]);
     }
 }

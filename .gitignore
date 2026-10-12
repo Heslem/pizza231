@@ -6,4 +6,4 @@ storage/logs/*
 storage/orders_backup_*.json
 storage/payment.json
 KODA.md
-.cache
+.phpunit.result.cache

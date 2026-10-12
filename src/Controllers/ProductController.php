@@ -1,9 +1,6 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../Models/Product.php';
-require_once __DIR__ . '/../Views/ProductTemplate.php';
-
 use App\Models\Product; 
 use App\Views\ProductTemplate;
 

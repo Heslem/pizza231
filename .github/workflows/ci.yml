@@ -43,10 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Проект поддерживает >= 7.4, тестируем на актуальных LTS
         php-version:
-          - '8.1'
-          - '8.2'
           - '8.3'
 
     steps:

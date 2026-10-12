@@ -1,9 +1,6 @@
 <?php
 namespace App\Models;
 
-require_once __DIR__ . '/../Config/Config.php';
-require_once __DIR__ . '/../Database/Database.php';
-
 use App\Config\Config;
 use App\Database\Database;
 use PDO;

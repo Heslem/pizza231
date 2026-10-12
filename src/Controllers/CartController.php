@@ -1,15 +1,12 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../Models/Cart.php';
-require_once __DIR__ . '/../Models/EmailSender.php';
-require_once __DIR__ . '/../Models/Payment.php';
-require_once __DIR__ . '/../Views/CartTemplate.php';
-
 use App\Models\Cart;
 use App\Models\EmailSender;
 use App\Models\Payment;
 use App\Views\CartTemplate;
+use App\Support\Session;
+use App\Support\Response;
 
 class CartController
 {
@@ -17,9 +14,7 @@ class CartController
 
     public function __construct()
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        Session::ensure();
     }
 
     /**
@@ -37,31 +32,27 @@ class CartController
     public function order(?array $data): string
     {
         if (!$data) {
-            http_response_code(400);
-            return json_encode(['success' => false, 'error' => 'Некорректные данные']);
+            return Response::error('Некорректные данные');
         }
 
         // Валидация обязательных полей
         $required = ['fio', 'email', 'phone', 'payment'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
-                http_response_code(400);
-                return json_encode(['success' => false, 'error' => 'Заполните все обязательные поля']);
+                return Response::error('Заполните все обязательные поля');
             }
         }
 
         // Для адреса - принимаем либо address (доставка), либо pickupPoint (самовывоз)
         $address = $data['address'] ?? $data['pickupPoint'] ?? '';
         if (empty($address)) {
-            http_response_code(400);
-            return json_encode(['success' => false, 'error' => 'Укажите адрес доставки или выберите точку самовывоза']);
+            return Response::error('Укажите адрес доставки или выберите точку самовывоза');
         }
 
         // Получаем товары из корзины
         $items = Cart::getItems();
         if (empty($items)) {
-            http_response_code(400);
-            return json_encode(['success' => false, 'error' => 'Корзина пуста']);
+            return Response::error('Корзина пуста');
         }
 
         $total = Cart::getTotal();
@@ -82,24 +73,17 @@ class CartController
         ];
 
         // Добавляем user_id только если пользователь авторизован
-        if (isset($_SESSION['user_id'])) {
-            $order['user_id'] = (int)$_SESSION['user_id'];
+        if (Session::has('user_id')) {
+            $order['user_id'] = (int)Session::get('user_id');
         }
 
         // Читаем существующие заказы
-        $orders = [];
-        if (file_exists(self::ORDERS_FILE)) {
-            $content = file_get_contents(self::ORDERS_FILE);
-            $orders = json_decode($content, true) ?: [];
-        }
-        
-        // Добавляем новый заказ
+        $orders = $this->loadOrders();
         $orders[] = $order;
 
-// Сохраняем
-        if (file_put_contents(self::ORDERS_FILE, json_encode($orders, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) === false) {
-            http_response_code(500);
-            return json_encode(['success' => false, 'error' => 'Ошибка сохранения заказа']);
+        // Сохраняем
+        if (!$this->saveOrders($orders)) {
+            return Response::error('Ошибка сохранения заказа', 500);
         }
         
         // Отправляем email-уведомление
@@ -122,7 +106,7 @@ class CartController
             $paymentUrl = Payment::getRobokassaUrl($order);
         }
 
-        return json_encode([
+        return Response::json([
             'success' => true,
             'orderId' => $order['id'],
             'paymentUrl' => $paymentUrl
@@ -136,11 +120,10 @@ class CartController
     public function add(?array $data): string
     {
         if (!$data || !isset($data['id'], $data['name'], $data['price'])) {
-            http_response_code(400);
-            return json_encode(['success' => false, 'error' => 'Некорректные данные']);
+            return Response::error('Некорректные данные');
         }
 
-        $result = Cart::add(
+        Cart::add(
             (int)$data['id'],
             (string)$data['name'],
             (float)$data['price'],
@@ -148,8 +131,8 @@ class CartController
             (int)($data['quantity'] ?? 1)
         );
 
-        return json_encode([
-            'success' => $result,
+        return Response::json([
+            'success' => true,
             'count' => Cart::getCount(),
             'total' => Cart::getTotal()
         ]);
@@ -162,17 +145,13 @@ class CartController
     public function update(?array $data): string
     {
         if (!$data || !isset($data['id'], $data['quantity'])) {
-            http_response_code(400);
-            return json_encode(['success' => false, 'error' => 'Некорректные данные']);
+            return Response::error('Некорректные данные');
         }
 
-        $result = Cart::updateQuantity(
-            (int)$data['id'],
-            (int)$data['quantity']
-        );
+        Cart::updateQuantity((int)$data['id'], (int)$data['quantity']);
 
-        return json_encode([
-            'success' => $result,
+        return Response::json([
+            'success' => true,
             'count' => Cart::getCount(),
             'total' => Cart::getTotal()
         ]);
@@ -185,14 +164,13 @@ class CartController
     public function remove(?array $data): string
     {
         if (!$data || !isset($data['id'])) {
-            http_response_code(400);
-            return json_encode(['success' => false, 'error' => 'Некорректные данные']);
+            return Response::error('Некорректные данные');
         }
 
-        $result = Cart::remove((int)$data['id']);
+        Cart::remove((int)$data['id']);
 
-        return json_encode([
-            'success' => $result,
+        return Response::json([
+            'success' => true,
             'count' => Cart::getCount(),
             'total' => Cart::getTotal()
         ]);
@@ -203,10 +181,10 @@ class CartController
      */
     public function clear(): string
     {
-        $result = Cart::clear();
+        Cart::clear();
 
-        return json_encode([
-            'success' => $result,
+        return Response::json([
+            'success' => true,
             'count' => 0,
             'total' => 0
         ]);
@@ -219,19 +197,14 @@ class CartController
     public function updateStatus(?array $data): string
     {
         if (!$data || !isset($data['id'], $data['status'])) {
-            http_response_code(400);
-            return json_encode(['success' => false, 'error' => 'Некорректные данные']);
+            return Response::error('Некорректные данные');
         }
         
         $orderId = $data['id'];
         $newStatus = $data['status'];
         
         // Читаем заказы
-        $orders = [];
-        if (file_exists(self::ORDERS_FILE)) {
-            $content = file_get_contents(self::ORDERS_FILE);
-            $orders = json_decode($content, true) ?: [];
-        }
+        $orders = $this->loadOrders();
         
         // Ищем и обновляем заказ
         $found = false;
@@ -245,18 +218,40 @@ class CartController
                 break;
             }
         }
+        unset($order);
         
         if (!$found) {
-            http_response_code(404);
-            return json_encode(['success' => false, 'error' => 'Заказ не найден']);
+            return Response::notFound('Заказ не найден');
         }
         
         // Сохраняем
-        if (file_put_contents(self::ORDERS_FILE, json_encode($orders, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) === false) {
-            http_response_code(500);
-            return json_encode(['success' => false, 'error' => 'Ошибка сохранения']);
+        if (!$this->saveOrders($orders)) {
+            return Response::error('Ошибка сохранения', 500);
         }
         
-        return json_encode(['success' => true]);
+        return Response::json(['success' => true]);
+    }
+
+    /**
+     * Загрузить заказы из файла
+     */
+    private function loadOrders(): array
+    {
+        if (!file_exists(self::ORDERS_FILE)) {
+            return [];
+        }
+        $content = file_get_contents(self::ORDERS_FILE);
+        return json_decode($content, true) ?: [];
+    }
+
+    /**
+     * Сохранить заказы в файл
+     */
+    private function saveOrders(array $orders): bool
+    {
+        return file_put_contents(
+            self::ORDERS_FILE,
+            json_encode($orders, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+        ) !== false;
     }
 }

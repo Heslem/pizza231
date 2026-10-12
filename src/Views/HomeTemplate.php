@@ -1,10 +1,6 @@
 <?php
 namespace App\Views;
 
-require_once __DIR__ . '/BaseTemplate.php';
-require_once __DIR__ . '/../Models/Product.php';
-require_once __DIR__ . '/../Config/Config.php';
-
 use App\Models\Product;
 use App\Config\Config;
 

@@ -150,5 +150,125 @@
         "verification_code": "025626",
         "verification_expires": "2026-03-30 12:19:20",
         "created_at": "2026-03-30 11:19:20"
+    },
+    {
+        "id": 16,
+        "email": "test_1791783396@example.com",
+        "password": "$2y$12$jg6coKdxoh0oDwvwWd4e0eC6tmEul\/NRO4HTeoa.w4J8iv8KSDUx6",
+        "name": "Test User",
+        "is_verified": false,
+        "verification_code": "559864",
+        "verification_expires": "2026-10-12 06:36:36",
+        "created_at": "2026-10-12 05:36:36"
+    },
+    {
+        "id": 17,
+        "email": "duplicate_test_1791783396@example.com",
+        "password": "$2y$12$pE2w4J\/lRrhQtjXoZ1weaOTvgWg1IIQzO8p.rHoTbflgIgY2xb6pC",
+        "name": "Test User 2",
+        "is_verified": false,
+        "verification_code": "375090",
+        "verification_expires": "2026-10-12 06:36:37",
+        "created_at": "2026-10-12 05:36:37"
+    },
+    {
+        "id": 18,
+        "email": "test_1791783887@example.com",
+        "password": "$2y$12$Kj0ZrOb3fJhfFd0GowVBROXz7C8hC2CvOSnNJeg5.CeG.aAuPmrbm",
+        "name": "Test User",
+        "is_verified": false,
+        "verification_code": "947170",
+        "verification_expires": "2026-10-12 06:44:47",
+        "created_at": "2026-10-12 05:44:47"
+    },
+    {
+        "id": 19,
+        "email": "duplicate_test_1791783887@example.com",
+        "password": "$2y$12$\/pwa1ywdl.pQxHDW3kxtUuWFn0XSD0pxxllAbBZ4i0MmIhKPVIkVC",
+        "name": "Test User 2",
+        "is_verified": false,
+        "verification_code": "338818",
+        "verification_expires": "2026-10-12 06:44:48",
+        "created_at": "2026-10-12 05:44:48"
+    },
+    {
+        "id": 20,
+        "email": "test_1791784279@example.com",
+        "password": "$2y$12$d4zvkZJAPet1pmAL8qBmU.MZ9pD3.hWvNKTZmwUQAAGIvIZuUozLK",
+        "name": "Test User",
+        "is_verified": false,
+        "verification_code": "330757",
+        "verification_expires": "2026-10-12 06:51:19",
+        "created_at": "2026-10-12 05:51:20"
+    },
+    {
+        "id": 21,
+        "email": "duplicate_test_1791784280@example.com",
+        "password": "$2y$12$WeMrQ0J\/dFNakbVkihWwwOWEJr9HM9WW6yIPnPh\/8ivbPLJBNVEEC",
+        "name": "Test User 2",
+        "is_verified": false,
+        "verification_code": "294727",
+        "verification_expires": "2026-10-12 06:51:20",
+        "created_at": "2026-10-12 05:51:20"
+    },
+    {
+        "id": 22,
+        "email": "test_1791787493@example.com",
+        "password": "$2y$12$BPCnLy7J8dhaEx49Clxgx.orsJWfSzhLR4QWRWD57KperZiH\/DlgK",
+        "name": "Test User",
+        "is_verified": false,
+        "verification_code": "277495",
+        "verification_expires": "2026-10-12 07:44:53",
+        "created_at": "2026-10-12 06:44:53"
+    },
+    {
+        "id": 23,
+        "email": "duplicate_test_1791787493@example.com",
+        "password": "$2y$12$85yvAGz7TX7BhE434k.Bde61X1id8n6cQSDXmA8SRYYOnj73AsAs2",
+        "name": "Test User 2",
+        "is_verified": false,
+        "verification_code": "040073",
+        "verification_expires": "2026-10-12 07:44:54",
+        "created_at": "2026-10-12 06:44:54"
+    },
+    {
+        "id": 24,
+        "email": "test_1791787682@example.com",
+        "password": "$2y$12$G5QtQgWQJ2B5kk.YOMRaK.pbyg31TeAFPIykrGqQelIro9.yGZYxO",
+        "name": "Test User",
+        "is_verified": false,
+        "verification_code": "081204",
+        "verification_expires": "2026-10-12 07:48:02",
+        "created_at": "2026-10-12 06:48:02"
+    },
+    {
+        "id": 25,
+        "email": "duplicate_test_1791787682@example.com",
+        "password": "$2y$12$D\/lUPj5M7MKig\/utQlkaZeVOjZB.oX9YptCfmnSugWGj\/8CHq7adu",
+        "name": "Test User 2",
+        "is_verified": false,
+        "verification_code": "493492",
+        "verification_expires": "2026-10-12 07:48:03",
+        "created_at": "2026-10-12 06:48:03"
+    },
+    {
+        "id": 26,
+        "email": "test_1791787857@example.com",
+        "password": "$2y$12$Q9H1kw5Q8IKNigJdCQs7B.CcHnaE7RIuqPKpXjbZ3\/itMb2Dmwv7.",
+        "name": "Test User",
+        "is_verified": false,
+        "verification_code": "060698",
+        "verification_expires": "2026-10-12 07:50:57",
+        "created_at": "2026-10-12 06:50:57"
+    },
+    {
+        "id": 27,
+        "email": "duplicate_test_1791787857@example.com",
+        "password": "$2y$12$gU.N4mA8scqSeexfnHl05.wKuoknuwfNAPiqx4c9e\/JRwQA.gmYVy",
+        "name": "Test User 2",
+        "is_verified": false,
+        "verification_code": "596408",
+        "verification_expires": "2026-10-12 07:50:58",
+        "created_at": "2026-10-12 06:50:58"
     }
 ]

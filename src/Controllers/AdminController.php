@@ -1,15 +1,13 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../Models/Product.php';
-require_once __DIR__ . '/../Models/Logger.php';
-require_once __DIR__ . '/../Views/AdminTemplate.php';
-
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Logger;
 use App\Views\AdminTemplate;
+use App\Support\Session;
+use App\Support\Response;
+use App\Support\Request;
 
 class AdminController
 {
@@ -20,10 +18,7 @@ class AdminController
     {
         $this->userModel = new User();
         $this->productModel = new Product();
-        
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        Session::ensure();
     }
     
     /**
@@ -31,17 +26,39 @@ class AdminController
      */
     private function checkAdmin(): bool
     {
-        if (!isset($_SESSION['user_id'])) {
+        if (!Session::has('user_id')) {
             return false;
         }
         
         // Сначала проверяем сессию
-        if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
+        if (Session::get('is_admin') === true) {
             return true;
         }
         
         // Если нет в сессии - проверяем через модель
-        return $this->userModel->isAdmin($_SESSION['user_id']);
+        return $this->userModel->isAdmin(Session::get('user_id'));
+    }
+    
+    /**
+     * Требовать доступ админа (для web-страниц)
+     */
+    private function requireAdminWeb(): void
+    {
+        if (!$this->checkAdmin()) {
+            header('Location: /login');
+            exit;
+        }
+    }
+    
+    /**
+     * Требовать доступ админа (для API) — возвращает Response::forbidden() или null
+     */
+    private function requireAdminApi(): ?string
+    {
+        if (!$this->checkAdmin()) {
+            return Response::forbidden();
+        }
+        return null;
     }
     
     /**
@@ -49,11 +66,7 @@ class AdminController
      */
     public function index(): void
     {
-        if (!$this->checkAdmin()) {
-            header('Location: /login');
-            exit;
-        }
-        
+        $this->requireAdminWeb();
         $stats = $this->getStats();
         echo AdminTemplate::renderDashboard($stats);
     }
@@ -63,11 +76,7 @@ class AdminController
      */
     public function orders(): void
     {
-        if (!$this->checkAdmin()) {
-            header('Location: /login');
-            exit;
-        }
-        
+        $this->requireAdminWeb();
         $orders = $this->getOrders();
         echo AdminTemplate::renderOrders($orders);
     }
@@ -77,11 +86,7 @@ class AdminController
      */
     public function users(): void
     {
-        if (!$this->checkAdmin()) {
-            header('Location: /login');
-            exit;
-        }
-        
+        $this->requireAdminWeb();
         $users = $this->userModel->loadData();
         echo AdminTemplate::renderUsers($users);
     }
@@ -141,14 +146,8 @@ class AdminController
      */
     public function apiStats(): string
     {
-        header('Content-Type: application/json');
-        
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
-        
-        return json_encode($this->getStats(), JSON_UNESCAPED_UNICODE);
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
+        return Response::json($this->getStats());
     }
     
     /**
@@ -156,14 +155,8 @@ class AdminController
      */
     public function apiOrders(): string
     {
-        header('Content-Type: application/json');
-        
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
-        
-        return json_encode($this->getOrders(), JSON_UNESCAPED_UNICODE);
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
+        return Response::json($this->getOrders());
     }
     
     /**
@@ -171,12 +164,7 @@ class AdminController
      */
     public function apiUsers(): string
     {
-        header('Content-Type: application/json');
-        
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
         
         $users = $this->userModel->loadData();
         
@@ -185,7 +173,7 @@ class AdminController
             unset($user['password']);
         }
         
-return json_encode($users, JSON_UNESCAPED_UNICODE);
+        return Response::json($users);
     }
     
     /**
@@ -193,12 +181,8 @@ return json_encode($users, JSON_UNESCAPED_UNICODE);
      */
     public function logs(): void
     {
-        if (!$this->checkAdmin()) {
-            header('Location: /login');
-            exit;
-        }
-        
-        $logs = Logger::getErrors(100); // Получить 100 последних записей
+        $this->requireAdminWeb();
+        $logs = Logger::getErrors(100);
         echo AdminTemplate::renderLogs($logs);
     }
     
@@ -207,17 +191,13 @@ return json_encode($users, JSON_UNESCAPED_UNICODE);
      */
     public function apiLogs(): string
     {
-        header('Content-Type: application/json');
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
         
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
-        
-        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 100;
+        $limit = Request::query('limit', 100);
+        $limit = is_int($limit) ? $limit : intval($limit);
         $logs = Logger::getErrors($limit);
         
-return json_encode($logs, JSON_UNESCAPED_UNICODE);
+        return Response::json($logs);
     }
     
     /**
@@ -225,16 +205,11 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
      */
     public function apiClearLogs(): string
     {
-        header('Content-Type: application/json');
-        
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
         
         Logger::clear();
         
-        return json_encode(['success' => true, 'message' => 'Логи успешно очищены'], JSON_UNESCAPED_UNICODE);
+        return Response::json(['success' => true, 'message' => 'Логи успешно очищены']);
     }
     
     /**
@@ -242,11 +217,7 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
      */
     public function catalog(): void
     {
-        if (!$this->checkAdmin()) {
-            header('Location: /login');
-            exit;
-        }
-        
+        $this->requireAdminWeb();
         $products = $this->productModel->loadData() ?? [];
         $categories = $this->productModel->getCategories();
         
@@ -258,23 +229,15 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
      */
     public function apiProducts(): string
     {
-        header('Content-Type: application/json');
-        
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
         
         $products = $this->productModel->loadData() ?? [];
         $categories = $this->productModel->getCategories();
         
-        // Удаляем ключи массива, возвращаем простой список
-        $productsList = array_values($products);
-        
-        return json_encode([
-            'products' => $productsList,
+        return Response::json([
+            'products' => array_values($products),
             'categories' => $categories
-        ], JSON_UNESCAPED_UNICODE);
+        ]);
     }
     
     /**
@@ -282,14 +245,9 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
      */
     public function apiCreateProduct(): string
     {
-        header('Content-Type: application/json');
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
         
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
-        
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = Request::json() ?? [];
         
         $name = trim($input['name'] ?? '');
         $description = trim($input['description'] ?? '');
@@ -298,8 +256,7 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
         $image = trim($input['image'] ?? '/assets/img/no-image.jpg');
         
         if (empty($name) || $price <= 0 || empty($category)) {
-            http_response_code(400);
-            return json_encode(['error' => 'Заполните название, цену и категорию'], JSON_UNESCAPED_UNICODE);
+            return Response::error('Заполните название, цену и категорию');
         }
         
         $id = $this->productModel->create([
@@ -311,15 +268,14 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
         ]);
         
         if ($id) {
-            return json_encode([
+            return Response::json([
                 'success' => true,
                 'message' => 'Товар успешно добавлен',
                 'id' => $id
-            ], JSON_UNESCAPED_UNICODE);
+            ]);
         }
         
-        http_response_code(500);
-        return json_encode(['error' => 'Не удалось создать товар'], JSON_UNESCAPED_UNICODE);
+        return Response::serverError('Не удалось создать товар');
     }
     
     /**
@@ -327,14 +283,9 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
      */
     public function apiUpdateProduct(int $id): string
     {
-        header('Content-Type: application/json');
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
         
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
-        
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = Request::json() ?? [];
         
         $name = trim($input['name'] ?? '');
         $description = trim($input['description'] ?? '');
@@ -343,8 +294,7 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
         $image = trim($input['image'] ?? '/assets/img/no-image.jpg');
         
         if (empty($name) || $price <= 0 || empty($category)) {
-            http_response_code(400);
-            return json_encode(['error' => 'Заполните название, цену и категорию'], JSON_UNESCAPED_UNICODE);
+            return Response::error('Заполните название, цену и категорию');
         }
         
         $result = $this->productModel->update($id, [
@@ -356,14 +306,10 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
         ]);
         
         if ($result) {
-            return json_encode([
-                'success' => true,
-                'message' => 'Товар успешно обновлён'
-            ], JSON_UNESCAPED_UNICODE);
+            return Response::json(['success' => true, 'message' => 'Товар успешно обновлён']);
         }
         
-        http_response_code(500);
-        return json_encode(['error' => 'Не удалось обновить товар'], JSON_UNESCAPED_UNICODE);
+        return Response::serverError('Не удалось обновить товар');
     }
     
     /**
@@ -371,23 +317,14 @@ return json_encode($logs, JSON_UNESCAPED_UNICODE);
      */
     public function apiDeleteProduct(int $id): string
     {
-        header('Content-Type: application/json');
-        
-        if (!$this->checkAdmin()) {
-            http_response_code(403);
-            return json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
-        }
+        if ($forbidden = $this->requireAdminApi()) return $forbidden;
         
         $result = $this->productModel->delete($id);
         
         if ($result) {
-            return json_encode([
-                'success' => true,
-                'message' => 'Товар успешно удалён'
-            ], JSON_UNESCAPED_UNICODE);
+            return Response::json(['success' => true, 'message' => 'Товар успешно удалён']);
         }
         
-        http_response_code(500);
-        return json_encode(['error' => 'Не удалось удалить товар'], JSON_UNESCAPED_UNICODE);
+        return Response::serverError('Не удалось удалить товар');
     }
 }

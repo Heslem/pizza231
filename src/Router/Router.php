@@ -1,29 +1,6 @@
 <?php
 namespace App\Router;
 
-// 👇 Существующие контроллеры
-require_once __DIR__ . '/../Controllers/HomeController.php';
-require_once __DIR__ . '/../Controllers/AboutController.php';
-require_once __DIR__ . '/../Controllers/ProductController.php';
-require_once __DIR__ . '/../Controllers/CatalogController.php';
-
-// 👇 НОВЫЕ: Контроллер и модель корзины
-require_once __DIR__ . '/../Models/Cart.php';
-require_once __DIR__ . '/../Controllers/CartController.php';
-
-// 👇 НОВЫЕ: Контроллер авторизации
-require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../Controllers/AuthController.php';
-
-// 👇 НОВЫЕ: Контроллер админки
-require_once __DIR__ . '/../Controllers/AdminController.php';
-
-// 👇 НОВЫЕ: Контроллер профиля
-require_once __DIR__ . '/../Controllers/ProfileController.php';
-
-// 👇 Логирование ошибок
-require_once __DIR__ . '/../Models/Logger.php';
-
 use App\Controllers\HomeController;
 use App\Controllers\AboutController;
 use App\Controllers\ProductController;

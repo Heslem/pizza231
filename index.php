@@ -1,35 +1,13 @@
 <?php
-// 👇 Подключаем автозагрузку или вручную нужные файлы
-require_once __DIR__ . '/src/Router/Router.php';
-
-// Контроллеры
-require_once __DIR__ . '/src/Controllers/HomeController.php';
-require_once __DIR__ . '/src/Controllers/AboutController.php';
-require_once __DIR__ . '/src/Controllers/ProductController.php';
-require_once __DIR__ . '/src/Controllers/CatalogController.php';
-require_once __DIR__ . '/src/Controllers/CartController.php'; // 👈 Новый
-
-// Модели
-require_once __DIR__ . '/src/Models/Cart.php'; // 👈 Новая модель
-require_once __DIR__ . '/src/Models/Logger.php'; // 👈 Логирование ошибок
-
-// === Инициализация PDO (перед использованием моделей) ===
-require_once __DIR__ . '/src/Config/Config.php';
-require_once __DIR__ . '/src/Database/Database.php';
+// Подключаем Composer-автолоад (PSR-4: App\ -> src/)
+require_once __DIR__ . '/vendor/autoload.php';
 
 use App\Config\Config;
-
-// Инициализируем подключение к БД (безопасно - если БД недоступна, будет fallback на JSON)
-Config::initDatabase();
-
-// Шаблоны
-require_once __DIR__ . '/src/Views/BaseTemplate.php';
-require_once __DIR__ . '/src/Views/HomeTemplate.php';
-require_once __DIR__ . '/src/Views/AboutTemplate.php';
-require_once __DIR__ . '/src/Views/CartTemplate.php'; // 👈 Новый шаблон
-
 use App\Router\Router;
 use App\Models\Logger;
+
+// Инициализируем PDO (если БД недоступна, модели будут работать через JSON-fallback)
+Config::initDatabase();
 
 // Регистрация обработчиков ошибок и исключений
 set_error_handler(function(int $errno, string $errstr, string $errfile, int $errline) {
